@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Delius&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>V1t</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            border: 3px solid black;
+        }
+
+        .small_container {
+            padding: 10px;
+            flex: 1;
+        }
+
+        .small_container:not(:last-child) {
+            border-right: 2px solid black;
+        }
+
+        h1 {
+            font-family: 'Delius', cursive;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        a {
+            text-decoration: none;
+            color: black;
+        }
+
+        hr {
+            border: 1px solid black;
+        }
+
+        img {
+            display: block;
+            max-width: 100px;
+            height: auto;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>V1t</h1>
+    <img src="vit.png" alt="">
+    <div class="container">
+        <div class="small_container">
+            <h2>Member</h2>
+            <hr>
+            <a href="https://ctftime.org/user/172832">Jaze</a><br>
+            <a href="https://ctftime.org/user/183484">Rawr</a><br>
+        </div>
+        <div class="small_container">
+            <h2>Participated in CTF events</h2>
+        </div>
+        <div class="small_container">
+            <h2>Social links</h2>
+            <hr>
+            <a href="https://discord.gg/RRBeuZ63Mk"><i class="fa-brands fa-discord"></i> Discord</a>
+        </div>
+    </div>
+</body>
+
+</html>
