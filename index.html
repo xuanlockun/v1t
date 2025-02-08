@@ -53,10 +53,51 @@
             height: auto;
             margin: 0 auto;
         }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex; 
+            justify-content: flex-end;
+        }
+        nav .logo {
+            padding-left: 20px;
+            display: flex;
+            align-items: center;
+        }
+        nav ul li {
+            padding: 15px 50px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav ul li:hover {
+            background: #dfe0de;
+        }
     </style>
 </head>
 
 <body>
+    <nav>
+        <div class="logo">
+            <i class="fa-solid fa-square" style="max-width: 100px; margin-right: 10px;"></i>            
+            <a href="#" style="font-weight: bold;"> V1t</a>
+        </div>
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">v1t</a></li>
+            <li><a href="#">v1t</a></li>
+            <li><a href="#">v1t</a></li>
+        </ul>
+    </nav>
     <h1>V1t</h1>
     <img src="vit.png" alt="">
     <div class="container">
