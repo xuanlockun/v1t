@@ -24,6 +24,10 @@
             flex: 1;
         }
 
+        /* .small_container:first-child {
+            flex: 0 0 30%;
+        } */
+
         .small_container:not(:last-child) {
             border-right: 2px solid black;
         }
@@ -38,11 +42,6 @@
             margin-bottom: 10px;
         }
 
-        a {
-            text-decoration: none;
-            color: black;
-        }
-
         hr {
             border: 1px solid black;
         }
@@ -53,23 +52,27 @@
             height: auto;
             margin: 0 auto;
         }
+
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+
         nav ul {
             list-style: none;
             padding: 0;
             margin: 0;
-            display: flex; 
+            display: flex;
             justify-content: flex-end;
         }
+
         nav .logo {
             padding-left: 20px;
             display: flex;
             align-items: center;
         }
+
         nav ul li {
             padding: 15px 50px;
         }
@@ -82,13 +85,31 @@
         nav ul li:hover {
             background: #dfe0de;
         }
+
+        a {
+            text-decoration: none;
+            color: black;
+            background: linear-gradient(0deg, black, black) no-repeat right bottom / 0 var(--bg-h);
+            transition: background-size 350ms, color 350ms;
+            --bg-h: 100%;
+        }
+
+        a:where(:hover, :focus-visible) {
+            background-size: 100% var(--bg-h);
+            background-position-x: left;
+            color: white;
+        }
+
+        a:hover {
+            color: white;
+        }
     </style>
 </head>
 
 <body>
     <nav>
         <div class="logo">
-            <i class="fa-solid fa-square" style="max-width: 100px; margin-right: 10px;"></i>            
+            <i class="fa-solid fa-square" style="max-width: 100px; margin-right: 10px;"></i>
             <a href="#" style="font-weight: bold;"> V1t</a>
         </div>
         <ul>
@@ -109,13 +130,31 @@
         </div>
         <div class="small_container">
             <h2>Participated in CTF events</h2>
+            <hr>
+            <table border="1" style="width: 100%; border-collapse: collapse; text-align: center;">
+                <thead>
+                    <th>Place</th>
+                    <th>Event</th>
+                    <th>CTF Points</th>
+                    <th>Rating points</th>
+                </thead>
+                <tbody>
+                    <td>...</td>
+                    <td><a href="https://ctftime.org/event/2592">LA CTF 2025</a></td>
+                    <td>...</td>
+                    <td>...</td>
+                </tbody>
+            </table>
         </div>
         <div class="small_container">
             <h2>Social links</h2>
             <hr>
-            <a href="https://ctftime.org/team/371186"><i style="display: inline-block; width: 20px; height: 20px; background-image: url('img/ctftime.png'); background-size: cover;"></i> CTFtime</a>
+            <a href="https://ctftime.org/team/371186"><i
+                    style="display: inline-block; width: 20px; height: 20px; background-image: url('img/ctftime.png'); background-size: cover;"></i>
+                CTFtime</a>
             <br>
-            <a href="https://discord.gg/kNmdMGQjNu" style="margin-bottom: 10px;"><i class="fa-brands fa-discord"></i> Discord</a>
+            <a href="https://discord.gg/kNmdMGQjNu" style="margin-bottom: 10px;"><i class="fa-brands fa-discord"></i>
+                Discord</a>
         </div>
     </div>
 </body>
