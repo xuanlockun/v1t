@@ -6,20 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="index, follow">
     <meta name="google-site-verification" content="ww5n8KjMFjdzkt2m2-WeeYDXTu_dA7lHi86mrR-GD4U" />
-    
+
     <!-- Idk what is these ;-; -->
     <meta property="og:title" content="V1t" />
-    <meta property="og:description" content="V1t CTF Team - Official Website. A community of cybersecurity enthusiasts participating in CTF competitions and sharing knowledge about security and technology.">
+    <meta property="og:description"
+        content="V1t CTF Team - Official Website. A community of cybersecurity enthusiasts participating in CTF competitions and sharing knowledge about security and technology.">
     <meta property="og:url" content="https://xuanlockun.github.io/v1t" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://xuanlockun.github.io/v1t/img/vit.png">
     <meta property="og:site_name" content="V1t CTF Team">
-    
+
     <!-- SEO -->
     <title>V1t</title>
     <meta name="author" content="V1t">
-    <meta name="description" content="V1t CTF Team - Official Website. A community of cybersecurity enthusiasts participating in CTF competitions and sharing knowledge about security and technology.">
-    
+    <meta name="description"
+        content="V1t CTF Team - Official Website. A community of cybersecurity enthusiasts participating in CTF competitions and sharing knowledge about security and technology.">
+
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Delius&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -123,11 +125,10 @@
         .small_container:first-child {
             flex: 0 0 25%;
         } */
-        
+
         td:not(.event) {
             text-align: center;
         }
-
     </style>
 </head>
 
@@ -152,16 +153,18 @@
             <hr>
             <a href="https://ctftime.org/user/172832">Jaze</a><br>
             <a href="https://ctftime.org/user/183484">Rawr</a><br>
+            <a href="https://ctftime.org/user/206379">Maro</a><br>
         </div>
         <div class="small_container">
             <h2>Participated in CTF events</h2>
             <hr>
-            <a href="https://ctftime.org/stats/VN" style="display: inline-flex;"><i class="fa-solid fa-crown" style="padding-right: 5px;"></i>
-                Country place: 20  
+            <a href="https://ctftime.org/stats/VN" style="display: inline-flex;"><i class="fa-solid fa-crown"
+                    style="padding-right: 5px;"></i>
+                Country place: 20
                 <img src="img/vn.svg" style="padding-left: 5px;" width="17.6">
             </a>
             <hr>
-            <table border="1" style="width: 100%; border-collapse: collapse;">
+            <table border="1" style="width: 100%; border-collapse: collapse;" id="dataTable">
                 <thead>
                     <th>Place</th>
                     <th>Event</th>
@@ -172,7 +175,7 @@
                     <tr>
                         <td>82</td>
                         <td class="event"><a href="https://ctftime.org/event/2657"><i class="fa-solid fa-flag"></i>
-                            BroncoCTF 2025</a></td>
+                                BroncoCTF 2025</a></td>
                         <td>3341.0000</td>
                         <td>6.874</td>
                     </tr>
@@ -209,7 +212,51 @@
     <footer>
         <h1>© Capture the flag since 2025</h1>
     </footer> -->
+    <!-- <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('data.txt')
+                .then(response => response.text())
+                .then(data => {
+                    const rows = data.trim().split("\n"); // Cắt thành từng dòng
+                    const tbody = document.querySelector("#dataTable tbody");
+                    if (!tbody) {
+                        console.error("Không tìm thấy tbody trong table!");
+                        return;
+                    }
+                    rows.forEach(row => {
+                        const cols = row.split(","); // Chia cột dựa vào dấu ,
+                        const tr = document.createElement("tr");
 
+                        // Cột 1: ID
+                        let td = document.createElement("td");
+                        td.textContent = cols[0].trim();
+                        tr.appendChild(td);
+
+                        // Cột 2: Event (link)
+                        td = document.createElement("td");
+                        td.classList.add("event");
+                        let a = document.createElement("a");
+                        a.href = cols[1].trim();
+                        a.innerHTML = `<i class="fa-solid fa-flag"></i> ${cols[2].trim()}`;
+                        td.appendChild(a);
+                        tr.appendChild(td);
+
+                        // Cột 3: Điểm
+                        td = document.createElement("td");
+                        td.textContent = cols[3].trim();
+                        tr.appendChild(td);
+
+                        // Cột 4: Hệ số điểm
+                        td = document.createElement("td");
+                        td.textContent = cols[4].trim();
+                        tr.appendChild(td);
+
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(error => console.error("Lỗi tải dữ liệu:", error));
+        });
+    </script> -->
 </body>
 
 </html>
