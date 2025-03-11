@@ -208,6 +208,45 @@
         <h1>© Capture the flag since 2025</h1>
     </footer> -->
     <script>
+        async function fetchGoogleSheetData() {
+            const url = "https://opensheet.elk.sh/1OJ1gs4Md9wFiaMFOED06MUG1KgxuZkmzzhRvYENMCkQ/Sheet1";
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                const tableBody = document.querySelector("#dataTable tbody");
+                tableBody.innerHTML = "";
+    
+                let totalRating = 0;
+                data.forEach(event => {
+                    totalRating += parseFloat(event["Rating Points"]);
+    
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${event.Place}</td>
+                        <td class="event"><a href="${event.Link}" target="_blank"><i class="fa-solid fa-flag"></i> ${event.Event}</a></td>
+                        <td>${parseFloat(event["CTF Points"]).toFixed(4)}</td>
+                        <td>${parseFloat(event["Rating Points"]).toFixed(3)}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+    
+                const totalRow = document.createElement("tr");
+                totalRow.innerHTML = `
+                    <td colspan="3" style="font-weight: bold;">Total Rating Points:</td>
+                    <td style="font-weight: bold;">${totalRating.toFixed(3)}</td>
+                `;
+                tableBody.appendChild(totalRow);
+    
+            } catch (error) {
+                console.error("Lỗi khi tải dữ liệu từ Google Sheets:", error);
+            }
+        }
+    
+        document.addEventListener("DOMContentLoaded", fetchGoogleSheetData);
+    </script>
+        
+    <!-- <script>
         const eventData = [
             { place: 132, event: "Pearl CTF", link: "https://ctftime.org/event/2592", points: 800.0000, rating: 3.261 },
             { place: 16, event: "VishwaCTF 2025", link: "https://ctftime.org/event/XXXXX", points: 5100.0000, rating: 19.986 },
@@ -249,7 +288,7 @@
         }
 
         document.addEventListener("DOMContentLoaded", loadTableData);
-    </script>
+    </script> -->
 </body>
 
 </html>
