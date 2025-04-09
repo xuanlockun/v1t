@@ -1,11 +1,11 @@
-const imageSources = [
-    'img/vit.png',
-    'img/v1t.png',
-    'img/V1t_fin.png'
-  ];
+// const imageSources = [
+//     'img/vit.png',
+//     'img/v1t.png',
+//     'img/V1t_fin.png'
+//   ];
 
-  const randomIndex = Math.floor(Math.random() * imageSources.length);
-  document.querySelector('img.logo').src = imageSources[randomIndex];
+//   const randomIndex = Math.floor(Math.random() * imageSources.length);
+//   document.querySelector('img.logo').src = imageSources[randomIndex];
 async function fetchGoogleSheetData() {
     const ctfUrl = "https://opensheet.elk.sh/1OJ1gs4Md9wFiaMFOED06MUG1KgxuZkmzzhRvYENMCkQ/CTF_2025";
     const rankUrl = "https://opensheet.elk.sh/1OJ1gs4Md9wFiaMFOED06MUG1KgxuZkmzzhRvYENMCkQ/Rank";
