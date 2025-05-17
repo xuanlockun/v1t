@@ -7,7 +7,7 @@
 
   socket.onopen = () => {
     // Gửi lệnh lấy flag
-    socket.send(JSON.stringify({ message: '/getFlag' }));
+    socket.send(JSON.stringify({ message: '/getFlag', sender: 'admin' }));
   };
 
   socket.onmessage = (event) => {
