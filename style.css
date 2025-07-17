@@ -101,3 +101,52 @@ a:hover {
 td:not(.event) {
     text-align: center;
 }
+
+/* Dark mode styles */
+body.dark-mode {
+    background-color: #121212;
+    color: #f1f1f1;
+}
+
+body.dark-mode nav {
+    background-color: #1e1e1e;
+}
+
+body.dark-mode a {
+    color: #f1f1f1;
+}
+
+body.dark-mode a:where(:hover, :focus-visible) {
+    background-size: 100% var(--bg-h);
+    background-position-x: left;
+    color: #fff;
+}
+
+body.dark-mode .container {
+    border: 3px solid #f1f1f1;
+}
+
+body.dark-mode .small_container:not(:last-child) {
+    border-right: 2px solid #f1f1f1;
+}
+
+body.dark-mode hr {
+    border-color: #f1f1f1;
+}
+
+body.dark-mode table, 
+body.dark-mode th, 
+body.dark-mode td {
+    border: 1px solid #f1f1f1;
+}
+
+body.dark-mode a {
+    color: #f1f1f1;
+    background: linear-gradient(0deg, #f1f1f1, #f1f1f1) no-repeat right bottom / 0 var(--bg-h);
+}
+
+body.dark-mode a:where(:hover, :focus-visible) {
+    background-size: 100% var(--bg-h);
+    background-position-x: left;
+    color: #121212; 
+}

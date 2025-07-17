@@ -6,6 +6,34 @@
 
 //   const randomIndex = Math.floor(Math.random() * imageSources.length);
 //   document.querySelector('img.logo').src = imageSources[randomIndex];
+
+document.addEventListener("DOMContentLoaded", () => {
+    const toggleLink = document.getElementById("darkModeToggle");
+    const body = document.body;
+
+    // Check saved preference
+    if (localStorage.getItem("darkMode") === "enabled") {
+        body.classList.add("dark-mode");
+        toggleLink.innerHTML = '<i class="fa-solid fa-sun"></i> Light Mode';
+    }
+
+    toggleLink.addEventListener("click", (e) => {
+        e.preventDefault(); // prevent page reload
+
+        body.classList.toggle("dark-mode");
+
+        if (body.classList.contains("dark-mode")) {
+            localStorage.setItem("darkMode", "enabled");
+            toggleLink.innerHTML = '<i class="fa-solid fa-sun"></i> Light Mode';
+        } else {
+            localStorage.setItem("darkMode", "disabled");
+            toggleLink.innerHTML = '<i class="fa-solid fa-moon"></i> Dark Mode';
+        }
+    });
+});
+
+
+
 async function fetchGoogleSheetData() {
     const ctfUrl = "https://opensheet.elk.sh/1OJ1gs4Md9wFiaMFOED06MUG1KgxuZkmzzhRvYENMCkQ/CTF_2025";
     const rankUrl = "https://opensheet.elk.sh/1OJ1gs4Md9wFiaMFOED06MUG1KgxuZkmzzhRvYENMCkQ/Rank";
