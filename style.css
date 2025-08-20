@@ -4,19 +4,26 @@ body {
     padding: 0;
 }
 
+/* ===== Container responsive ===== */
 .container {
     display: flex;
+    flex-wrap: wrap; /* cho phép xuống dòng khi màn hình nhỏ */
     border: 3px solid black;
+    margin: 0 10px;
 }
 
 .small_container {
     padding: 10px;
-    flex: 1;
-}
-
-.small_container:not(:last-child) {
+    flex: 1 1 300px; /* flex-grow:1, flex-shrink:1, flex-basis:300px */
+    box-sizing: border-box;
+    margin-bottom: 10px;
     border-right: 2px solid black;
 }
+
+.small_container:last-child {
+    border-right: none;
+}
+
 
 h1 {
     font-family: 'Delius', cursive;
@@ -149,4 +156,91 @@ body.dark-mode a:where(:hover, :focus-visible) {
     background-size: 100% var(--bg-h);
     background-position-x: left;
     color: #121212; 
+}
+
+/* ===== Mobile responsiveness ===== */
+.hamburger {
+    display: none;
+}
+/* Mobile menu animation */
+@media screen and (max-width: 768px) {
+    nav {
+        position: relative;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        background-color: #fff; /* nền nav */
+    }
+
+    nav ul {
+        position: absolute;
+        top: 60px; /* dưới nav */
+        right: 0;
+        width: 200px;
+        flex-direction: column;
+        background-color: #f8f8f8;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.3s ease, opacity 0.3s ease;
+        opacity: 0;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+    }
+
+    nav.active ul {
+        max-height: 500px; /* đủ chứa tất cả li */
+        opacity: 1;
+    }
+
+    nav ul li {
+        padding: 12px 20px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    nav ul li:last-child {
+        border-bottom: none;
+    }
+
+    .hamburger {
+        display: block;
+        font-size: 24px;
+        cursor: pointer;
+    }
+}
+
+/* Mobile menu dark mode */
+@media screen and (max-width: 768px) {
+    body.dark-mode nav {
+        background-color: #1e1e1e; /* nền nav tối */
+    }
+
+    body.dark-mode nav ul {
+        background-color: #2a2a2a; /* nền menu tối */
+        border: 1px solid #444;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+
+    body.dark-mode nav ul li {
+        border-bottom: 1px solid #444;
+    }
+
+    body.dark-mode nav ul li:last-child {
+        border-bottom: none;
+    }
+
+    body.dark-mode nav ul li a {
+        color: #f1f1f1;
+    }
+
+    body.dark-mode nav ul li a:hover {
+        color: #121212;
+        background: linear-gradient(0deg, #f1f1f1, #f1f1f1) no-repeat right bottom / 100% 100%;
+    }
+
+    body.dark-mode .hamburger {
+        color: #f1f1f1; /* icon hamburger sáng */
+    }
 }

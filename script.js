@@ -6,6 +6,13 @@
 
 //   const randomIndex = Math.floor(Math.random() * imageSources.length);
 //   document.querySelector('img.logo').src = imageSources[randomIndex];
+// Hamburger toggle
+const hamburger = document.getElementById('hamburger');
+const nav = document.querySelector('nav');
+
+hamburger.addEventListener('click', () => {
+    nav.classList.toggle('active');
+});
 
 document.addEventListener("DOMContentLoaded", () => {
     const toggleLink = document.getElementById("darkModeToggle");
