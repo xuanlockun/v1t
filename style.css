@@ -318,7 +318,7 @@ body.dark-mode a:where(:hover, :focus-visible) {
     -webkit-background-clip: text;
 
     /* Hiệu ứng chạy chữ */
-    animation: rainbow-text 8s linear infinite;
+    animation: rainbow-text 1s linear infinite;
 }
 
 @keyframes rainbow-text {
