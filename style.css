@@ -291,6 +291,42 @@ body.dark-mode a:where(:hover, :focus-visible) {
     line-height: 1.2;
 }
 
+
+.profile-card .quote01 {
+    font-size: 0.7rem;
+    font-weight: bold;
+    line-height: 1.2;
+    text-align: center;
+
+    /* Rainbow gradient */
+    background-image: linear-gradient(
+        90deg,
+        red,
+        orange,
+        yellow,
+        green,
+        cyan,
+        blue,
+        violet,
+        red
+    );
+    background-size: 400% auto;
+
+    /* Clip gradient vào text */
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+
+    /* Hiệu ứng chạy chữ */
+    animation: rainbow-text 8s linear infinite;
+}
+
+@keyframes rainbow-text {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+
+
 /* Dark mode */
 body.dark-mode .profile-card {
     background-color: #000;
