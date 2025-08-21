@@ -280,14 +280,6 @@ body.dark-mode a:where(:hover, :focus-visible) {
     border: 2px solid #000; /* viền pixel cho ảnh */
 }
 
-.profile-card img01 {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    margin-bottom: 10px;
-    border: 2px solid #000; /* viền pixel cho ảnh */
-}
-
 .profile-card:hover img01 {
     animation: spin 1s linear infinite;
 }
