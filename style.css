@@ -244,3 +244,79 @@ body.dark-mode a:where(:hover, :focus-visible) {
         color: #f1f1f1; /* icon hamburger sáng */
     }
 }
+
+/* Pixel-art font */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+.profile-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.profile-card {
+    background-color: #fff;
+    border: 3px solid #000; /* viền đen dày kiểu pixel */
+    width: 200px;
+    height: 250px;
+    text-align: center;
+    padding: 10px;
+    font-family: 'Press Start 2P', cursive; /* font pixel */
+    box-sizing: border-box;
+    transition: transform 0.2s;
+}
+
+.profile-card:hover {
+    transform: scale(1.05); /* hover nhẹ */
+}
+
+.profile-card img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    margin-bottom: 10px;
+    border: 2px solid #000; /* viền pixel cho ảnh */
+}
+
+.profile-card h3 {
+    margin: 5px 0;
+    font-size: 0.8rem;
+}
+
+.profile-card .quote {
+    font-size: 0.7rem;
+    color: #000;
+    line-height: 1.2;
+}
+
+/* Dark mode */
+body.dark-mode .profile-card {
+    background-color: #000;
+    border: 3px solid #fff;
+    color: #fff;
+}
+
+body.dark-mode .profile-card .quote {
+    color: #fff;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+    .profile-card {
+        width: 80%;
+        height: auto; /* tự động tăng chiều cao theo nội dung */
+    }
+}
+
+.profile-card h4 {
+    font-family: 'Press Start 2P', cursive; /* pixel font */
+    font-size: 0.6rem; /* nhỏ hơn h3 */
+    margin: 2px 0 5px 0; /* khoảng cách hợp lý */
+    color: #000; /* hoặc đổi theo darkmode */
+}
+
+body.dark-mode .profile-card h4 {
+    color: #fff;
+}

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="index, follow">
     <meta name="google-site-verification" content="ww5n8KjMFjdzkt2m2-WeeYDXTu_dA7lHi86mrR-GD4U" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
 
     <!-- Idk what is these ;-; -->
     <meta property="og:title" content="V1t" />
@@ -26,53 +27,112 @@
     <link href="https://fonts.googleapis.com/css2?family=Delius&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <style>
-        .eventDiv {
-            text-align: center;
-        }
-    </style>
 </head>
+
 <body>
     <nav>
         <div class="logo">
             <i class="fa-solid fa-square" style="max-width: 100px; margin-right: 10px;"></i>
             <a href="#" style="font-weight: bold;"> V1t</a>
         </div>
-        <ul>
+        <div class="hamburger" id="hamburger">
+            <i class="fa-solid fa-bars"></i>
+        </div>
+        <ul id="nav-links">
             <li><a href="index.html"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li><a href="https://ctf.v1t.site/"><i class="fa-solid fa-flag"></i> CTF</a></li>
             <li><a href="blog.html"><i class="fa-solid fa-mug-hot"></i> Blog</a></li>
-            <li><a href="events.html"><i class="fa-solid fa-calendar-days"></i> Events</a></li>
-            <li><a href="#">Food</a></li>
+            <li><a href="events.html"><i class="fa-solid fa-calendar-days"></i> Lab</a></li>
+            <li><a href="#" id="darkModeToggle"><i class="fa-solid fa-moon"></i> Dark Mode</a></li>
         </ul>
     </nav>
-    <h1>Upcoming CTF Events</h1>
-    <div id="events"></div>
-    <hr>
-    <h1>Coming soon</h1>
-    <script>
-        async function fetchEvents() {
-            const response = await fetch('https://opensheet.elk.sh/1OJ1gs4Md9wFiaMFOED06MUG1KgxuZkmzzhRvYENMCkQ/Event');
-            const events = await response.json();
-            const eventsContainer = document.getElementById('events');
-            
-            events.forEach(event => {
-                const eventDiv = document.createElement('div');
-                eventDiv.classList.add('event');
-                
-                eventDiv.innerHTML = `
-                <hr>
-                    <div class="eventDiv">
-                        <img src="${event.Image}" alt="${event.Name}" width=60px height=60px>
-                        <h3>${event.Name}</h3>
-                        <p>Weight: ${event.Weight}</p>
-                        ${event.Link ? `<a href="${event.Link}" target="_blank"><i class="fa-solid fa-right-to-bracket"></i> Enter Event</a>` : '<p>No link available</p>'}
-                    </div>
-                `;
-                eventsContainer.appendChild(eventDiv);
-            });
-        }
 
-        fetchEvents();
-    </script>
+    <h1>V1t</h1>
+    <img class="logo" src="img/v1t.png" alt="">
+
+    <h1>Members</h1>
+    <div style="text-align: center;">
+        <div class="profile-container">
+            <div class="profile-card">
+                <img src="img/V1t_fin.png" alt="Jaze">
+                <h3>Jaze</h3>
+                <h4>Forensic</h4>
+                <p class="quote">"Quack quack !"</p>
+            </div>
+
+            <div class="profile-card">
+                <img src="img/nerd.png" alt="Rawr">
+                <h3>Rawr</h3>
+                <h4>Duck</h4>
+                <p class="quote">"Quack quack !"</p>
+            </div>
+
+            <div class="profile-card">
+                <img src="img/maro.png" alt="Temp">
+                <h3>Maro</h3>
+                <h4>Crypto</h4>
+                <p class="quote">"❤️‍🔥كالقابض علي الجمر"</p>
+            </div>
+            <div class="profile-card">
+                <img src="img/bachkhi.png" alt="LongPham+">
+                <h3>LongPham+</h3>
+                <h4>Web</h4>
+                <p class="quote">"Quack quack !"</p>
+            </div>
+            <div class="profile-card">
+                <img src="img/hacker.png" alt="Basim Mehdi">
+                <h3>Basim Mehdi</h3>
+                <h4>Pwn</h4>
+                <p class="quote">"Quack quack !"</p>
+            </div>
+            <div class="profile-card">
+                <img src="img/vit.png" alt="vjz3r">
+                <h3>vjz3r</h3>
+                <h4>Osint</h4>
+                <p class="quote">"Quack quack !"</p>
+            </div>
+            <div class="profile-card">
+                <img src="img/vit.png" alt="n4n4s1">
+                <h3>n4n4s1</h3>
+                <h4>Rev</h4>
+                <p class="quote">"Quack quack !"</p>
+            </div>
+            <div class="profile-card">
+                <img src="img/vit.png" alt="Arasu">
+                <h3>Arasu</h3>
+                <h4>Web</h4>
+                <p class="quote">"Quack quack !"</p>
+            </div>
+            <div class="profile-card">
+                <img src="img/spy.png" alt="Safear">
+                <h3>Safear</h3>
+                <h4>Rev</h4>
+                <p class="quote">"Quack quack !"</p>
+            </div>
+            <div class="profile-card">
+                <img src="img/vit.png" alt="deroise2306">
+                <h3>deroise2306</h3>
+                <h4>Crypto</h4>
+                <p class="quote">"Quack quack !"</p>
+            </div>
+            <div class="profile-card">
+                <img src="img/vit.png" alt="akurakute">
+                <h3>akurakute</h3>
+                <h4>Misc</h4>
+                <p class="quote">"Quack quack !"</p>
+            </div>
+        </div>
+
+    </div>
+    <!-- <div style="text-align: center;">
+        <h2>Join us</h2>
+    </div> -->
+    <!-- <hr>
+    <footer>
+        <h1>© Capture the flag since 2025</h1>
+    </footer> -->
+    <script src="script.js"></script>
+
 </body>
+
 </html>
