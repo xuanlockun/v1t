@@ -365,3 +365,63 @@ body.dark-mode .profile-card .quote {
 body.dark-mode .profile-card h4 {
     color: #fff;
 }
+
+.blog-container {
+  place-items: center; /* canh giữa cả ngang & dọc */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+
+.blog-card {
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 10px;
+  min-width: 1000px;
+  overflow: hidden;
+  margin-bottom: 50px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.blog-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.blog-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-bottom: 2px solid #000;
+}
+
+.blog-content {
+  padding: 15px;
+}
+
+.blog-content h2 {
+  margin: 0 0 10px;
+  font-family: 'Delius', cursive;
+}
+
+.blog-meta {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Dark mode blog card */
+body.dark-mode .blog-card {
+  background: #1e1e1e;
+  border: 2px solid #f1f1f1;
+}
+
+body.dark-mode .blog-card img {
+  border-bottom: 2px solid #f1f1f1;
+}
+
+body.dark-mode .blog-meta {
+  color: #aaa;
+}
