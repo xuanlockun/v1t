@@ -429,3 +429,12 @@ body.dark-mode .blog-card img {
 body.dark-mode .blog-meta {
   color: #aaa;
 }
+
+#small_container .terminal {
+    border: 3px solid #000; /* viền đen */
+}
+
+/* Dark mode */
+.dark-mode #small_container .terminal {
+    border: 3px solid #fff; /* viền trắng */
+}
