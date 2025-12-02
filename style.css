@@ -7,14 +7,14 @@ body {
 /* ===== Container responsive ===== */
 .container {
     display: flex;
-    flex-wrap: wrap; /* cho phép xuống dòng khi màn hình nhỏ */
+    flex-wrap: wrap;
     border: 3px solid black;
     margin: 0 10px;
 }
 
 .small_container {
     padding: 10px;
-    flex: 1 1 300px; /* flex-grow:1, flex-shrink:1, flex-basis:300px */
+    flex: 1 1 300px;
     box-sizing: border-box;
     margin-bottom: 10px;
     border-right: 2px solid black;
@@ -241,7 +241,7 @@ body.dark-mode a:where(:hover, :focus-visible) {
     }
 
     body.dark-mode .hamburger {
-        color: #f1f1f1; /* icon hamburger sáng */
+        color: #f1f1f1; 
     }
 }
 
@@ -258,18 +258,18 @@ body.dark-mode a:where(:hover, :focus-visible) {
 
 .profile-card {
     background-color: #fff;
-    border: 3px solid #000; /* viền đen dày kiểu pixel */
+    border: 3px solid #000; 
     width: 200px;
     height: 250px;
     text-align: center;
     padding: 10px;
-    font-family: 'Press Start 2P', cursive; /* font pixel */
+    font-family: 'Press Start 2P', cursive;
     box-sizing: border-box;
     transition: transform 0.2s;
 }
 
 .profile-card:hover {
-    transform: scale(1.05); /* hover nhẹ */
+    transform: scale(1.05); 
 }
 
 .profile-card img {
@@ -277,7 +277,7 @@ body.dark-mode a:where(:hover, :focus-visible) {
     height: 100px;
     object-fit: cover;
     margin-bottom: 10px;
-    border: 2px solid #000; /* viền pixel cho ảnh */
+    border: 2px solid #000; 
 }
 
 .profile-card:hover img {
@@ -331,7 +331,6 @@ body.dark-mode a:where(:hover, :focus-visible) {
     background-clip: text;
     -webkit-background-clip: text;
 
-    /* Hiệu ứng chạy chữ */
     animation: rainbow-text 1s linear infinite;
 }
 
