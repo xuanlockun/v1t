@@ -24,7 +24,6 @@ body {
     border-right: none;
 }
 
-
 h1 {
     font-family: 'Delius', cursive;
     text-align: center;
@@ -96,14 +95,6 @@ a:hover {
 .event {
     padding-left: 10px;
 }
-
-/* .small_container:last-child {
-    flex: 0 0 25%;
-}
-
-.small_container:first-child {
-    flex: 0 0 25%;
-} */
 
 td:not(.event) {
     text-align: center;
@@ -305,7 +296,6 @@ body.dark-mode a:where(:hover, :focus-visible) {
     line-height: 1.2;
 }
 
-
 .profile-card .quote01 {
     font-size: 0.7rem;
     font-weight: bold;
@@ -338,7 +328,6 @@ body.dark-mode a:where(:hover, :focus-visible) {
     0% { background-position: 0% 50%; }
     100% { background-position: 100% 50%; }
 }
-
 
 /* Dark mode */
 body.dark-mode .profile-card {
@@ -376,7 +365,6 @@ body.dark-mode .profile-card h4 {
   gap: 20px;
   padding: 20px;
 }
-
 
 .blog-card {
   background: #fff;
