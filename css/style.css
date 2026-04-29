@@ -23,7 +23,9 @@ body {
     padding: 0;
     overflow-x: hidden;
     /* Thêm chấm bi mờ mờ cho đúng vibe */
-    background-image: radial-gradient(var(--accent-yellow) 15%, transparent 16%), radial-gradient(var(--accent-yellow) 15%, transparent 16%);
+
+    background-image: radial-gradient(rgba(255, 202, 40, 0.15) 15%, transparent 16%), 
+                      radial-gradient(rgba(255, 202, 40, 0.15) 15%, transparent 16%);
     background-size: 40px 40px;
     background-position: 0 0, 20px 20px;
 }
@@ -341,6 +343,61 @@ body.dark-mode .bg-overlay { opacity: 0.1; }
 body.dark-mode .small_container a, body.dark-mode .arcade-table td { background: #2a2a2a; color: #fff; }
 body.dark-mode .profile-card img { background: #121212; }
 
+/* ========================================================
+   🦆 DARK MODE CHO BẢNG XẾP HẠNG (#dataTable)
+   ======================================================== */
+
+/* 1. Tiêu đề bảng: Chữ vàng, đổ bóng đen xịn xò */
+body.dark-mode #dataTable th {
+    color: var(--accent-yellow);
+    text-shadow: 2px 2px 0px #000;
+    border-bottom: 2px dashed var(--accent-orange);
+}
+
+/* 2. Các ô dữ liệu: Nền xám đen, chữ trắng, viền xám sáng */
+body.dark-mode #dataTable td {
+    background-color: #1e1e1e;
+    color: #f1f1f1;
+    border: 2px solid #444; /* Viền xám mờ để tách ô */
+    border-style: solid none;
+}
+
+/* 3. Chốt viền 2 bên bằng màu Vàng cho giữ form thẻ bài */
+body.dark-mode #dataTable td:first-child {
+    border-left: 2px solid var(--accent-yellow);
+}
+body.dark-mode #dataTable td:last-child {
+    border-right: 2px solid var(--accent-yellow);
+}
+
+/* 4. Hiệu ứng Hover nảy tưng bừng trong đêm */
+body.dark-mode #dataTable tbody tr:hover td {
+    background-color: #333;
+    color: var(--accent-yellow);
+    border-color: var(--accent-orange); /* Sáng viền khi hover */
+}
+
+/* 5. DÒNG TỔNG ĐIỂM (TOTAL RATING POINTS) TỎA SÁNG */
+/* Nhắm thẳng vào hàng cuối cùng của bảng */
+body.dark-mode #dataTable tbody tr:last-child td {
+    background-color: #2a2a2a; /* Nền sáng hơn một chút để tách biệt */
+    color: var(--accent-orange) !important; /* Chữ màu cam đậm */
+    font-family: 'Press Start 2P', monospace; /* Đổi font 8-bit cho ngầu */
+    font-size: 10px;
+    text-shadow: 1px 1px 0px #000;
+    border-top: 3px dashed var(--accent-yellow); /* Viền đứt nét ngăn cách ở trên */
+    border-bottom: 3px solid var(--accent-orange);
+}
+
+/* Bo lại góc dưới cho dòng Total để không bị nhọn */
+body.dark-mode #dataTable tbody tr:last-child td:first-child {
+    border-left: 3px solid var(--accent-orange);
+    border-radius: 0 0 0 12px;
+}
+body.dark-mode #dataTable tbody tr:last-child td:last-child {
+    border-right: 3px solid var(--accent-orange);
+    border-radius: 0 0 12px 0;
+}
 
 /* ===== MOBILE RESPONSIVENESS ===== */
 .hamburger { display: none; }

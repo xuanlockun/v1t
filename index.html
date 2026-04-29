@@ -7,35 +7,33 @@
     <meta name="robots" content="index, follow">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
 
-    <!-- Idk what is these ;-; -->
-    <meta property="og:title" content="V1t" />
+    <!-- Open Graph SEO -->
+    <meta property="og:title" content="V1T CTF TEAM" />
     <meta property="og:description"
         content="V1t CTF Team - Official Website. A community of cybersecurity enthusiasts participating in CTF competitions and sharing knowledge about security and technology.">
     <meta property="og:url" content="https://v1t.site" />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://v1t.site/img/v1t.png">
+    <meta property="og:image" content="https://v1t.site/img/V1t_fin.png">
     <meta property="og:site_name" content="V1t CTF Team">
 
-    <!-- SEO -->
-    <title>V1t</title>
+    <title>V1T CTF TEAM</title>
     <meta name="author" content="V1t">
-    <meta name="description"
-        content="V1t CTF Team - Official Website. A community of cybersecurity enthusiasts participating in CTF competitions and sharing knowledge about security and technology.">
+    <meta name="description" content="V1t CTF Team - Official Website.">
 
     <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Delius&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <!-- Link file CSS vừa tách ra -->
+
+    <!-- Link file CSS -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/ansi.css">
 </head>
 
 <body>
+    <!-- Navbar -->
     <nav>
         <div class="logo">
-            <i class="fa-solid fa-square" style="max-width: 100px; margin-right: 10px;"></i>
-            <a href="#" style="font-weight: bold;"> V1t</a>
+            <i class="fa-solid fa-square" style="margin-right: 10px; font-size: 18px;"></i>
+            <a href="#"> V1T TEAM</a>
         </div>
         <div class="hamburger" id="hamburger">
             <i class="fa-solid fa-bars"></i>
@@ -46,193 +44,249 @@
             <li><a href="#" id="darkModeToggle"><i class="fa-solid fa-moon"></i> Dark Mode</a></li>
         </ul>
     </nav>
-    <h1>V1t</h1>
-    <img class="logo" src="img/v1t.png" alt="">
+
+    <!-- Header Logo -->
+    <h1>V1T CTF TEAM</h1>
+    <img class="logo" src="img/V1t_fin.png" alt="V1T Logo"
+        onerror="this.src='https://v1t.site/files/85253f2392c01adcd69c3c281a9337b8/V1t.png'">
+
+    <!-- 3 Khối Thông Tin (Grid Layout) -->
     <div class="container">
+        <!-- Khối 1: Members -->
         <div class="small_container">
-            <h2>Member</h2>
-            <hr>
-            <a href="https://ctftime.org/user/172832">Jaze</a><br>
-            <a href="https://ctftime.org/user/183484">Rawr</a><br>
-            <a href="https://ctftime.org/user/206379">Maro</a><br>
-            <a href="https://ctftime.org/user/213437">LongPham+</a><br>
-            <a href="https://ctftime.org/user/218749">Basim Mehdi</a><br>
-            <a href="https://ctftime.org/user/141944">vjz3r</a><br>
-            <a href="https://ctftime.org/user/223280">n4n4s1</a><br>
-            <a href="#">Arasu</a><br>
-            <a href="https://ctftime.org/user/165731">emKhoi2k10</a><br>
-            <a href="https://ctftime.org/user/219785">deroise2306</a><br>
-            <a href="#">akurakute</a><br>
-            <a href="https://ctftime.org/user/219123">Shah_Ji</a><br>
-            <a href="https://ctftime.org/user/168272">Jayce</a><br>
-            <!-- <hr>
-            <p>Wanna join ?</p> -->
+            <h2>MEMBERS</h2>
+            <div style="text-align: center; line-height: 2;">
+                <a href="https://ctftime.org/user/172832" target="_blank">Jaze</a>
+                <a href="https://ctftime.org/user/183484" target="_blank">Rawr</a>
+                <a href="https://ctftime.org/user/206379" target="_blank">Maro</a>
+                <a href="https://ctftime.org/user/213437" target="_blank">LongPham+</a>
+                <a href="https://ctftime.org/user/218749" target="_blank">Basim Mehdi</a>
+                <a href="https://ctftime.org/user/141944" target="_blank">vjz3r</a>
+                <a href="https://ctftime.org/user/223280" target="_blank">n4n4s1</a>
+                <a href="#">Arasu</a>
+                <a href="https://ctftime.org/user/165731" target="_blank">emKhoi2k10</a>
+                <a href="https://ctftime.org/user/219785" target="_blank">deroise2306</a>
+                <a href="#">akurakute</a>
+                <a href="https://ctftime.org/user/219123" target="_blank">Shah_Ji</a>
+                <a href="https://ctftime.org/user/168272" target="_blank">Jayce</a>
+            </div>
         </div>
+
+        <!-- Khối 2: Stats -->
         <div class="small_container">
-            <h2>Participated in CTF events</h2>
-            <hr>
-            <a id="world-rank" href="https://ctftime.org/stats/" style="display: inline-flex;">
-                <i class="fa-solid fa-earth-americas" style="padding-right: 5px;"></i>
-                World rank: *
-            </a>
-            <br>
-            <a id="country-rank" href="https://ctftime.org/stats/VN" style="display: inline-flex;">
-                <i class="fa-solid fa-crown" style="padding-right: 5px;"></i>
-                Country place: *
-                <img src="img/vn.svg" style="padding-left: 5px;" width="17.6">
-            </a>
-            <hr>
-            <table border="1" style="width: 100%; border-collapse: collapse;" id="dataTable">
+            <h2>CTF STATS</h2>
+            <div style="text-align: center; margin-bottom: 15px;">
+                <a id="world-rank" href="https://ctftime.org/stats/" target="_blank">
+                    <i class="fa-solid fa-earth-americas"></i> World rank: *
+                </a>
+                <br>
+                <a id="country-rank" href="https://ctftime.org/stats/VN" target="_blank">
+                    <i class="fa-solid fa-crown" style="color: #FF9800;"></i> Country place: * 🇻🇳
+                </a>
+            </div>
+            <!--
+            <table id="dataTable">
                 <thead>
                     <tr>
                         <th>Place</th>
                         <th>Event</th>
-                        <th>CTF Points</th>
-                        <th>Rating points</th>
+                        <th>Points</th>
                     </tr>
                 </thead>
                 <tbody>
+                    
+                </tbody>
+            </table>
+             -->
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>PLACE</th>
+                        <th>EVENT</th>
+                        <th>CTF PTS</th>
+                        <th>RATING PTS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Đám dữ liệu từ Google Sheets sẽ tự động bay vào đây -->
                 </tbody>
             </table>
         </div>
+
+
+        <!-- Khối 3: Socials -->
         <div class="small_container">
-            <h2>Social links</h2>
-            <hr>
-            <a href="https://ctftime.org/team/371186"><i
-                    style="display: inline-block; width: 20px; height: 20px; background-image: url('img/ctftime.png'); background-size: cover;"></i>
-                CTFtime</a>
-            <br>
-            <a href="https://discord.com/invite/WyYTC2EZqK" style="margin-bottom: 10px;"><i class="fa-brands fa-discord"></i>
-                Discord</a>
+            <h2>SOCIALS</h2>
+            <div style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <a href="https://ctftime.org/team/371186" target="_blank" style="width: 80%;">
+                    <i class="fa-solid fa-flag-checkered"></i> CTFtime
+                </a>
+                <a href="https://discord.com/invite/WyYTC2EZqK" target="_blank" style="width: 80%; color: #5865F2;">
+                    <i class="fa-brands fa-discord"></i> Discord
+                </a>
+                <a href="https://www.linkedin.com/company/v1t-quack/" target="_blank"
+                    style="width: 80%; color: #0d71bd;">
+                    <i class="fa-brands fa-linkedin"></i> Linkedin
+                </a>
+                <a href="https://www.facebook.com/profile.php?id=61586992003855" target="_blank"
+                    style="width: 80%; color: #1877f2;">
+                    <i class="fa-brands fa-facebook"></i> Facebook
+                </a>
+            </div>
         </div>
     </div>
-    <h1>Curl the duck</h1>
-    <div id="small_container" style="display: flex;justify-content: center;align-items: center;">
-        <pre style="padding:10px" class="terminal shadow" id="main-terminal"><code></code></pre>
+
+    <!-- Terminal Section -->
+    <h1>CURL THE DUCK</h1>
+    <div id="small_container">
+        <pre class="terminal shadow" id="main-terminal"><code>$ curl v1t.site
+> Fetching duck energy...</code></pre>
     </div>
 
+    <!-- Members Profile Section -->
+    <h1>MEET THE QUACKIEST</h1>
+    <div class="profile-container">
+        <div class="profile-card">
+            <img src="img/jaze_v1t.png" alt="Jaze"
+                onerror="this.src='https://v1t.site/files/85253f2392c01adcd69c3c281a9337b8/V1t.png'">
+            <h3>Jaze</h3>
+            <h4>Forensic</h4>
+            <p class="quote01">"Fuzzy Duck | Ducky Fuzz | Does she Fuck?"</p>
+            <a href="https://jaze.v1t.site/" target="_blank">BLOG</a>
+        </div>
+
+        <div class="profile-card">
+            <img src="img/v1t_2026.png" alt="Rawr"
+                onerror="this.src='https://v1t.site/files/c07d3b8e09173d7ba31576b5e6a5e578/binz.png'">
+            <h3>Rawr</h3>
+            <h4>Duck</h4>
+            <p class="quote">";-;"</p>
+            <a href="https://rawr.v1t.site/" target="_blank">BLOG</a>
+        </div>
+
+        <div class="profile-card">
+            <img src="img/maro.png" alt="Maro">
+            <h3>Maro</h3>
+            <h4>Crypto</h4>
+            <p class="quote">"❤️‍🔥كالقابض علي الجمر"</p>
+        </div>
+
+        <div class="profile-card">
+            <img src="img/bachkhi.png" alt="LongPham+">
+            <h3>LongPham+</h3>
+            <h4>Web</h4>
+            <p class="quote">"Optimus Prime uu ee ac ac"</p>
+        </div>
+
+        <div class="profile-card">
+            <img src="img/hacker.png" alt="Basim Mehdi">
+            <h3>Basim Mehdi</h3>
+            <h4>Pwn</h4>
+            <p class="quote">"Somethings Are Just Never Meant To Be ..."</p>
+            <a href="https://basimmehdi.vercel.app/" target="_blank">BLOG</a>
+        </div>
+
+        <div class="profile-card">
+            <img src="img/ninja.png" alt="vjz3r">
+            <h3>vjz3r</h3>
+            <h4>Osint</h4>
+            <p class="quote">"Not Safe For Flag"</p>
+            <a href="https://vjz3r.github.io/" target="_blank">BLOG</a>
+        </div>
+
+        <div class="profile-card">
+            <img src="img/binz.png" alt="n4n4s1">
+            <h3>n4n4s1</h3>
+            <h4>Rev</h4>
+            <p class="quote">"Give me ur coke"</p>
+        </div>
+
+        <div class="profile-card">
+            <img src="img/student.png" alt="Arasu">
+            <h3>Arasu</h3>
+            <h4>Web</h4>
+            <p class="quote">"A f*cking man"</p>
+        </div>
+
+        <div class="profile-card">
+            <img src="img/spy.png" alt="emKhoi2k10">
+            <h3>emKhoi2k10</h3>
+            <h4>Rev</h4>
+            <p class="quote">"Dancing nihilist"</p>
+            <a href="https://emkhoi2k10.v1t.site/" target="_blank">BLOG</a>
+        </div>
+
+        <div class="profile-card">
+            <img src="img/sus_anime.png" alt="deroise2306">
+            <h3>deroise2306</h3>
+            <h4>Crypto</h4>
+            <p class="quote">"sceebeedee"</p>
+        </div>
+
+        <div class="profile-card">
+            <img src="img/anime.png" alt="dreamybullXXL">
+            <h3>dreamybullXXL</h3>
+            <h4>Misc</h4>
+            <p class="quote">"Quack quack !"</p>
+        </div>
+
+        <div class="profile-card">
+            <img src="img/vit.png" alt="akurakute">
+            <h3>akurakute</h3>
+            <h4>Misc</h4>
+            <p class="quote">"Quack quack !"</p>
+        </div>
+
+        <div class="profile-card">
+            <img src="img/cow.png" alt="Shirajuki">
+            <h3>Shirajuki</h3>
+            <h4>Misc</h4>
+            <p class="quote">"M0o Mo0 !"</p>
+            <a href="https://shirajuki.js.org/" target="_blank">BLOG</a>
+        </div>
+
+        <div class="profile-card">
+            <img src="img/shahji.png" alt="Shah_Ji">
+            <h3>Shah_Ji</h3>
+            <h4>Misc</h4>
+            <p class="quote">"Just here"</p>
+            <a href="https://syedjazib.vercel.app/" target="_blank">BLOG</a>
+        </div>
+
+        <div class="profile-card">
+            <img src="img/v1t.png" alt="Jayce">
+            <h3>Jayce</h3>
+            <h4>Web</h4>
+            <p class="quote">"Mốc 7 học viện"</p>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div style="text-align: center; margin: 50px 0 80px;">
+        <h2
+            style="font-family: 'Press Start 2P', monospace; font-size: 14px; margin-bottom: 20px; border-bottom: 0px dashed var(--accent-yellow);">
+            WANNA JOIN THE
+            QUACKY GANG?</h2>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSeyGG-JeEogJY-ot2HMGawO8Y3HGOXE4M7VqtVTVJApkkfuGA/viewform"
+            target="_blank" style="
+            display: inline-block;
+            background: #FF5252;
+            color: white;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 14px;
+            padding: 20px 40px;
+            text-decoration: none;
+            border: 4px solid #2d2d2d;
+            border-radius: 15px;
+            box-shadow: 8px 8px 0 #2d2d2d;
+            transition: 0.2s;">
+            QUACK WITH US!
+        </a>
+    </div>
+
+    <!-- Scripts -->
     <script src="js/commands.js"></script>
     <script src="js/terminal.js"></script>
-
-    <h1>Members</h1>
-    <div style="text-align: center;">
-        <div class="profile-container">
-            <div class="profile-card">
-                <img src="img/V1t_fin.png" alt="Jaze">
-                <h3>Jaze</h3>
-                <h4>Forensic</h4>
-                <p class="quote01">"Fuzzy Duck | Ducky Fuzz | Does she Fuck?"</p>
-                <a href="https://jaze.v1t.site/">-Blog-</a>
-            </div>
-
-            <div class="profile-card">
-                <img src="img/v1t_2026.png" alt="Rawr">
-                <h3>Rawr</h3>
-                <h4>Duck</h4>
-                <p class="quote">";-;"</p>
-                <a href="https://rawr.v1t.site/">-Blog-</a>
-            </div>
-
-            <div class="profile-card">
-                <img src="img/maro.png" alt="Temp">
-                <h3>Maro</h3>
-                <h4>Crypto</h4>
-                <p class="quote">"❤️‍🔥كالقابض علي الجمر"</p>
-            </div>
-            <div class="profile-card">
-                <img src="img/bachkhi.png" alt="LongPham+">
-                <h3>LongPham+</h3>
-                <h4>Web</h4>
-                <p class="quote">"Optimus Prime uu ee ac ac"</p>
-            </div>
-            <div class="profile-card">
-                <img src="img/hacker.png" alt="Basim Mehdi">
-                <h3>Basim Mehdi</h3>
-                <h4>Pwn</h4>
-                <p class="quote">"Somethings Are Just Never Meant To Be ..."</p>
-                <a href="https://basimmehdi.vercel.app/">-Blog-</a>
-            </div>
-            <div class="profile-card">
-                <img src="img/ninja.png" alt="vjz3r">
-                <h3>vjz3r</h3>
-                <h4>Osint</h4>
-                <p class="quote">"Not Safe For Flag"</p>
-                <a href="https://vjz3r.github.io/">-Blog-</a>
-            </div>
-            <div class="profile-card">
-                <img src="img/binz.png" alt="n4n4s1">
-                <h3>n4n4s1</h3>
-                <h4>Rev</h4>
-                <p class="quote">"Give me ur coke"</p>
-            </div>
-            <div class="profile-card">
-                <img src="img/student.png" alt="Arasu">
-                <h3>Arasu</h3>
-                <h4>Web</h4>
-                <p class="quote">"A f*cking man"</p>
-            </div>
-            <div class="profile-card">
-                <img src="img/spy.png" alt="emKhoi2k10">
-                <h3>emKhoi2k10</h3>
-                <h4>Rev</h4>
-                <p class="quote">"Dancing nihilist"</p>
-                <a href="https://emkhoi2k10.v1t.site/">-Blog-</a>
-            </div>
-            <div class="profile-card">
-                <img src="img/sus_anime.png" alt="deroise2306">
-                <h3>deroise2306</h3>
-                <h4>Crypto</h4>
-                <p class="quote">"sceebeedee"</p>
-            </div>
-            <div class="profile-card">
-                <img src="img/anime.png" alt="dreamybullXXL">
-                <h3>dreamybullXXL</h3>
-                <h4>Misc</h4>
-                <p class="quote">"Quack quack !"</p>
-            </div>
-            <div class="profile-card">
-                <img src="img/vit.png" alt="akurakute">
-                <h3>akurakute</h3>
-                <h4>Misc</h4>
-                <p class="quote">"Quack quack !"</p>
-            </div>
-            <div class="profile-card">
-                <img src="img/cow.png" alt="Shirajuki">
-                <h3>Shirajuki</h3>
-                <h4>Misc</h4>
-                <p class="quote">"M0o Mo0 !"</p>
-                <a href="https://shirajuki.js.org/">-Blog-</a>
-            </div>
-            <div class="profile-card">
-                <img src="img/shahji.png" alt="Shah_Ji">
-                <h3>Shah_Ji</h3>
-                <h4>Misc</h4>
-                <p class="quote">"Just here"</p>
-                <a href="https://syedjazib.vercel.app/">-Blog-</a>
-                
-            </div>
-            <div class="profile-card">
-                <img src="img/v1t.png" alt="Jayce">
-                <h3>Jayce</h3>
-                <h4>Web</h4>
-                <p class="quote">"Mốc 7 học viện"</p>
-            </div>
-        </div>
-    <h1>Wanna join us ?</h1>
-    <a href="https://docs.google.com/forms/d/e/1FAIpQLSeyGG-JeEogJY-ot2HMGawO8Y3HGOXE4M7VqtVTVJApkkfuGA/viewform?usp=publish-editor">Link</a>
-    <br><br><br><br><br><br><br><br><br>
-    </div>
-    <!-- <div style="text-align: center;">
-        <h2>hello</h2>
-
-    </div> -->
-    <!-- <div style="text-align: center;">
-        <h2>Join us</h2>
-    </div> -->
-    <!-- <hr>
-    <footer>
-        <h1>© Capture the flag since 2025</h1>
-    </footer> -->
     <script src="js/script.js"></script>
 </body>
 

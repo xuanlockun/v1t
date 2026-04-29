@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+    <!-- Idk what is these ;-; -->
+    <meta property="og:title" content="V1t" />
+    <meta property="og:description"
+        content="V1t CTF Team - Official Website. A community of cybersecurity enthusiasts participating in CTF competitions and sharing knowledge about security and technology.">
+    <meta property="og:url" content="https://v1t.site" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://v1t.site/img/v1t.png">
+    <meta property="og:site_name" content="V1t CTF Team">
+
+    <!-- SEO -->
+    <title>V1t — Quack the Flag 🦆</title>
+    <meta name="author" content="V1t">
+    <meta name="description"
+        content="V1t CTF Team - Official Website. A community of cybersecurity enthusiasts participating in CTF competitions and sharing knowledge about security and technology.">
+
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Link file CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/ansi.css">
+</head>
+
+<body>
+    <!-- 🦆 Navbar -->
+    <nav>
+        <div class="logo">
+            <span>🦆</span>
+            <a href="#" style="font-weight: bold;"> V1t</a>
+        </div>
+        <div class="hamburger" id="hamburger">
+            <i class="fa-solid fa-bars"></i>
+        </div>
+        <ul id="nav-links">
+            <li><a href="index.html"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li><a href="https://ctf.v1t.site/"><i class="fa-solid fa-flag"></i> CTF</a></li>
+            <li><a href="#" id="darkModeToggle"><i class="fa-solid fa-moon"></i> Dark Mode</a></li>
+        </ul>
+    </nav>
+
+    <!-- 🦆 Hero -->
+    <h1>V1t</h1>
+    <div class="duck-hero">
+        <img src="img/duck_mascot.png" alt="V1t Duck Mascot">
+    </div>
+    <img class="logo" src="img/v1t.png" alt="V1t Logo">
+
+    <!-- 🦆 Info Cards -->
+    <div class="container">
+        <div class="small_container">
+            <h2>🐤 Member</h2>
+            <hr>
+            <a href="https://ctftime.org/user/172832">Jaze</a>
+            <a href="https://ctftime.org/user/183484">Rawr</a>
+            <a href="https://ctftime.org/user/206379">Maro</a>
+            <a href="https://ctftime.org/user/213437">LongPham+</a>
+            <a href="https://ctftime.org/user/218749">Basim Mehdi</a>
+            <a href="https://ctftime.org/user/141944">vjz3r</a>
+            <a href="https://ctftime.org/user/223280">n4n4s1</a>
+            <a href="#">Arasu</a>
+            <a href="https://ctftime.org/user/165731">emKhoi2k10</a>
+            <a href="https://ctftime.org/user/219785">deroise2306</a>
+            <a href="#">akurakute</a>
+            <a href="https://ctftime.org/user/219123">Shah_Ji</a>
+            <a href="https://ctftime.org/user/168272">Jayce</a>
+        </div>
+        <div class="small_container">
+            <h2>🏆 CTF Events</h2>
+            <hr>
+            <a id="world-rank" href="https://ctftime.org/stats/" style="display: inline-flex; align-items: center;">
+                <i class="fa-solid fa-earth-americas" style="padding-right: 5px;"></i>
+                World rank: *
+            </a>
+            <br>
+            <a id="country-rank" href="https://ctftime.org/stats/VN" style="display: inline-flex; align-items: center;">
+                <i class="fa-solid fa-crown" style="padding-right: 5px;"></i>
+                Country place: *
+                <img src="img/vn.svg" style="padding-left: 5px;" width="17.6">
+            </a>
+            <hr>
+            <table border="1" style="width: 100%; border-collapse: collapse;" id="dataTable">
+                <thead>
+                    <tr>
+                        <th>Place</th>
+                        <th>Event</th>
+                        <th>CTF Points</th>
+                        <th>Rating points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <div class="small_container">
+            <h2>🔗 Social Links</h2>
+            <hr>
+            <a href="https://ctftime.org/team/371186"><i
+                    style="display: inline-block; width: 20px; height: 20px; background-image: url('img/ctftime.png'); background-size: cover;"></i>
+                CTFtime</a>
+            <br>
+            <a href="https://discord.com/invite/WyYTC2EZqK" style="margin-bottom: 10px;"><i class="fa-brands fa-discord"></i>
+                Discord</a>
+        </div>
+    </div>
+
+    <!-- 🦆 Terminal -->
+    <div class="section-divider">🦆🦆🦆🦆🦆</div>
+    <h1>Curl the duck</h1>
+    <div id="small_container" style="display: flex;justify-content: center;align-items: center;">
+        <pre style="padding:10px" class="terminal shadow" id="main-terminal"><code></code></pre>
+    </div>
+
+    <script src="js/commands.js"></script>
+    <script src="js/terminal.js"></script>
+
+    <!-- 🦆 Members -->
+    <div class="section-divider">🦆🦆🦆🦆🦆</div>
+    <h1>Members</h1>
+    <div style="text-align: center;">
+        <div class="profile-container">
+            <div class="profile-card">
+                <img src="img/V1t_fin.png" alt="Jaze">
+                <h3>Jaze</h3>
+                <h4>Forensic</h4>
+                <p class="quote01">"Fuzzy Duck | Ducky Fuzz | Does she Fuck?"</p>
+                <a href="https://jaze.v1t.site/">-Blog-</a>
+            </div>
+
+            <div class="profile-card">
+                <img src="img/v1t_2026.png" alt="Rawr">
+                <h3>Rawr</h3>
+                <h4>Duck</h4>
+                <p class="quote">";-;"</p>
+                <a href="https://rawr.v1t.site/">-Blog-</a>
+            </div>
+
+            <div class="profile-card">
+                <img src="img/maro.png" alt="Temp">
+                <h3>Maro</h3>
+                <h4>Crypto</h4>
+                <p class="quote">"❤️‍🔥كالقابض علي الجمر"</p>
+            </div>
+            <div class="profile-card">
+                <img src="img/bachkhi.png" alt="LongPham+">
+                <h3>LongPham+</h3>
+                <h4>Web</h4>
+                <p class="quote">"Optimus Prime uu ee ac ac"</p>
+            </div>
+            <div class="profile-card">
+                <img src="img/hacker.png" alt="Basim Mehdi">
+                <h3>Basim Mehdi</h3>
+                <h4>Pwn</h4>
+                <p class="quote">"Somethings Are Just Never Meant To Be ..."</p>
+                <a href="https://basimmehdi.vercel.app/">-Blog-</a>
+            </div>
+            <div class="profile-card">
+                <img src="img/ninja.png" alt="vjz3r">
+                <h3>vjz3r</h3>
+                <h4>Osint</h4>
+                <p class="quote">"Not Safe For Flag"</p>
+                <a href="https://vjz3r.github.io/">-Blog-</a>
+            </div>
+            <div class="profile-card">
+                <img src="img/binz.png" alt="n4n4s1">
+                <h3>n4n4s1</h3>
+                <h4>Rev</h4>
+                <p class="quote">"Give me ur coke"</p>
+            </div>
+            <div class="profile-card">
+                <img src="img/student.png" alt="Arasu">
+                <h3>Arasu</h3>
+                <h4>Web</h4>
+                <p class="quote">"A f*cking man"</p>
+            </div>
+            <div class="profile-card">
+                <img src="img/spy.png" alt="emKhoi2k10">
+                <h3>emKhoi2k10</h3>
+                <h4>Rev</h4>
+                <p class="quote">"Dancing nihilist"</p>
+                <a href="https://emkhoi2k10.v1t.site/">-Blog-</a>
+            </div>
+            <div class="profile-card">
+                <img src="img/sus_anime.png" alt="deroise2306">
+                <h3>deroise2306</h3>
+                <h4>Crypto</h4>
+                <p class="quote">"sceebeedee"</p>
+            </div>
+            <div class="profile-card">
+                <img src="img/anime.png" alt="dreamybullXXL">
+                <h3>dreamybullXXL</h3>
+                <h4>Misc</h4>
+                <p class="quote">"Quack quack !"</p>
+            </div>
+            <div class="profile-card">
+                <img src="img/vit.png" alt="akurakute">
+                <h3>akurakute</h3>
+                <h4>Misc</h4>
+                <p class="quote">"Quack quack !"</p>
+            </div>
+            <div class="profile-card">
+                <img src="img/cow.png" alt="Shirajuki">
+                <h3>Shirajuki</h3>
+                <h4>Misc</h4>
+                <p class="quote">"M0o Mo0 !"</p>
+                <a href="https://shirajuki.js.org/">-Blog-</a>
+            </div>
+            <div class="profile-card">
+                <img src="img/shahji.png" alt="Shah_Ji">
+                <h3>Shah_Ji</h3>
+                <h4>Misc</h4>
+                <p class="quote">"Just here"</p>
+                <a href="https://syedjazib.vercel.app/">-Blog-</a>
+                
+            </div>
+            <div class="profile-card">
+                <img src="img/v1t.png" alt="Jayce">
+                <h3>Jayce</h3>
+                <h4>Web</h4>
+                <p class="quote">"Mốc 7 học viện"</p>
+            </div>
+        </div>
+
+    <!-- 🦆 Join CTA -->
+    <div class="section-divider">🦆🦆🦆🦆🦆</div>
+    <h1>Wanna join us ?</h1>
+    <div style="text-align: center; margin-bottom: 60px;">
+        <a class="quack-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSeyGG-JeEogJY-ot2HMGawO8Y3HGOXE4M7VqtVTVJApkkfuGA/viewform?usp=publish-editor">
+            🦆 Quack to Join!
+        </a>
+    </div>
+    </div>
+
+    <!-- 🦆 Footer -->
+    <footer>
+        <h1>© V1t CTF Team 2025 — Quack!</h1>
+        <p style="margin-top: 10px; opacity: 0.6; font-size: 0.85rem;">Made with 🦆 and ☕</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>
