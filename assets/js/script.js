@@ -1,7 +1,7 @@
 // const imageSources = [
-//     'img/vit.png',
-//     'img/v1t.png',
-//     'img/V1t_fin.png'
+//     '/assets/images/vit.png',
+//     '/assets/images/v1t.png',
+//     '/assets/images/V1t_fin.png'
 //   ];
 
 //   const randomIndex = Math.floor(Math.random() * imageSources.length);
@@ -98,7 +98,7 @@ function updateRankInfo(rankData) {
     document.querySelector("#country-rank").innerHTML = `
         <i class="fa-solid fa-crown" style="padding-right: 5px;"></i>
         Country place: ${countryRank}
-        <img src="img/vn.svg" style="padding-left: 5px;" width="17.6">
+        <img src="/assets/images/vn.svg" style="padding-left: 5px;" width="17.6">
     `;
 }
 
