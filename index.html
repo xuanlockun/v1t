@@ -19,10 +19,12 @@
 
     <title>V1T | Technology & Security</title>
     <meta name="author" content="V1T">
-    <meta name="description" content="V1T is a technology and security collective focused on cybersecurity research, CTF, engineering projects, writeups, and community knowledge sharing.">
+    <meta name="description"
+        content="V1T is a technology and security collective focused on cybersecurity research, CTF, engineering projects, writeups, and community knowledge sharing.">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="V1T | Technology & Security">
-    <meta name="twitter:description" content="V1T is a technology and security collective focused on cybersecurity research, CTF, engineering projects, writeups, and community knowledge sharing.">
+    <meta name="twitter:description"
+        content="V1T is a technology and security collective focused on cybersecurity research, CTF, engineering projects, writeups, and community knowledge sharing.">
     <meta name="twitter:image" content="https://v1t.site/assets/images/V1t_fin.png">
 
     <!-- Fonts & Icons -->
@@ -55,6 +57,26 @@
                 "name": "V1T",
                 "publisher": { "@id": "https://v1t.site/#organization" },
                 "inLanguage": "en"
+            },
+            {
+                "@type": "SiteNavigationElement",
+                "name": "Capture The Flag",
+                "url": "https://v1t.site/ctf/"
+            },
+            {
+                "@type": "SiteNavigationElement",
+                "name": "Projects",
+                "url": "https://v1t.site/projects/"
+            },
+            {
+                "@type": "SiteNavigationElement",
+                "name": "Careers",
+                "url": "https://v1t.site/careers/"
+            },
+            {
+                "@type": "SiteNavigationElement",
+                "name": "Articles",
+                "url": "https://v1t.site/articles/"
             }
         ]
     }
@@ -66,14 +88,14 @@
     <nav>
         <div class="logo">
             <i class="fa-solid fa-square" style="margin-right: 10px; font-size: 18px;"></i>
-            <a href="#"> V1T TEAM</a>
+            <a href="/"> V1T TEAM</a>
         </div>
         <div class="hamburger" id="hamburger">
             <i class="fa-solid fa-bars"></i>
         </div>
         <ul id="nav-links">
-            <li><a href="index.html"><i class="fa-solid fa-house"></i> Home</a></li>
-            <li><a href="https://ctf.v1t.site/"><i class="fa-solid fa-flag"></i> CTF</a></li>
+            <li><a href="/"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li><a href="/ctf/" title="Capture The Flag" aria-label="Capture The Flag"><i class="fa-solid fa-flag"></i> CTF</a></li>
             <li><a href="/projects/"><i class="fa-solid fa-diagram-project"></i> Projects</a></li>
             <li><a href="#team"><i class="fa-solid fa-users"></i> Team</a></li>
             <li><a href="/articles/"><i class="fa-solid fa-newspaper"></i> Articles</a></li>
@@ -175,7 +197,7 @@
                 <a href="https://www.instagram.com/v1tnamese/" target="_blank" style="width: 80%; color: #e4405f;">
                     <i class="fa-brands fa-instagram"></i> Instagram
                 </a>
-                
+
             </div>
         </div>
     </div>
@@ -190,15 +212,7 @@
     <!-- Members Profile Section -->
     <h2 id="team" class="h1-like">MEET THE QUACKIEST</h2>
     <div class="profile-container">
-        <div class="profile-card">
-            <img src="/assets/images/jaze_v1t.png" alt="Jaze" loading="lazy"
-                onerror="this.src='https://v1t.site/files/85253f2392c01adcd69c3c281a9337b8/V1t.png'">
-            <h3>Jaze</h3>
-            <h4>Forensic</h4>
-            <p class="quote01">"Fuzzy Duck | Ducky Fuzz | Does she Fuck?"</p>
-            <a href="https://jaze.v1t.site/" target="_blank">BLOG</a>
-        </div>
-
+        
         <div class="profile-card">
             <img src="/assets/images/v1t_2026.png" alt="Rawr" loading="lazy"
                 onerror="this.src='https://v1t.site/files/c07d3b8e09173d7ba31576b5e6a5e578/binz.png'">
@@ -206,6 +220,14 @@
             <h4>Duck</h4>
             <p class="quote">";-;"</p>
             <a href="https://rawr.v1t.site/" target="_blank">BLOG</a>
+        </div>
+        <div class="profile-card">
+            <img src="/assets/images/jaze_v1t.png" alt="Jaze" loading="lazy"
+                onerror="this.src='https://v1t.site/files/85253f2392c01adcd69c3c281a9337b8/V1t.png'">
+            <h3>Jaze</h3>
+            <h4>Security Researcher</h4>
+            <p class="quote01">"Fuzzy Duck | Ducky Fuzz | Does she F*ck?"</p>
+            <a href="https://jaze.v1t.site/" target="_blank">BLOG</a>
         </div>
 
         <div class="profile-card">
@@ -304,7 +326,7 @@
             <h4>Web</h4>
             <p class="quote">"Mốc 7 học viện"</p>
         </div>
-        
+
         <div class="profile-card">
             <img src="/assets/images/winky.png" alt="Winky" loading="lazy">
             <h3>Winky</h3>
@@ -312,7 +334,7 @@
             <p class="quote">"Just a noob"</p>
             <a href="https://threalwinky.github.io/" target="_blank">BLOG</a>
         </div>
-        
+
         <div class="profile-card">
             <img src="/assets/images/qth24.png" alt="Qth24" loading="lazy">
             <h3>Qth24</h3>
@@ -320,7 +342,7 @@
             <p class="quote">"Newbie to ctf"</p>
             <a href="https://thinhdq.site/" target="_blank">BLOG</a>
         </div>
-        
+
         <div class="profile-card">
             <img src="/assets/images/r1muru.png" alt="R1muru" loading="lazy">
             <h3>R1muru</h3>
