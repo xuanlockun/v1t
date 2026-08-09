@@ -194,6 +194,17 @@ td:first-child { border-left: 2px solid var(--border-color); border-radius: 8px 
 td:last-child { border-right: 2px solid var(--border-color); border-radius: 0 8px 8px 0; }
 td:not(.event) { text-align: center; }
 
+.team-cve-title {
+    margin: 18px 0 8px;
+    padding-top: 14px;
+    border-top: 3px dashed var(--accent-yellow);
+    color: var(--accent-orange);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    text-align: center;
+}
+
 .team-cve-list {
     display: flex;
     flex-direction: column;
@@ -400,6 +411,11 @@ body.dark-mode .small_container .team-cve-item:hover {
     background: #333;
     color: var(--accent-orange);
     border-color: var(--accent-orange);
+}
+
+body.dark-mode .team-cve-title {
+    color: var(--accent-orange);
+    border-top-color: var(--accent-yellow);
 }
 
 /* ========================================================
