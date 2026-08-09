@@ -194,6 +194,42 @@ td:first-child { border-left: 2px solid var(--border-color); border-radius: 8px 
 td:last-child { border-right: 2px solid var(--border-color); border-radius: 0 8px 8px 0; }
 td:not(.event) { text-align: center; }
 
+.team-cve-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.small_container .team-cve-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #fff;
+    border: 3px solid var(--border-color);
+    box-shadow: 4px 4px 0 var(--accent-yellow);
+    color: var(--accent-dark-orange);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    line-height: 1.5;
+}
+
+.small_container .team-cve-item:hover {
+    background: var(--accent-yellow);
+    box-shadow: 5px 5px 0 var(--border-color);
+    color: var(--border-color);
+}
+
+.team-cve-item i {
+    flex: 0 0 auto;
+    margin-left: 10px;
+    font-size: 11px;
+}
+
 /* ===== Terminal ===== */
 #small_container { max-width: 800px; margin: 0 auto; padding: 20px; }
 .terminal {
@@ -353,6 +389,18 @@ body.dark-mode {
 body.dark-mode .bg-overlay { opacity: 0.1; }
 body.dark-mode .small_container a, body.dark-mode .arcade-table td { background: #2a2a2a; color: #fff; }
 body.dark-mode .profile-card img { background: #121212; }
+
+body.dark-mode .small_container .team-cve-item {
+    background: #2a2a2a;
+    color: var(--accent-yellow);
+    border-color: #444;
+}
+
+body.dark-mode .small_container .team-cve-item:hover {
+    background: #333;
+    color: var(--accent-orange);
+    border-color: var(--accent-orange);
+}
 
 /* ========================================================
    🦆 DARK MODE CHO BẢNG XẾP HẠNG (#dataTable)
