@@ -129,7 +129,13 @@ nav .logo {
     padding: 15px 0;
 }
 
-nav .logo a { color: var(--accent-yellow); background: none; box-shadow: none; }
+nav .logo a {
+    color: #fff;
+    text-decoration: none;
+    background: none;
+    box-shadow: none;
+    padding-left: 12px;
+}
 
 nav ul {
     list-style: none;
