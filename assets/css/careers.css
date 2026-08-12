@@ -1,0 +1,393 @@
+.careers-page {
+    min-height: 100vh;
+}
+
+.careers-shell {
+    width: min(1180px, calc(100% - 32px));
+    margin: 0 auto 72px;
+}
+
+.careers-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 24px;
+    align-items: end;
+    padding: 58px 0 46px;
+    border-bottom: 4px solid var(--border-color);
+}
+
+.hero-copy {
+    max-width: 820px;
+}
+
+.careers-kicker {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    background: #111;
+    color: var(--accent-yellow);
+    border: 3px solid var(--border-color);
+    box-shadow: 4px 4px 0 var(--accent-orange);
+    padding: 9px 12px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    line-height: 1.5;
+}
+
+.careers-hero h1 {
+    max-width: 820px;
+    margin: 26px 0 18px;
+    text-align: left;
+    font-size: clamp(30px, 5vw, 54px);
+    line-height: 1.22;
+}
+
+.careers-hero p {
+    max-width: 760px;
+    margin: 0;
+    color: var(--text-color);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.6;
+}
+
+.hero-terms {
+    display: grid;
+    gap: 12px;
+}
+
+.hero-terms div {
+    background: #fff;
+    border: 4px solid var(--border-color);
+    box-shadow: 5px 5px 0 var(--accent-orange);
+    padding: 14px;
+}
+
+.hero-terms span {
+    display: block;
+    color: var(--accent-dark-orange);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    line-height: 1.6;
+    text-transform: uppercase;
+}
+
+.hero-terms strong {
+    display: block;
+    margin-top: 8px;
+    color: var(--text-color);
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.hero-primary {
+    margin-top: 28px;
+}
+
+.hero-primary,
+.detail-button,
+.role-apply-panel a,
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #111;
+    background: var(--accent-yellow);
+    border: 3px solid var(--border-color);
+    border-radius: 10px;
+    box-shadow: 4px 4px 0 var(--border-color);
+    padding: 12px 14px;
+    text-decoration: none;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    line-height: 1.5;
+}
+
+.hero-primary:hover,
+.detail-button:hover,
+.role-apply-panel a:hover,
+.back-link:hover {
+    background: var(--accent-orange);
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0 var(--border-color);
+}
+
+.section-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.section-heading h2 {
+    margin: 0;
+    border: 0;
+    text-align: right;
+    font-size: 18px;
+}
+
+.role-list {
+    display: grid;
+    gap: 18px;
+}
+
+.career-role {
+    display: grid;
+    grid-template-columns: 78px minmax(0, 1fr) auto;
+    gap: 18px;
+    align-items: center;
+    background: var(--card-bg);
+    border: 4px solid var(--border-color);
+    box-shadow: 8px 8px 0 var(--accent-yellow);
+    padding: 22px;
+}
+
+.role-index {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    background: #111;
+    color: var(--accent-yellow);
+    border: 4px solid var(--border-color);
+    box-shadow: 4px 4px 0 var(--accent-orange);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 16px;
+}
+
+.role-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.role-tags span {
+    background: #fff;
+    border: 2px solid var(--border-color);
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    line-height: 1.4;
+    color: var(--accent-dark-orange);
+}
+
+.role-copy h3 {
+    margin: 14px 0 8px;
+    color: var(--border-color);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.role-copy p {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.55;
+}
+
+.hiring-flow {
+    margin-top: 54px;
+}
+
+.flow-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.flow-grid article,
+.role-detail-card,
+.role-apply-panel {
+    background: #fff;
+    border: 4px solid var(--border-color);
+    box-shadow: 7px 7px 0 var(--accent-orange);
+    padding: 22px;
+}
+
+.flow-grid span {
+    display: inline-grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    background: var(--accent-yellow);
+    border: 3px solid var(--border-color);
+    box-shadow: 3px 3px 0 var(--border-color);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+}
+
+.flow-grid h3,
+.role-detail-card h2,
+.role-apply-panel h2 {
+    color: var(--accent-orange);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 18px 0 10px;
+}
+
+.flow-grid p,
+.role-detail-card p,
+.role-detail-card li,
+.role-apply-panel p {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.6;
+}
+
+.role-detail-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 28px;
+    padding: 46px 0 26px;
+}
+
+.role-detail-hero h1 {
+    margin: 22px 0 16px;
+    text-align: left;
+    font-size: clamp(26px, 4vw, 48px);
+}
+
+.role-detail-hero p {
+    max-width: 760px;
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.6;
+}
+
+.role-summary {
+    background: #111;
+    color: #fff;
+    border: 5px solid var(--border-color);
+    box-shadow: 9px 9px 0 var(--accent-yellow);
+    padding: 20px;
+}
+
+.role-summary dl {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+}
+
+.role-summary dt {
+    color: var(--accent-yellow);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    line-height: 1.5;
+}
+
+.role-summary dd {
+    margin: 4px 0 0;
+    font-weight: 900;
+}
+
+.role-detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 24px;
+    align-items: start;
+    margin-bottom: 72px;
+}
+
+.role-detail-stack {
+    display: grid;
+    gap: 20px;
+}
+
+.role-detail-card ul {
+    margin: 12px 0 0;
+    padding-left: 20px;
+}
+
+.role-apply-panel {
+    position: sticky;
+    top: 92px;
+}
+
+.role-apply-panel a {
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 12px;
+}
+
+.back-link {
+    margin-top: 20px;
+}
+
+body.dark-mode .hero-terms div,
+body.dark-mode .role-tags span,
+body.dark-mode .flow-grid article,
+body.dark-mode .role-detail-card,
+body.dark-mode .role-apply-panel {
+    background: var(--card-bg);
+}
+
+body.dark-mode .career-role {
+    background: var(--card-bg);
+}
+
+@media screen and (max-width: 900px) {
+    .careers-hero,
+    .role-detail-hero,
+    .role-detail-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .career-role {
+        grid-template-columns: 58px minmax(0, 1fr);
+    }
+
+    .detail-button {
+        grid-column: 2;
+        width: fit-content;
+    }
+
+    .flow-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-heading {
+        align-items: start;
+        flex-direction: column;
+    }
+
+    .section-heading h2 {
+        text-align: left;
+    }
+
+    .role-apply-panel {
+        position: static;
+    }
+}
+
+@media screen and (max-width: 560px) {
+    .careers-shell {
+        width: min(100% - 22px, 1180px);
+    }
+
+    .careers-hero {
+        padding-top: 34px;
+    }
+
+    .careers-hero h1,
+    .role-detail-hero h1 {
+        font-size: 24px;
+    }
+
+    .career-role {
+        grid-template-columns: 1fr;
+        padding: 18px;
+    }
+
+    .role-index {
+        width: 58px;
+    }
+
+    .detail-button {
+        grid-column: auto;
+    }
+}

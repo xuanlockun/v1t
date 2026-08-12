@@ -4,99 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="index, follow, max-image-preview:large">
-    <link rel="canonical" href="https://v1t.site/projects/">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <title>Projects | V1T</title>
-    <meta name="description" content="Technology, security, tooling, and engineering projects from V1T.">
-    <meta property="og:site_name" content="V1T">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Projects | V1T">
-    <meta property="og:description" content="Technology, security, tooling, and engineering projects from V1T.">
-    <meta property="og:url" content="https://v1t.site/projects/">
-    <meta property="og:image" content="https://v1t.site/assets/images/V1t_fin.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Projects | V1T">
-    <meta name="twitter:description" content="Technology, security, tooling, and engineering projects from V1T.">
-    <meta name="twitter:image" content="https://v1t.site/assets/images/V1t_fin.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/construction.css">
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://v1t.site/" },
-            { "@type": "ListItem", "position": 2, "name": "Projects", "item": "https://v1t.site/projects/" }
-        ]
-    }
-    </script>
+    <meta name="robots" content="noindex, follow">
+    <link rel="canonical" href="https://v1t.site/product/">
+    <meta http-equiv="refresh" content="0; url=/product/">
+    <title>V1T | Product</title>
 </head>
 
-<body class="construction-page">
-    <nav>
-        <div class="logo">
-            <i class="fa-solid fa-square" style="margin-right: 10px; font-size: 18px;"></i>
-            <a href="/"> V1T TEAM</a>
-        </div>
-        <div class="hamburger" id="hamburger">
-            <i class="fa-solid fa-bars"></i>
-        </div>
-        <ul id="nav-links">
-            <li><a href="/"><i class="fa-solid fa-house"></i> Home</a></li>
-            <li><a href="/ctf/" title="Capture The Flag" aria-label="Capture The Flag"><i class="fa-solid fa-flag"></i> CTF</a></li>
-            <li><a href="/projects/"><i class="fa-solid fa-diagram-project"></i> Projects</a></li>
-            <li><a href="/#team"><i class="fa-solid fa-users"></i> Team</a></li>
-            <li><a href="/articles/"><i class="fa-solid fa-newspaper"></i> Articles</a></li>
-            <li><a href="/careers/"><i class="fa-solid fa-briefcase"></i> Careers</a></li>
-            <li><a href="#" id="darkModeToggle"><i class="fa-solid fa-moon"></i> Dark Mode</a></li>
-        </ul>
-    </nav>
-
-    <main class="construction-wrap">
-        <marquee class="ticker" scrollamount="7">*** V1T PROJECTS *** SECURITY TOOLS *** ENGINEERING BUILDS *** RESEARCH NOTES ***</marquee>
-        <section class="construction-panel">
-            <span class="page-kicker">PROJECTS.HTML</span>
-            <h1>Projects</h1>
-            <div class="construction-image-wrap">
-                <img class="construction-image" src="/assets/images/under_construction.png" alt="Under construction" loading="lazy">
-            </div>
-            <div class="warning-tape">SECURITY TOOLS, CTF INFRASTRUCTURE, AND ENGINEERING WORK</div>
-            <p>Technology, security, tooling, and engineering projects from V1T.</p>
-            <div class="visitor-counter" aria-label="Visitor counter">
-                <span>0</span><span>0</span><span>0</span><span>0</span><span>9</span><span>9</span>
-            </div>
-            <div class="old-links">
-                <a href="/"><i class="fa-solid fa-house"></i> Home</a>
-                <a href="/articles/"><i class="fa-solid fa-newspaper"></i> Articles</a>
-                <a href="/careers/"><i class="fa-solid fa-briefcase"></i> Careers</a>
-            </div>
-        </section>
-    </main>
-
-    <script>
-        const nav = document.querySelector('nav');
-        const hamburger = document.getElementById('hamburger');
-        const darkModeToggle = document.getElementById('darkModeToggle');
-
-        hamburger.addEventListener('click', () => nav.classList.toggle('active'));
-
-        if (localStorage.getItem('darkMode') === 'enabled') {
-            document.body.classList.add('dark-mode');
-            darkModeToggle.innerHTML = '<i class="fa-solid fa-sun"></i> Light Mode';
-        }
-
-        darkModeToggle.addEventListener('click', (event) => {
-            event.preventDefault();
-            document.body.classList.toggle('dark-mode');
-            const enabled = document.body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', enabled ? 'enabled' : 'disabled');
-            darkModeToggle.innerHTML = enabled
-                ? '<i class="fa-solid fa-sun"></i> Light Mode'
-                : '<i class="fa-solid fa-moon"></i> Dark Mode';
-        });
-    </script>
+<body>
+    <p>Redirecting to <a href="/product/">V1T Product</a>.</p>
 </body>
 
 </html>
