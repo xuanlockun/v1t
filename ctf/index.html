@@ -1,52 +1,373 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="index, follow, max-image-preview:large">
-    <meta http-equiv="refresh" content="0; url=https://ctf.v1t.site/">
     <link rel="canonical" href="https://v1t.site/ctf/">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <title>V1T | Capture The Flag</title>
+
+    <title>V1T CTF 2027 - Coming Soon</title>
     <meta name="description"
-        content="V1T Capture The Flag competitions, challenges, scoreboard, and cybersecurity training events.">
+        content="V1T CTF is the Capture The Flag event hub for V1T. Follow upcoming V1T CTF 2027 updates and access legacy V1T CTF 2026 and 2025 event pages.">
+    <meta name="author" content="V1T">
+
     <meta property="og:site_name" content="V1T">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="V1T | Capture The Flag">
+    <meta property="og:title" content="V1T CTF 2027 - Coming Soon">
     <meta property="og:description"
-        content="V1T Capture The Flag competitions, challenges, scoreboard, and cybersecurity training events.">
+        content="Follow upcoming V1T CTF 2027 updates and access legacy V1T CTF 2026 and 2025 event pages.">
     <meta property="og:url" content="https://v1t.site/ctf/">
-    <meta property="og:image" content="https://v1t.site/assets/images/V1t_fin.png">
+    <meta property="og:image" content="https://v1t.site/assets/images/v1t.png">
+
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="V1T | Capture The Flag">
+    <meta name="twitter:title" content="V1T CTF 2027 - Coming Soon">
     <meta name="twitter:description"
-        content="V1T Capture The Flag competitions, challenges, scoreboard, and cybersecurity training events.">
-    <meta name="twitter:image" content="https://v1t.site/assets/images/V1t_fin.png">
+        content="Follow upcoming V1T CTF 2027 updates and access legacy V1T CTF 2026 and 2025 event pages.">
+    <meta name="twitter:image" content="https://v1t.site/assets/images/v1t.png">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka+One&display=swap"
+        rel="stylesheet">
+
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "WebPage",
-        "name": "Capture The Flag",
+        "name": "V1T CTF 2027",
         "url": "https://v1t.site/ctf/",
+        "description": "V1T CTF is the Capture The Flag event hub for V1T.",
         "isPartOf": {
             "@type": "WebSite",
             "name": "V1T",
             "url": "https://v1t.site/"
         },
-        "about": "V1T Capture The Flag competitions and cybersecurity challenges"
+        "publisher": {
+            "@type": "Organization",
+            "name": "V1T",
+            "url": "https://v1t.site/",
+            "logo": "https://v1t.site/assets/images/v1t.png"
+        },
+        "about": "Capture The Flag cybersecurity competitions and V1T CTF events"
     }
     </script>
+
+    <style>
+        :root {
+            --duck-yellow: #FFCA28;
+            --duck-light: #FFFDE7;
+            --duck-card: #FFF9C4;
+            --duck-orange: #FF9800;
+            --duck-dark-orange: #E65100;
+            --duck-brown: #5D4037;
+            --duck-border: #2d2d2d;
+            --duck-red: #FF5252;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--duck-light);
+            color: var(--duck-brown);
+            font-family: 'Comic Sans MS', 'Fredoka One', cursive, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(#FFD54F 15%, transparent 16%), radial-gradient(#FFD54F 15%, transparent 16%);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .main-frame {
+            text-align: center;
+            z-index: 10;
+            padding: 40px;
+            background: var(--duck-card);
+            border: 5px dashed var(--duck-orange);
+            border-radius: 25px;
+            box-shadow: 12px 12px 0 var(--duck-yellow);
+            max-width: 600px;
+            width: 90%;
+            animation: floatSway 4s ease-in-out infinite;
+        }
+
+        @keyframes floatSway {
+            0%, 100% { transform: translateY(0) rotate(-1deg); }
+            50% { transform: translateY(-10px) rotate(1deg); }
+        }
+
+        .page-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+
+        .page-modal[hidden] {
+            display: none;
+        }
+
+        .modal-card {
+            width: min(100%, 520px);
+            padding: 35px 30px;
+            border-radius: 20px;
+            border: 4px solid var(--duck-border);
+            background-color: var(--duck-light);
+            box-shadow: 10px 10px 0 var(--duck-orange);
+            text-align: center;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-card h3 {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            color: var(--duck-dark-orange);
+            text-shadow: 2px 2px 0 var(--duck-yellow);
+        }
+
+        .modal-card p {
+            color: var(--duck-brown);
+            font-size: 1.1rem;
+            font-weight: bold;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: nowrap;
+            align-items: stretch;
+        }
+
+        .logo-wrapper {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+        }
+
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            image-rendering: pixelated;
+            filter: drop-shadow(0 8px 0 rgba(230, 81, 0, 0.2));
+            animation: duckBounce 1.5s infinite;
+        }
+
+        @keyframes duckBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px) scale(1.05); }
+        }
+
+        h1 {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1.8rem;
+            line-height: 1.4;
+            margin-bottom: 10px;
+            color: var(--duck-dark-orange);
+            text-shadow: 3px 3px 0 #FFF, 5px 5px 0 var(--duck-yellow);
+        }
+
+        h2 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.5rem;
+            color: var(--duck-orange);
+            margin-bottom: 10px;
+        }
+
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            text-decoration: none;
+            color: var(--duck-border);
+            padding: 15px 20px;
+            font-weight: 900;
+            font-size: 14px;
+            font-family: 'Press Start 2P', monospace;
+            text-transform: uppercase;
+            border-radius: 12px;
+            border: 3px solid var(--duck-border);
+            position: relative;
+            transition: all 0.1s ease;
+            box-shadow: 4px 4px 0 var(--duck-border);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn:active {
+            transform: translateY(4px) translateX(4px);
+            box-shadow: 0 0 0 var(--duck-border) !important;
+        }
+
+        .btn-featured {
+            background-color: var(--duck-orange);
+            color: #FFF;
+        }
+
+        .btn-featured:hover {
+            background-color: var(--duck-dark-orange);
+            box-shadow: 4px 4px 0 var(--duck-brown);
+        }
+
+        .btn-featured .year {
+            font-size: 14px;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 0 var(--duck-border);
+        }
+
+        .btn-featured .status {
+            font-family: 'Comic Sans MS', cursive;
+            font-size: 12px;
+            text-transform: none;
+            font-weight: bold;
+            color: #FFFDE7;
+        }
+
+        .btn-archive {
+            background-color: #E0E0E0;
+            color: var(--duck-brown);
+        }
+
+        .btn-archive:hover {
+            background-color: #BDBDBD;
+        }
+
+        .btn-dismiss {
+            background-color: var(--duck-red);
+            color: #FFF;
+            flex-direction: row;
+        }
+
+        .btn-dismiss:hover {
+            background-color: #D50000;
+        }
+
+        .modal-actions .btn {
+            flex: 1 1 0;
+            min-width: 0;
+            font-size: 11px;
+            padding: 12px;
+        }
+
+        .modal-actions .btn-featured .year {
+            margin-bottom: 0;
+            font-size: 11px;
+        }
+
+        .v-badge {
+            background: var(--duck-border);
+            color: var(--duck-yellow);
+            font-size: 8px;
+            padding: 4px 6px;
+            vertical-align: middle;
+            margin-left: 8px;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 640px) {
+            .main-frame {
+                padding: 30px 20px;
+                border-width: 4px;
+            }
+
+            h1 { font-size: 1.3rem; }
+            h2 { font-size: 1.2rem; }
+            .btn { padding: 12px; font-size: 11px; }
+            .btn-featured .year { font-size: 11px; }
+            .btn-featured .status { font-size: 10px; }
+            .logo-wrapper { width: 100px; height: 100px; }
+            .modal-actions { flex-direction: column; }
+            .modal-actions .btn { width: 100%; }
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Capture The Flag</h1>
-    <p>Redirecting to the V1T CTF platform.</p>
-    <p><a href="https://ctf.v1t.site/">Continue to ctf.v1t.site</a></p>
+    <div class="bg-overlay"></div>
+
+    <div class="page-modal" id="redirect-modal" role="dialog" aria-modal="true" aria-labelledby="redirect-title">
+        <div class="modal-card">
+            <h3 id="redirect-title">QUACK! GO TO 2026?</h3>
+            <p>Do you want to redirect to <strong>2026.v1t.site</strong> for the V1T CTF 2026 event page?</p>
+            <div class="modal-actions">
+                <a href="https://2026.v1t.site" class="btn btn-featured">
+                    <span class="year">YES, TAKE ME!</span>
+                </a>
+                <button type="button" class="btn btn-dismiss" id="stay-here">
+                    <span>STAY HERE</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <main class="main-frame">
+        <div class="logo-wrapper">
+            <img src="/assets/images/v1t.png" alt="V1T logo" class="logo-img">
+        </div>
+
+        <h1>V1T CTF 2027</h1>
+        <h2>Coming soon</h2>
+        <br>
+        <div class="btn-container">
+            <a href="https://2026.v1t.site" class="btn btn-featured" aria-label="V1T CTF 2026 legacy event page">
+                <span class="year">V1T CTF 2026<span class="v-badge">LEGACY</span></span>
+            </a>
+
+            <a href="https://2025.v1t.site" class="btn btn-archive" aria-label="V1T CTF 2025 legacy event page">
+                <span>V1T CTF 2025 <span class="v-badge">LEGACY</span></span>
+            </a>
+        </div>
+    </main>
 
     <script>
-        window.location.replace('https://ctf.v1t.site/');
+        const redirectModal = document.getElementById('redirect-modal');
+        const stayHereButton = document.getElementById('stay-here');
+
+        stayHereButton.addEventListener('click', () => {
+            redirectModal.hidden = true;
+        });
     </script>
 </body>
 
