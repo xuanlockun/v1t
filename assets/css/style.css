@@ -147,7 +147,8 @@ nav ul li {
     padding: 15px 20px;
 }
 
-nav ul li a {
+nav ul li a,
+nav ul li button {
     color: white;
     font-family: 'Press Start 2P', monospace;
     font-size: 10px;
@@ -157,16 +158,20 @@ nav ul li a {
     border-radius: 8px;
     transition: 0.2s;
     background: none;
+    border: 0;
+    cursor: pointer;
 }
 
-nav ul li a:hover {
+nav ul li a:hover,
+nav ul li button:hover {
     background: var(--accent-yellow);
     color: #111;
     box-shadow: 3px 3px 0 #000;
 }
 
 /* Link chung (a) */
-.small_container a {
+.small_container a,
+.small_container .member-name {
     display: inline-block;
     color: var(--text-color);
     font-weight: bold;

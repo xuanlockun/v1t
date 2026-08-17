@@ -19,13 +19,13 @@
     <meta property="og:description"
         content="Follow upcoming V1T CTF 2027 updates and access legacy V1T CTF 2026 and 2025 event pages.">
     <meta property="og:url" content="https://v1t.site/ctf/">
-    <meta property="og:image" content="https://v1t.site/assets/images/v1t.png">
+    <meta property="og:image" content="https://v1t.site/assets/images/V1t_fin.png">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="V1T CTF 2027 - Coming Soon">
     <meta name="twitter:description"
         content="Follow upcoming V1T CTF 2027 updates and access legacy V1T CTF 2026 and 2025 event pages.">
-    <meta name="twitter:image" content="https://v1t.site/assets/images/v1t.png">
+    <meta name="twitter:image" content="https://v1t.site/assets/images/V1t_fin.png">
 
     <link
         href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka+One&display=swap"
@@ -47,7 +47,7 @@
             "@type": "Organization",
             "name": "V1T",
             "url": "https://v1t.site/",
-            "logo": "https://v1t.site/assets/images/v1t.png"
+            "logo": "https://v1t.site/assets/images/V1t_fin.png"
         },
         "about": "Capture The Flag cybersecurity competitions and V1T CTF events"
     }
@@ -265,6 +265,15 @@
             color: #FFFDE7;
         }
 
+        .btn-main {
+            background-color: var(--duck-yellow);
+        }
+
+        .btn-main:hover {
+            background-color: #FFD54F;
+            box-shadow: 4px 4px 0 var(--duck-brown);
+        }
+
         .btn-archive {
             background-color: #E0E0E0;
             color: var(--duck-brown);
@@ -327,7 +336,7 @@
 <body>
     <div class="bg-overlay"></div>
 
-    <div class="page-modal" id="redirect-modal" role="dialog" aria-modal="true" aria-labelledby="redirect-title">
+    <div class="page-modal" id="redirect-modal" role="dialog" aria-modal="true" aria-labelledby="redirect-title" hidden>
         <div class="modal-card">
             <h3 id="redirect-title">QUACK! GO TO 2026?</h3>
             <p>Do you want to redirect to <strong>2026.v1t.site</strong> for the V1T CTF 2026 event page?</p>
@@ -344,13 +353,17 @@
 
     <main class="main-frame">
         <div class="logo-wrapper">
-            <img src="/assets/images/v1t.png" alt="V1T logo" class="logo-img">
+            <img src="/assets/images/V1t_fin.png" alt="V1T logo" class="logo-img">
         </div>
 
         <h1>V1T CTF 2027</h1>
         <h2>Coming soon</h2>
         <br>
         <div class="btn-container">
+            <a href="/" class="btn btn-main" aria-label="Back to V1T homepage">
+                <span>BACK HOME</span>
+            </a>
+
             <a href="https://2026.v1t.site" class="btn btn-featured" aria-label="V1T CTF 2026 legacy event page">
                 <span class="year">V1T CTF 2026<span class="v-badge">LEGACY</span></span>
             </a>
@@ -364,6 +377,8 @@
     <script>
         const redirectModal = document.getElementById('redirect-modal');
         const stayHereButton = document.getElementById('stay-here');
+
+        redirectModal.hidden = false;
 
         stayHereButton.addEventListener('click', () => {
             redirectModal.hidden = true;
