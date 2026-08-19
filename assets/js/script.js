@@ -108,8 +108,43 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // wire load-local-file button + hidden file input
+    const loadFileBtn = document.getElementById('cve-load-file');
+    const fileInput = document.getElementById('cves-file-input');
+    if (loadFileBtn && fileInput) {
+        loadFileBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (evt) => {
+            const f = evt.target.files && evt.target.files[0];
+            if (!f) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const parsed = JSON.parse(String(e.target.result));
+                    // accept either array of IDs or mapping object
+                    if (Array.isArray(parsed) || (parsed && typeof parsed === 'object')) {
+                        localFileData = parsed;
+                        console.log('Loaded local CVE file, entries:', Array.isArray(parsed) ? parsed.length : Object.keys(parsed).length);
+                        // re-render grid
+                        renderCveGrid();
+                    } else {
+                        alert('Local CVE file must be an array of IDs or an object mapping IDs to records');
+                    }
+                } catch (err) {
+                    alert('Failed to parse selected JSON file: ' + err.message);
+                }
+            };
+            reader.readAsText(f);
+        });
+    }
+
     async function loadCveList() {
-        // Try inline JSON first (useful when opening the page via file:// in the browser)
+        // 1) if user supplied a local file via file input, prefer it
+        if (localFileData) {
+            if (Array.isArray(localFileData)) return localFileData;
+            if (typeof localFileData === 'object') return Object.keys(localFileData);
+        }
+
+        // 2) Try inline JSON first (useful when opening the page via file:// in the browser)
         const inlineEl = document.getElementById('cves-list-inline');
         if (inlineEl) {
             try {
@@ -124,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const listUrl = 'assets/data/cves-list.json';
         if (location.protocol === 'file:') {
             // When opened via file://, avoid attempting fetch() to local files (browsers block those).
-            console.warn('Running from file:// — skipping fetch to assets/data/cves-list.json. Use inline JSON (id="cves-list-inline") or run a local HTTP server (python -m http.server).');
+            console.warn('Running from file:// — skipping fetch to assets/data/cves-list.json. Use inline JSON (id="cves-list-inline"), select a local file with "Load local file", or run a local HTTP server (python -m http.server).');
             // try local inline fallback only
             const localInline = document.getElementById('cves-local-inline');
             if (localInline) {
@@ -161,6 +196,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // cached details map
     const cveCache = {}; // cveId -> record object
 
+    // File-based override (when user selects a local JSON file via file input)
+    // localFileData may be either an array of IDs (['CVE-...']) or an object mapping id->record
+    let localFileData = null;
     async function fetchCveRecord(cveId) {
         if (cveCache[cveId]) return cveCache[cveId];
         // Prefer local JSON first (inline or assets) to avoid remote CORS / rate issues
@@ -436,6 +474,26 @@ document.addEventListener('DOMContentLoaded', () => {
     if (modal) {
         modal.addEventListener('click', (e) => { if (e.target === modal) modal.hidden = true; });
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) modal.hidden = true; });
+    }
+
+    // Expose debug helpers to window for easier console testing when opened via file://
+    try {
+        window.debugCves = {
+            loadCveList: async () => {
+                const ids = await loadCveList();
+                console.log('cve list', ids);
+                return ids;
+            },
+            fetchCveRecord: async (id) => {
+                const rec = await fetchCveRecord(id);
+                console.log('cve record', id, rec);
+                return rec;
+            },
+            renderCveGrid: async () => { await renderCveGrid(); console.log('renderCveGrid done'); },
+            cache: cveCache
+        };
+    } catch (e) {
+        /* ignore if window not writable */
     }
 
     // Close any touch-opened popups when clicking outside and hide floating popups
