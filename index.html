@@ -110,7 +110,7 @@
     <img class="logo" src="/assets/images/V1t_fin.png" alt="V1T Logo" loading="lazy">
 
     <!-- 3 Khối Thông Tin (Grid Layout) -->
-    <div class="container">
+    <div class="container stats-layout">
         <!-- Khối 1: Members -->
         <div class="small_container">
             <h2>MEMBERS</h2>
@@ -135,40 +135,43 @@
         </div>
 
         <!-- Khối 2: Stats -->
-        <div class="small_container">
+        <div class="small_container expand-x">
             <h2>CTF STATS</h2>
-            <div style="text-align: center; margin-bottom: 15px;">
-                <a id="world-rank" href="https://ctftime.org/stats/" target="_blank" rel="noopener noreferrer">
-                    <i class="fa-solid fa-earth-americas"></i> World rank: *
-                </a>
-                <br>
-                <a id="country-rank" href="https://ctftime.org/stats/VN" target="_blank" rel="noopener noreferrer">
-                    <i class="fa-solid fa-crown" style="color: #FF9800;"></i> Country place: * 🇻🇳
-                </a>
+            <div class="stats-row" style="text-align: center; margin-bottom: 15px;">
+                <div class="row first-row">
+                    <span id="highest-rank"><i class="fa-solid fa-trophy" style="padding-right:5px;"></i> Highest: *</span>
+                    <span id="world-rank" style="margin-left:12px;"><i class="fa-solid fa-earth-americas" style="padding-right:5px;"></i> World: *</span>
+                </div>
+                <div class="row second-row">
+                    <span id="current-rank"><i class="fa-solid fa-chart-line" style="padding-right:5px;"></i> Current: *</span>
+                    <span id="country-rank" style="margin-left:12px;"><i class="fa-solid fa-flag" style="padding-right:5px; color: #FF9800;"></i> Country: * 🇻🇳</span>
+                </div>
             </div>
-            <div class="team-cve-title">CVES</div>
-            <div class="team-cve-list">
-                <a class="team-cve-item" href="https://www.cve.org/CVERecord?id=CVE-2026-14841" target="_blank" rel="noopener noreferrer">
-                    <span>CVE-2026-14841</span>
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                </a>
-                <a class="team-cve-item" href="https://www.cve.org/CVERecord?id=CVE-2026-61985" target="_blank" rel="noopener noreferrer">
-                    <span>CVE-2026-61985</span>
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                </a>
-                <a class="team-cve-item" href="https://www.cve.org/CVERecord?id=CVE-2026-61978" target="_blank" rel="noopener noreferrer">
-                    <span>CVE-2026-61978</span>
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                </a>
-                <a class="team-cve-item" href="https://www.cve.org/CVERecord?id=CVE-2026-66687" target="_blank" rel="noopener noreferrer">
-                    <span>CVE-2026-66687</span>
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                </a>
-                <a class="team-cve-item" href="https://www.cve.org/CVERecord?id=CVE-2026-66603" target="_blank" rel="noopener noreferrer">
-                    <span>CVE-2026-66603</span>
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                </a>
-                
+            <div class="center-actions">
+                <div class="team-cve-title">CVES</div>
+                <div class="team-cve-list">
+                    <button class="team-cve-showall" id="show-cves" type="button">Show all CVEs</button>
+                    <!-- Full CVE listing is shown in a modal/card to preserve page layout -->
+                </div>
+
+                <div class="team-article-title">ARTICLES</div>
+                <div class="team-article-list">
+                    <button class="team-cve-showall team-article-btn" id="show-articles" type="button" data-href="articles/">Show Articles</button>
+                    <!-- Articles button navigates to /articles/ via JS (keeps button semantics and consistent styling) -->
+                </div>
+            </div>
+        </div>
+
+        <!-- CVE modal (full-screen card) -->
+        <div id="cve-modal" class="cve-modal" hidden>
+            <div class="cve-modal-backdrop"></div>
+            <div class="cve-modal-card">
+                <button class="cve-close" id="cve-close" aria-label="Close CVE list">✕</button>
+                <div class="cve-modal-header">
+                    <h3>All CVEs</h3>
+                    <div class="cve-modal-actions"><button id="cve-refresh" class="team-cve-showall">Refresh</button></div>
+                </div>
+                <div id="cve-grid" class="cve-grid" role="list"></div>
             </div>
         </div>
 
@@ -349,9 +352,12 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/assets/js/commands.js"></script>
-    <script src="/assets/js/terminal.js"></script>
-    <script src="/assets/js/script.js"></script>
+    <!-- Inline JSON fallbacks (useful when opening index.html via file:// in the browser). Prefer running a local HTTP server instead. -->
+    <script id="cves-list-inline" type="application/json">["CVE-2026-66603","CVE-2025-00001"]</script>
+    <script id="cves-local-inline" type="application/json">{"CVE-2026-66603":{"dataType":"CVE_RECORD","dataVersion":"5.2","cveMetadata":{"cveId":"CVE-2026-66603","assignerOrgId":"21595511-bba5-4825-b968-b78d1f9984a3","state":"PUBLISHED","assignerShortName":"Patchstack","dateReserved":"2026-07-27T14:00:13.421Z","datePublished":"2026-08-18T22:02:00.833Z","dateUpdated":"2026-08-18T22:02:00.833Z"},"containers":{"cna":{"providerMetadata":{"orgId":"21595511-bba5-4825-b968-b78d1f9984a3","shortName":"Patchstack","dateUpdated":"2026-08-18T22:02:00.833Z"},"title":"WordPress Draft List plugin <= 2.6.4 - Cross Site Scripting (XSS) vulnerability","problemTypes":[{"descriptions":[{"lang":"en","cweId":"CWE-79","description":"CWE-79 Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')","type":"CWE"}]}],"impacts":[{"capecId":"CAPEC-592","descriptions":[{"lang":"en","value":"CAPEC-592 Stored XSS"}]}],"affected":[{"vendor":"David Artiss","product":"Draft List","collectionURL":"https://wordpress.org/plugins","packageName":"simple-draft-list","versions":[{"status":"affected","version":"n/a","lessThanOrEqual":"2.6.4","changes":[{"at":"2.6.5","status":"unaffected"}],"versionType":"custom"}],"defaultStatus":"unaffected"}],"descriptions":[{"lang":"en","value":"Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in David Artiss Draft List simple-draft-list allows Stored XSS.\n\nThis issue affects Draft List: from n/a through 2.6.4.","supportingMedia":[{"type":"text/html","base64":false,"value":"Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in David Artiss Draft List simple-draft-list allows Stored XSS.<p>This issue affects Draft List: from n/a through 2.6.4.</p>"}]}],"tags":["x_open-source"],"references":[{"url":"https://patchstack.com/database/wordpress/plugin/simple-draft-list/vulnerability/wordpress-draft-list-plugin-2-6-4-cross-site-scripting-xss-vulnerability?_s_id=cve","tags":["vdb-entry"]}],"metrics":[{"format":"CVSS","scenarios":[{"lang":"en","value":"GENERAL"}],"cvssV3_1":{"version":"3.1","attackVector":"NETWORK","attackComplexity":"LOW","privilegesRequired":"LOW","userInteraction":"REQUIRED","scope":"CHANGED","confidentialityImpact":"LOW","integrityImpact":"LOW","availabilityImpact":"LOW","baseSeverity":"MEDIUM","baseScore":6.5,"vectorString":"CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:L"}}],"solutions":[{"lang":"en","value":"Update the WordPress Draft List Plugin to the latest available version (at least 2.6.5).","supportingMedia":[{"type":"text/html","base64":false,"value":"Update the WordPress Draft List Plugin to the latest available version (at least 2.6.5)."}]}],"credits":[{"lang":"en","value":"V1T | Patchstack Bug Bounty Program","user":"00000000-0000-4000-9000-000000000000","type":"finder"}],"source":{"discovery":"EXTERNAL"},"x_generator":{"engine":"Vulnogram 0.2.0"}}}</script>
+    <script src="assets/js/commands.js"></script>
+    <script src="assets/js/terminal.js"></script>
+    <script src="assets/js/script.js"></script>
 </body>
 
 </html>

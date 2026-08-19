@@ -4,6 +4,9 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka+One&family=Quicksand:wght@500;700&family=Delius&display=swap');
 
+/* Use border-box everywhere to avoid width/padding overflow issues */
+*, *::before, *::after { box-sizing: border-box; }
+
 :root {
     --bg-color: #FFFDE7;
     --card-bg: #FFF9C4;
@@ -91,6 +94,59 @@ img.logo {
     padding: 20px;
 }
 
+/* Stats layout: three-column centered middle card with side cards attached */
+:root{
+    --stats-center-min: 280px;
+    --stats-center-preferred: 32vw;
+    --stats-center-max: 700px;
+    --stats-center-width: clamp(var(--stats-center-min), var(--stats-center-preferred), var(--stats-center-max));
+}
+/* Layout: three cards with the center column fixed via clamp and side cards sharing remaining space (stable) */
+.stats-layout {
+    display: grid;
+    grid-template-columns: 1fr var(--stats-center-width) 1fr; /* center column sized via clamp */
+    gap: 20px;
+    align-items: stretch; /* equal heights */
+    max-width: none;
+}
+
+/* Side cards: fill their grid column so they remain equal-width and responsive */
+.stats-layout .small_container:first-child,
+.stats-layout .small_container:nth-child(3) {
+    justify-self: stretch;
+    align-self: stretch;
+    min-width: 160px;
+    box-sizing: border-box;
+}
+
+/* Center card: occupies the middle column and stretches vertically */
+.stats-layout .small_container:nth-child(2) {
+    justify-self: center;
+    align-self: stretch;
+    width: var(--stats-center-width);
+    max-width: 95vw;
+}
+
+/* If expand-x is present allow content-sized width but keep max-width */
+.stats-layout .small_container.expand-x {
+    max-width: 95vw;
+    overflow-wrap: anywhere;
+}
+
+/* Medium screens: slightly tighter gaps */
+@media screen and (max-width: 1200px) {
+  :root{ --stats-center-preferred: 42vw; }
+  .stats-layout { gap: 18px; }
+}
+
+/* Small screens: stack, center card first */
+@media screen and (max-width: 1000px) {
+  .stats-layout { display: flex; flex-direction: column; align-items: stretch; gap: 18px; padding: 0 16px; }
+  .stats-layout .small_container { width: 100%; max-width: 100%; }
+  .stats-layout .small_container.expand-x { width: 100% !important; display: block !important; }
+  .stats-layout .small_container:nth-child(2) { order: -1; }
+}
+
 /* Biến từng cột thành thẻ Card độc lập, bỏ border-right */
 .small_container {
     background: var(--card-bg);
@@ -98,13 +154,28 @@ img.logo {
     border-radius: 15px;
     padding: 25px;
     box-shadow: 8px 8px 0 var(--accent-yellow);
-    transition: 0.2s;
+    transition: transform 260ms cubic-bezier(.2,.9,.3,1), box-shadow 260ms ease, width 260ms ease;
+    display: flex;
+    flex-direction: column;
+    will-change: transform, width;
 }
 
 .small_container:hover {
-    transform: translateY(-5px);
-    box-shadow: 8px 12px 0 var(--accent-orange);
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 10px 14px 0 var(--accent-orange);
 }
+
+/* Smoothly animate stats rows and modal appearance */
+.stats-row .row { transition: all 220ms ease; }
+.cve-modal { transition: opacity 220ms ease; }
+.cve-modal[hidden] { opacity: 0; pointer-events: none; }
+.cve-modal:not([hidden]) { opacity: 1; pointer-events: auto; }
+
+/* Ensure elements don't jump too abruptly */
+@media (prefers-reduced-motion: reduce) {
+  .small_container, .stats-row .row, .cve-modal { transition: none !important; }
+}
+
 
 /* ===== Navbar 8-Bit ===== */
 nav {
@@ -206,9 +277,9 @@ td:last-child { border-right: 2px solid var(--border-color); border-radius: 0 8p
 td:not(.event) { text-align: center; }
 
 .team-cve-title {
-    margin: 18px 0 8px;
-    padding-top: 14px;
-    border-top: 3px dashed var(--accent-yellow);
+    margin: 0 0 12px;
+    padding-bottom: 12px;
+    border-bottom: 3px dashed var(--accent-yellow);
     color: var(--accent-orange);
     font-family: 'Press Start 2P', monospace;
     font-size: 14px;
@@ -220,8 +291,129 @@ td:not(.event) { text-align: center; }
     display: flex;
     flex-direction: column;
     gap: 12px;
+    align-items: center; /* center the CVE button like the article button */
 }
 
+/* CVE button original styling — kept as source of truth. Article button uses this class too. */
+.team-cve-showall {
+    display: inline-block;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: var(--accent-yellow);
+    border: 3px solid var(--border-color);
+    font-family: 'Press Start 2P', monospace;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--border-color);
+    font-size: 12px;
+    line-height: 1;
+    box-sizing: border-box;
+    text-align: center;
+    max-width: 100%;
+}
+.team-cve-showall:hover { background: var(--accent-orange); }
+
+/* Ensure article button explicitly also matches (in case it lacks the class) */
+.team-article-btn {
+    display: inline-block;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: var(--accent-yellow);
+    border: 3px solid var(--border-color);
+    font-family: 'Press Start 2P', monospace;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--border-color);
+    font-size: 12px;
+    line-height: 1;
+    box-sizing: border-box;
+    text-align: center;
+    max-width: 100%;
+}
+.team-article-btn:hover { background: var(--accent-orange); }
+
+/* Make the lists in the center card full-width so their buttons can span the card's inner width */
+.stats-layout .small_container:nth-child(2) .center-actions,
+.stats-layout .small_container:nth-child(2) .center-actions > * {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* center-actions expands to take remaining vertical space and distributes its children evenly */
+.stats-layout .small_container:nth-child(2) .center-actions {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly; /* distribute CVE and ARTICLE evenly in the available vertical space */
+    align-items: stretch;
+    padding: 0 0 0 0; /* rely on small_container padding */
+}
+
+/* Make buttons inside the center card fill the available width */
+.stats-layout .small_container:nth-child(2) .center-actions .team-cve-list .team-cve-showall,
+.stats-layout .small_container:nth-child(2) .center-actions .team-article-list .team-cve-showall,
+.stats-layout .small_container:nth-child(2) .center-actions .team-article-list .team-article-btn {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+}
+
+/* CVE modal styles */
+.cve-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+.cve-modal[hidden] { display: none; }
+.cve-modal-backdrop {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.65);
+}
+.cve-modal-card {
+    position: relative;
+    width: min(98vw, 1100px);
+    max-height: 94vh;
+    background: var(--card-bg);
+    border: 4px solid var(--border-color);
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 12px 12px 0 var(--accent-yellow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+.cve-close { position: absolute; right: 14px; top: 10px; background: transparent; border: none; font-size: 18px; cursor: pointer; color: var(--border-color); }
+.cve-modal-header { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
+.cve-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 12px; overflow:auto; padding: 8px; }
+
+/* CVE card */
+.cve-card { background: #fff; border: 3px solid var(--border-color); padding: 12px; border-radius: 10px; box-shadow: 4px 4px 0 var(--accent-yellow); position: relative; transition: transform .18s ease, box-shadow .18s ease; cursor: pointer; }
+.cve-card:hover { transform: translateY(-6px); box-shadow: 6px 6px 0 var(--accent-orange); }
+.cve-id { font-family: 'Press Start 2P', monospace; font-size: 12px; color: var(--border-color); margin-bottom:8px; }
+.cve-title { font-weight:700; font-size:13px; margin-bottom:6px; color: #111; }
+.cve-meta { font-size:12px; color:#333; opacity:0.9; }
+
+/* Popup detail: appears above cards on hover (pointer) or on tap (touch) */
+.cve-popup { display: none; position: absolute; left: 50%; transform: translateX(-50%) translateY(-8px); top: 0; z-index: 2500; width: min(420px, 90vw); max-height: 60vh; overflow:auto; background: var(--card-bg); border: 3px solid var(--border-color); padding: 14px; border-radius: 10px; box-shadow: 10px 10px 0 var(--accent-yellow); box-sizing: border-box; }
+.cve-popup .desc { font-size: 13px; color: var(--accent-dark-orange); margin-bottom: 8px; }
+.cve-popup .cvss { font-weight: 700; color: var(--accent-orange); margin-bottom: 8px; }
+.cve-popup .refs a { color: var(--accent-yellow); text-decoration: underline; }
+
+@media (pointer: fine) {
+  .cve-card:hover .cve-popup { display: block; }
+}
+.cve-card.popup-open .cve-popup { display: block; }
+
+@media (max-width:600px) {
+    .cve-modal-card { width: 96vw; padding: 12px; }
+    .cve-grid { grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap:10px; }
+}
+
+/* Remove any min-width constraints previously set for equal sizing — center card controls width now */
+.stats-layout .small_container:nth-child(2) .team-cve-showall,
+.stats-layout .small_container:nth-child(2) .team-article-btn {
+    min-width: 0 !important;
+}
 .small_container .team-cve-item {
     display: flex;
     align-items: center;
@@ -485,6 +677,67 @@ body.dark-mode #dataTable tbody tr:last-child td:last-child {
     border-radius: 0 0 12px 0;
 }
 
+/* Stats row and CVE modal */
+.stats-row { display:flex; flex-direction:column; gap:8px; align-items:center; }
+.stats-row .row { display:inline-flex; gap:8px; justify-content:center; align-items:center; flex-wrap:nowrap; min-width:-webkit-min-content; min-width:-moz-min-content; min-width:min-content; }
+.stats-row span { display:inline-flex; white-space:nowrap; background:#fff; border:2px solid var(--border-color); padding:4px 6px; border-radius:6px; font-family:'Press Start 2P', monospace; color:var(--border-color); box-shadow:2px 2px 0 var(--accent-yellow); flex:0 0 auto; font-size:12px; }
+.stats-row span i { font-size: 12px; margin-right:6px; }
+
+/* Allow the overall container to scroll horizontally when a child grows wider; let small_container itself be visible overflow */
+.container { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.small_container { overflow-x: visible; }
+/* Make the stats card expand to fit its content */
+.small_container.expand-x { width: -moz-max-content; width: -webkit-max-content; width: max-content; display: inline-block; }
+
+/* Make the modal responsive to viewport */
+.cve-modal-card { width:auto; max-width:95vw; box-sizing:border-box; }
+
+/* Allow wrapping on very small screens */
+@media screen and (max-width:520px) {
+  .stats-row .row { flex-wrap:wrap; gap:8px; }
+  .stats-row { gap:6px; }
+}
+.team-cve-showall { display:inline-block; padding:6px 10px; border-radius:8px; background:var(--accent-yellow); border:3px solid var(--border-color); font-family:'Press Start 2P', monospace; cursor:pointer; box-shadow:2px 2px 0 var(--border-color); font-size:12px; line-height:1; box-sizing:border-box; margin-bottom:15px}
+.team-cve-showall:hover { background:var(--accent-orange); }
+
+/* Articles area below CVEs */
+.team-article-title { margin-top:12px; font-family:'Press Start 2P', monospace; font-size:10px; color:var(--accent-dark-orange); padding-top:8px; }
+.team-article-title { margin: 0 0 12px; padding-bottom: 12px; border-bottom: 3px dashed var(--accent-yellow); color: var(--accent-orange); font-family: 'Press Start 2P', monospace; font-size: 14px; line-height: 1.6; text-align: center; }
+.team-article-list { 
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+}
+.team-article-btn { display:inline-block; padding:6px 10px; border-radius:8px; background:var(--accent-yellow); border:3px solid var(--border-color); font-family:'Press Start 2P', monospace; cursor:pointer; box-shadow:2px 2px 0 var(--border-color); font-size:12px; text-decoration:none; color: inherit; }
+.team-article-btn:hover { background:var(--accent-orange); }
+
+/* Ensure anchor-based article button is not overridden by generic .small_container a rules */
+.small_container a.team-article-btn,
+.team-article-list a.team-article-btn {
+    background: var(--accent-yellow) !important;
+    border: 3px solid var(--border-color) !important;
+    box-shadow: 2px 2px 0 var(--border-color) !important;
+    padding: 6px 10px !important;
+    border-radius: 8px !important;
+    color: inherit !important;
+    text-decoration: none !important;
+    display: inline-block !important;
+}
+.small_container a.team-article-btn:hover { background: var(--accent-orange) !important; }
+.team-cve-showall:hover { background:var(--accent-orange); }
+
+.cve-modal { position:fixed; inset:0; background: rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:2000; }
+.cve-modal[hidden]{ display:none; }
+.cve-modal-card { width: 80vw; height: 80vh; max-width: 1200px; max-height: 90vh; overflow: auto; background:var(--card-bg); border:4px solid var(--border-color); border-radius:12px; padding:20px; box-shadow:8px 8px 0 var(--accent-yellow); box-sizing:border-box; }
+.cve-modal-card h2 { font-family:'Press Start 2P',monospace; font-size:18px; color:var(--accent-dark-orange); margin-top:0; }
+.cve-close { position: absolute; right: 14px; top: 10px; background: transparent; border: none; font-size: 18px; cursor: pointer; color: var(--border-color); }
+/* full screen grid for CVEs */
+.cve-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:12px; align-items:start; }
+/* each CVE card shows only the ID */
+.cve-card { display:flex; align-items:center; justify-content:center; height:80px; font-family: 'Press Start 2P', monospace; font-size:12px; letter-spacing:0.6px; text-transform:uppercase; }
+
+
 /* ===== MOBILE RESPONSIVENESS ===== */
 .hamburger { display: none; }
 
@@ -500,6 +753,10 @@ body.dark-mode #dataTable tbody tr:last-child td:last-child {
         max-height: 0; overflow: hidden; opacity: 0;
         transition: max-height 0.3s ease, opacity 0.3s ease;
     }
+
+/* Ensure popup is fixed and always above everything (override earlier rules) */
+.cve-popup { display: none !important; position: fixed !important; left: 0 !important; top: 0 !important; z-index: 99999 !important; width: min(520px, 92vw) !important; max-height: 78vh !important; overflow: auto !important; background: var(--card-bg) !important; border: 3px solid var(--border-color) !important; padding: 14px !important; border-radius: 10px !important; box-shadow: 12px 12px 0 var(--accent-yellow) !important; box-sizing: border-box !important; }
+
 
     nav.active ul { max-height: 500px; opacity: 1; padding-bottom: 10px; }
     nav ul li { padding: 10px 20px; text-align: center; }

@@ -1,0 +1,35 @@
+{
+  "CVE-2026-66603": {
+    "dataType": "CVE_RECORD",
+    "dataVersion": "5.2",
+    "cveMetadata": {
+      "cveId": "CVE-2026-66603",
+      "state": "PUBLISHED",
+      "datePublished": "2026-08-18T22:02:00.833Z"
+    },
+    "containers": {
+      "cna": {
+        "title": "WordPress Draft List plugin <= 2.6.4 - Cross Site Scripting (XSS) vulnerability",
+        "descriptions": [
+          {
+            "lang": "en",
+            "value": "Improper Neutralization of Input During Web Page Generation (Stored XSS) in Draft List plugin."
+          }
+        ],
+        "metrics": [
+          {
+            "format": "CVSS",
+            "cvssV3_1": {
+              "baseSeverity": "MEDIUM",
+              "baseScore": 6.5,
+              "vectorString": "CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:L"
+            }
+          }
+        ],
+        "references": [
+          { "url": "https://patchstack.com/database/wordpress/plugin/simple-draft-list/vulnerability/wordpress-draft-list-plugin-2-6-4-cross-site-scripting-xss-vulnerability?_s_id=cve" }
+        ]
+      }
+    }
+  }
+}
