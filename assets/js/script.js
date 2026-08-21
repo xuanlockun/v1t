@@ -51,17 +51,17 @@ async function fetchGoogleSheetData() {
 
     } catch (error) {
         console.error("Lỗi khi tải dữ liệu từ Google Sheets:", error);
+        updateRankInfo(null);
     }
 }
 
 function updateRankInfo(rankData) {
-
-    // Try multiple possible column names for resilience
+    const fallbackText = rankData ? "*" : "N/A";
     const row = rankData && rankData[0] ? rankData[0] : {};
-    const overallRank = row["Overall Rating Place"] || row["Overall Rating"] || row["World Rank"] || "*";
-    const highestRank = row["Highest Rating Place"] || row["Highest Rank"] || row["Best Rating Place"] || "*";
-    const countryRank = row["Country Place"] || "*";
-    const countryFlagImg = '<img src="assets/images/vn.svg" style="padding-left: 5px;" width="17.6">';
+    const overallRank = row["Overall Rating Place"] || row["Overall Rating"] || row["World Rank"] || fallbackText;
+    const highestRank = row["Highest Rating Place"] || row["Highest Rank"] || row["Best Rating Place"] || fallbackText;
+    const countryRank = row["Country Place"] || fallbackText;
+    const countryFlagImg = rankData ? '<img src="assets/images/vn.svg" style="padding-left: 5px;" width="17.6">' : '';
 
     const setText = (selector, icon, label, value, extra = '') => {
         const el = document.querySelector(selector);
@@ -93,138 +93,45 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // wire refresh button
-    const refreshBtn = document.getElementById('cve-refresh');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', async () => {
-            try {
-                refreshBtn.disabled = true;
-                await renderCveGrid();
-            } catch (err) {
-                console.error('Error refreshing CVE grid', err);
-            } finally {
-                refreshBtn.disabled = false;
-            }
-        });
-    }
-
-    // wire load-local-file button + hidden file input
-    const loadFileBtn = document.getElementById('cve-load-file');
-    const fileInput = document.getElementById('cves-file-input');
-    if (loadFileBtn && fileInput) {
-        loadFileBtn.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', (evt) => {
-            const f = evt.target.files && evt.target.files[0];
-            if (!f) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const parsed = JSON.parse(String(e.target.result));
-                    // accept either array of IDs or mapping object
-                    if (Array.isArray(parsed) || (parsed && typeof parsed === 'object')) {
-                        localFileData = parsed;
-                        console.log('Loaded local CVE file, entries:', Array.isArray(parsed) ? parsed.length : Object.keys(parsed).length);
-                        // re-render grid
-                        renderCveGrid();
-                    } else {
-                        alert('Local CVE file must be an array of IDs or an object mapping IDs to records');
-                    }
-                } catch (err) {
-                    alert('Failed to parse selected JSON file: ' + err.message);
-                }
-            };
-            reader.readAsText(f);
-        });
-    }
-
     async function loadCveList() {
-        // 1) if user supplied a local file via file input, prefer it
-        if (localFileData) {
-            if (Array.isArray(localFileData)) return localFileData;
-            if (typeof localFileData === 'object') return Object.keys(localFileData);
-        }
-
-        // 2) Try inline JSON first (useful when opening the page via file:// in the browser)
-        const inlineEl = document.getElementById('cves-list-inline');
-        if (inlineEl) {
-            try {
-                const parsed = JSON.parse(inlineEl.textContent || inlineEl.innerText);
-                if (Array.isArray(parsed)) return parsed;
-                console.warn('cves-list-inline found but not an array');
-            } catch (err) {
-                console.warn('Failed to parse cves-list-inline JSON', err);
-            }
-        }
-
         const listUrl = 'assets/data/cves-list.json';
-        if (location.protocol === 'file:') {
-            // When opened via file://, avoid attempting fetch() to local files (browsers block those).
-            console.warn('Running from file:// — skipping fetch to assets/data/cves-list.json. Use inline JSON (id="cves-list-inline"), select a local file with "Load local file", or run a local HTTP server (python -m http.server).');
-            // try local inline fallback only
-            const localInline = document.getElementById('cves-local-inline');
-            if (localInline) {
-                try {
-                    const obj = JSON.parse(localInline.textContent || localInline.innerText);
-                    if (obj && typeof obj === 'object') return Object.keys(obj);
-                } catch (err) {
-                    console.warn('Failed to parse cves-local-inline JSON', err);
-                }
-            }
-            return [];
-        }
-
         try {
             const res = await fetch(listUrl);
             const ids = await res.json();
             return Array.isArray(ids) ? ids : [];
         } catch (e) {
             console.warn('Failed to load cves-list.json', e);
-            // fallback: if there is inline local map, return its keys
-            const localInline = document.getElementById('cves-local-inline');
-            if (localInline) {
-                try {
-                    const obj = JSON.parse(localInline.textContent || localInline.innerText);
-                    if (obj && typeof obj === 'object') return Object.keys(obj);
-                } catch (err) {
-                    console.warn('Failed to parse cves-local-inline JSON', err);
-                }
-            }
             return [];
         }
     }
 
     // cached details map
     const cveCache = {}; // cveId -> record object
-
-    // File-based override (when user selects a local JSON file via file input)
-    // localFileData may be either an array of IDs (['CVE-...']) or an object mapping id->record
-    let localFileData = null;
-    async function fetchCveRecord(cveId) {
-        if (cveCache[cveId]) return cveCache[cveId];
-        // Prefer local JSON first (inline or assets) to avoid remote CORS / rate issues
+    
+    let localCvesMap = null;
+    async function loadLocalCvesMap() {
+        if (localCvesMap !== null) return localCvesMap;
         try {
-            // inline fallback (added to index.html as cves-local-inline)
-            const inline = document.getElementById('cves-local-inline');
-            if (inline) {
-                try {
-                    const parsed = JSON.parse(inline.textContent || inline.innerText);
-                    if (parsed && parsed[cveId]) { cveCache[cveId] = parsed[cveId]; return parsed[cveId]; }
-                } catch (e) { /* ignore parse error */ }
-            }
-            // try local file unless running from file:// (which will be blocked)
-            if (location.protocol !== 'file:') {
-                try {
-                    const localR = await fetch('assets/data/cves-local.json');
-                    if (localR.ok) {
-                        const localJson = await localR.json();
-                        if (localJson[cveId]) { cveCache[cveId] = localJson[cveId]; return localJson[cveId]; }
-                    }
-                } catch (e) {
-                    // ignore local read errors
-                }
+            const res = await fetch('assets/data/cves-local.json');
+            if (res.ok) {
+                localCvesMap = await res.json();
+                return localCvesMap;
             }
         } catch (e) {
-            // ignore local read errors
+            console.warn('Failed to load cves-local.json', e);
+        }
+        localCvesMap = {}; // fallback to empty object
+        return localCvesMap;
+    }
+
+    async function fetchCveRecord(cveId) {
+        if (cveCache[cveId]) return cveCache[cveId];
+        
+        // check local JSON first
+        const localMap = await loadLocalCvesMap();
+        if (localMap[cveId]) {
+            cveCache[cveId] = localMap[cveId];
+            return localMap[cveId];
         }
 
         // try remote MITRE API as fallback
@@ -440,6 +347,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function renderCveGrid() {
+        // Remove old popups to prevent DOM bloat and memory leaks
+        document.querySelectorAll('.cve-popup').forEach(p => p.remove());
+
         const grid = document.getElementById('cve-grid');
         if (!grid) return;
         grid.innerHTML = '';
