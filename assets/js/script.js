@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // cached details map
     const cveCache = {}; // cveId -> record object
-    
+
     let localCvesMap = null;
     async function loadLocalCvesMap() {
         if (localCvesMap !== null) return localCvesMap;
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchCveRecord(cveId) {
         if (cveCache[cveId]) return cveCache[cveId];
-        
+
         // check local JSON first
         const localMap = await loadLocalCvesMap();
         if (localMap[cveId]) {
@@ -162,6 +162,39 @@ document.addEventListener('DOMContentLoaded', () => {
         idEl.textContent = record.cveMetadata && record.cveMetadata.cveId ? record.cveMetadata.cveId : cveId;
         container.appendChild(idEl);
 
+        let title = 'Waiting for description...';
+        if (record.containers && record.containers.cna && record.containers.cna.title) {
+            title = record.containers.cna.title;
+        } else if (record.containers && record.containers.cna && record.containers.cna.descriptions && record.containers.cna.descriptions[0]) {
+            title = record.containers.cna.descriptions[0].value;
+        }
+        const titleEl = document.createElement('div');
+        titleEl.className = 'cve-title';
+        titleEl.textContent = title;
+        container.appendChild(titleEl);
+
+        let cvssText = 'Unknown Severity';
+        let sevColor = '#999';
+        if (record.containers && record.containers.cna && record.containers.cna.metrics) {
+            for (const m of record.containers.cna.metrics) {
+                const cvss = m.cvssV3_1 || m.cvssV3 || m.cvssV4_0;
+                if (cvss) {
+                    cvssText = cvss.baseSeverity + ' (' + cvss.baseScore + ')';
+                    const sev = cvss.baseSeverity.toUpperCase();
+                    if (sev === 'CRITICAL') sevColor = '#E65100';
+                    else if (sev === 'HIGH') sevColor = '#FF5252';
+                    else if (sev === 'MEDIUM') sevColor = '#FF9800';
+                    else sevColor = '#FFCA28';
+                    break;
+                }
+            }
+        }
+        const sevTag = document.createElement('div');
+        sevTag.className = 'cve-severity-tag';
+        sevTag.textContent = cvssText;
+        sevTag.style.backgroundColor = sevColor;
+        container.appendChild(sevTag);
+
         // popup detail element — appended to body so it can float above everything
         const popup = document.createElement('div');
         popup.className = 'cve-popup';
@@ -175,6 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const cvssEl = document.createElement('div');
         cvssEl.className = 'cvss';
         cvssEl.textContent = cvssText;
+        popup.appendChild(cvssEl);
         popup.appendChild(cvssEl);
 
         // reference link
@@ -307,15 +341,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 const newDesc = (fresh.containers && fresh.containers.cna && fresh.containers.cna.descriptions && fresh.containers.cna.descriptions[0] && fresh.containers.cna.descriptions[0].value) || 'No description available.';
                 descEl.innerHTML = newDesc;
 
+                let newTitle = 'Waiting for description...';
+                if (fresh.containers && fresh.containers.cna && fresh.containers.cna.title) {
+                    newTitle = fresh.containers.cna.title;
+                } else if (newDesc !== 'No description available.') {
+                    newTitle = newDesc;
+                }
+                titleEl.textContent = newTitle;
+
                 // update cvss
-                let newCvss = '';
+                let newCvss = 'Unknown Severity';
+                let newSevColor = '#999';
                 if (fresh.containers && fresh.containers.cna && fresh.containers.cna.metrics) {
                     for (const m of fresh.containers.cna.metrics) {
-                        if (m.cvssV3_1) { newCvss = `Severity: ${m.cvssV3_1.baseSeverity} (${m.cvssV3_1.baseScore})`; break; }
-                        if (m.cvssV3) { newCvss = `Severity: ${m.cvssV3.baseSeverity} (${m.cvssV3.baseScore})`; break; }
+                        const cvss = m.cvssV3_1 || m.cvssV3 || m.cvssV4_0;
+                        if (cvss) {
+                            newCvss = cvss.baseSeverity + ' (' + cvss.baseScore + ')';
+                            const sev = cvss.baseSeverity.toUpperCase();
+                            if (sev === 'CRITICAL') newSevColor = '#E65100';
+                            else if (sev === 'HIGH') newSevColor = '#FF5252';
+                            else if (sev === 'MEDIUM') newSevColor = '#FF9800';
+                            else newSevColor = '#FFCA28';
+                            break;
+                        }
                     }
                 }
                 cvssEl.textContent = newCvss;
+                sevTag.textContent = newCvss;
+                sevTag.style.backgroundColor = newSevColor;
                 // update reference link if present
                 if (fresh.containers && fresh.containers.cna && fresh.containers.cna.references && fresh.containers.cna.references[0]) {
                     refList.innerHTML = '';
