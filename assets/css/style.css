@@ -469,7 +469,7 @@ td:not(.event) { text-align: center; }
 }
 
 /* CVE grid & card styling */
-.cve-grid { display: flex; flex-direction: row; flex-wrap: wrap; gap: 15px; overflow-y: auto; overflow-x: hidden; padding: 10px; padding-bottom: 20px; align-content: flex-start; }
+.cve-grid { display: flex; flex-direction: row; flex-wrap: wrap; gap: 15px; overflow-y: auto; overflow-x: hidden; padding: 10px; padding-bottom: 20px; padding-right:20px; align-content: flex-start; }
 
 /* When split mode, make it column so cards stack on the left sidebar */
 .cve-modal.split-mode .cve-grid { flex-direction: column; flex-wrap: nowrap; }
@@ -486,7 +486,7 @@ td:not(.event) { text-align: center; }
     display: flex; align-items: center; justify-content: center;
     height: 50px; flex-shrink: 0; min-width: 180px; max-width: 100%;
 }
-.cve-modal.split-mode .cve-card { width: 100%; min-width: 0; justify-content: flex-start; }
+.cve-modal.split-mode .cve-card { width: 100%; min-width: 0; justify-content: center; }
 .cve-card:hover, .cve-card.active { transform: translateY(-4px) scale(1.02); box-shadow: 6px 6px 0 var(--accent-orange); }
 .cve-modal.split-mode .cve-card:hover, .cve-modal.split-mode .cve-card.active { transform: translateX(8px) scale(1.01); box-shadow: 6px 6px 0 var(--accent-orange); }
 .cve-card.active { background: var(--accent-yellow); }
