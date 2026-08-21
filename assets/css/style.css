@@ -390,8 +390,8 @@ td:not(.event) { text-align: center; }
     0% { transform: scale(0.8); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
 }
-.cve-close { position: absolute; right: 20px; top: 15px; background: transparent; border: none; font-size: 24px; font-weight: bold; cursor: pointer; color: var(--border-color); transition: transform 0.2s; }
-.cve-close:hover { transform: scale(1.2) rotate(90deg); color: var(--accent-red); }
+.cve-close { position: absolute; right: 15px; top: 15px; background: #d32f2f; color: white; border: 3px solid #111; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; cursor: pointer; box-shadow: 4px 4px 0 #111; z-index: 9999; transition: all 0.2s; }
+.cve-close:hover { transform: translateY(-2px) scale(1.05); box-shadow: 6px 6px 0 #111; background: #f44336; }
 .cve-modal-header { margin-bottom: 20px; border-bottom: 3px dashed var(--accent-orange); padding-bottom: 10px; }
 .cve-modal-header h3 { font-family: 'Press Start 2P', monospace; font-size: 20px; color: var(--accent-dark-orange); margin: 0; text-shadow: 2px 2px 0 #fff; }
 /* Split Layout Elements */
@@ -512,51 +512,162 @@ td:not(.event) { text-align: center; }
   .cve-card:hover .cve-popup { display: block; }
 }
 
-/* CVE Detail View Enhancements */
-.cve-detail-header { border-bottom: 4px solid var(--border-color); padding-bottom: 20px; margin-bottom: 20px; }
-.cve-detail-header h2 { font-family: 'Fredoka One', cursive; font-size: 24px; color: var(--accent-dark-orange); margin-top: 0; margin-bottom: 12px; }
-.cve-meta-tags { display: flex; flex-wrap: wrap; gap: 10px; }
-.cve-tag { font-family: 'Press Start 2P', monospace; font-size: 10px; color: #fff; background: var(--border-color); padding: 6px 10px; border-radius: 4px; box-shadow: 2px 2px 0 var(--accent-red); }
-.cve-tag.tag-id { background: var(--accent-red); box-shadow: 2px 2px 0 var(--border-color); }
-.cve-tag.tag-date { background: var(--accent-blue); box-shadow: 2px 2px 0 var(--border-color); }
+/* CVE Detail View - Clean & Readable */
+.cve-detail-header { border-bottom: 2px solid #eaeaea; padding-bottom: 20px; margin-bottom: 25px; }
+.cve-detail-header h2 { font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 26px; color: #111; margin-top: 0; margin-bottom: 15px; }
+.cve-meta-tags { display: flex; flex-wrap: wrap; gap: 12px; }
+.cve-tag { font-family: 'Quicksand', sans-serif; font-weight: 600; font-size: 13px; color: #fff; padding: 6px 12px; border-radius: 6px; }
+.cve-tag.tag-id { background: var(--accent-red); color: #fff; }
+.cve-tag.tag-date { background: #e0e0e0; color: #333; }
+.cve-tag.tag-assigner { background: #555; color: #fff; }
 
-.detail-row { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 20px; }
-.flex-1 { flex: 1; min-width: 250px; }
+.detail-row { display: flex; flex-wrap: wrap; gap: 25px; margin-bottom: 25px; }
+.flex-1 { flex: 1; min-width: 280px; }
 
-.detail-box { background: var(--card-bg); border: 4px solid var(--border-color); border-radius: 12px; margin-bottom: 20px; box-shadow: 4px 4px 0 var(--border-color); overflow: hidden; }
-.box-title { background: var(--border-color); color: #fff; font-family: 'Fredoka One', cursive; font-size: 16px; padding: 10px 15px; border-bottom: 4px solid var(--border-color); }
-.box-content { padding: 15px; font-family: 'Quicksand', sans-serif; font-size: 14px; color: #333; line-height: 1.6; }
+.detail-box { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
+.box-title { background: #f8f9fa; color: #333; font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 17px; padding: 12px 18px; border-bottom: 1px solid #e0e0e0; }
+.box-content { padding: 18px; font-family: 'Quicksand', sans-serif; font-size: 16px; color: #222; line-height: 1.7; }
 
-.metric-item { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
-.metric-score { font-family: 'Press Start 2P', monospace; font-size: 9px; color: #fff; padding: 6px 10px; border-radius: 4px; border: 2px solid var(--border-color); }
-.badge-critical { background: #ff4d4d; }
-.badge-high { background: #ff9800; }
-.badge-medium { background: #ffeb3b; color: #111; }
-.badge-low { background: #81c784; }
-.metric-vector { font-family: 'Courier New', monospace; font-size: 11px; background: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 4px; border: 1px dashed #ccc; word-break: break-all; }
+.metric-item { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.metric-score { font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 14px; color: #fff; padding: 6px 12px; border-radius: 6px; }
+.badge-critical { background: #d32f2f; }
+.badge-high { background: #f57c00; }
+.badge-medium { background: #fbc02d; color: #111; }
+.badge-low { background: #388e3c; }
+.metric-vector { font-family: 'Courier New', monospace; font-size: 13px; color: #555; background: #f5f5f5; padding: 6px 10px; border-radius: 6px; border: 1px solid #ddd; word-break: break-all; }
 
-.cwe-id-badge { font-family: 'Press Start 2P', monospace; font-size: 9px; color: #fff; background: var(--accent-red); padding: 4px 8px; border-radius: 4px; border: 2px solid var(--border-color); display: inline-block; margin-right: 5px; }
+.cwe-id-badge { font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 14px; color: #fff; background: var(--accent-red); padding: 4px 8px; border-radius: 6px; display: inline-block; margin-right: 8px; }
 
 .affected-list, .ref-list { margin: 0; padding-left: 20px; }
-.affected-list li, .ref-list li { margin-bottom: 8px; }
-.version-badge { font-family: 'Courier New', monospace; font-size: 11px; background: var(--accent-yellow); padding: 2px 6px; border: 1px solid var(--border-color); border-radius: 4px; margin-left: 5px; font-weight: bold; }
-.ref-list a { color: var(--accent-blue); text-decoration: none; font-weight: bold; word-break: break-all; }
-.ref-list a:hover { text-decoration: underline; color: var(--accent-red); }
+.affected-list li, .ref-list li { margin-bottom: 10px; }
+.version-badge { font-family: 'Quicksand', sans-serif; font-size: 13px; background: #fff3e0; color: #e65100; padding: 4px 8px; border: 1px solid #ffe0b2; border-radius: 6px; margin-left: 8px; font-weight: 600; }
+.ref-list a { color: #1976d2; text-decoration: none; font-weight: 500; word-break: break-all; }
+.ref-list a:hover { text-decoration: underline; color: #0d47a1; }
 
-.cve-raw-json { background: #282c34; border: 4px solid var(--border-color); border-radius: 12px; margin-top: 30px; overflow: hidden; box-shadow: 4px 4px 0 var(--accent-yellow); }
-.raw-header { display: flex; justify-content: space-between; align-items: center; background: var(--border-color); color: #fff; padding: 10px 15px; font-family: 'Fredoka One', cursive; font-size: 14px; }
-.copy-json-btn { font-family: 'Fredoka One', cursive; font-size: 12px; background: var(--accent-yellow); color: var(--border-color); border: 2px solid var(--border-color); border-radius: 6px; padding: 6px 12px; cursor: pointer; transition: all 0.2s; box-shadow: 2px 2px 0 var(--border-color); }
-.copy-json-btn:hover { transform: translateY(-2px); box-shadow: 2px 4px 0 var(--border-color); }
-.copy-json-btn:active { transform: translateY(0); box-shadow: 0 0 0 var(--border-color); }
-.cve-raw-json pre { margin: 0; padding: 15px; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 12px; color: #abb2bf; }
+.cve-raw-json { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; margin-top: 35px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.raw-header { display: flex; justify-content: space-between; align-items: center; background: #e0e0e0; color: #333; padding: 12px 18px; font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 15px; }
+.copy-json-btn { font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 14px; background: #fff; color: #333; border: 1px solid #ccc; border-radius: 6px; padding: 8px 16px; cursor: pointer; transition: all 0.2s; }
+.copy-json-btn:hover { background: #f0f0f0; border-color: #bbb; }
+.copy-json-btn:active { background: #e0e0e0; }
+.cve-raw-json pre { margin: 0; padding: 18px; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 14px; color: #333; }
 
-@media (max-width:768px) {
-    .cve-modal-card { width: 96vw; padding: 12px; height: 90vh; }
-    .cve-modal-content { flex-direction: column; overflow-y: auto; overflow-x: hidden; }
-    .cve-modal.split-mode .cve-sidebar { width: 100%; min-width: 0; border-right: none; padding-right: 0; border-bottom: 4px dashed var(--border-color); padding-bottom: 20px; }
-    .cve-modal.split-mode .cve-detail-view { width: 100%; display: flex; flex: 1 1 auto; margin-top: 20px; }
-    .cve-modal.split-mode .cve-grid { flex-direction: row; flex-wrap: wrap; }
-    .cve-modal.split-mode .cve-card { width: auto; justify-content: center; }
+@media (max-width: 768px) {
+    .cve-modal-card { width: 96vw; height: 92vh; padding: 10px; display: flex; flex-direction: column; }
+    .cve-modal-content { flex-direction: column; overflow: hidden; flex: 1; }
+    
+    /* Default Grid Mode */
+    .cve-sidebar {
+        width: 100%;
+        height: 100%;
+        border-right: none;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .cve-sidebar .cve-modal-header {
+        flex-shrink: 0;
+        text-align: center;
+    }
+    .cve-grid {
+        flex: 1;
+        flex-direction: row;
+        flex-wrap: wrap;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        justify-content: center; /* Center items in non-split mode */
+        align-content: flex-start;
+        padding-bottom: 20px;
+    }
+    .cve-card {
+        padding: 12px 15px;
+        width: calc(50% - 15px); /* 2 columns on mobile */
+    }
+
+    /* Adjust Close Button for mobile */
+    .cve-close {
+        right: 10px;
+        top: 10px;
+        width: 36px;
+        height: 36px;
+        border: 2px solid #111;
+        font-size: 16px;
+        box-shadow: 2px 2px 0 #111;
+    }
+
+    /* Split Mode (Horizontal scroll top, detail bottom) */
+    .cve-modal.split-mode .cve-sidebar {
+        width: calc(100% + 20px);
+        margin: 0 -10px;
+        height: 80px; /* Fixed height for horizontal list */
+        min-height: 80px;
+        flex: 0 0 80px;
+        border-right: none;
+        border-bottom: 2px solid #eaeaea;
+        overflow: hidden; /* We'll scroll the inner grid horizontally */
+        margin-top: 16px
+    }
+    
+    /* Hide the 'All CVEs' header in split mode on mobile to save space */
+    .cve-modal.split-mode .cve-sidebar .cve-modal-header {
+        display: none;
+    }
+    
+    /* When split mode, make sure the close button is still visible but might need to adjust top position if needed */
+    .cve-modal.split-mode .cve-close {
+        top: 5px;
+        right: 5px;
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+
+    .cve-modal.split-mode .cve-grid {
+        height: 100%;
+        width: 100%;
+        max-width: 100%;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 10px 10px;
+        align-items: center;
+        scrollbar-width: none; /* Hide scrollbar Firefox */
+        -webkit-overflow-scrolling: touch;
+    }
+    .cve-modal.split-mode .cve-grid::-webkit-scrollbar {
+        display: none; /* Hide scrollbar Chrome/Safari */
+    }
+    
+    .cve-modal.split-mode .cve-card {
+        flex: 0 0 auto;
+        width: auto;
+        min-width: max-content;
+        margin-bottom: 0;
+        white-space: nowrap;
+        padding: 10px 15px;
+    }
+
+    .cve-modal.split-mode .cve-detail-view {
+        width: 100%;
+        flex: 1 1 auto;
+        height: calc(100% - 80px);
+        overflow-y: auto;
+        padding: 15px 10px;
+        margin-top: 0;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Adjust Detail View Typography for Mobile */
+    .cve-detail-header h2 { font-size: 20px; line-height: 1.4; }
+    .detail-row { flex-direction: column; gap: 15px; }
+    .flex-1 { min-width: 100%; }
+    .cve-meta-tags { gap: 8px; }
+    .cve-tag { font-size: 11px; padding: 5px 10px; }
+    .box-title { font-size: 15px; padding: 10px 15px; }
+    .box-content { font-size: 14px; padding: 15px; }
+
+    /* Disable hover popups on mobile */
+    .cve-popup { display: none !important; }
 }
 
 /* Remove any min-width constraints previously set for equal sizing — center card controls width now */

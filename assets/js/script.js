@@ -114,7 +114,23 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const res = await fetch('assets/data/cves-local.json');
             if (res.ok) {
-                localCvesMap = await res.json();
+                const data = await res.json();
+                localCvesMap = {};
+                // Handle different JSON structures intelligently
+                if (Array.isArray(data)) {
+                    // Array of CVE records
+                    data.forEach(item => {
+                        if (item.cveMetadata && item.cveMetadata.cveId) {
+                            localCvesMap[item.cveMetadata.cveId] = item;
+                        }
+                    });
+                } else if (data.dataType === "CVE_RECORD" && data.cveMetadata && data.cveMetadata.cveId) {
+                    // Single bare CVE record
+                    localCvesMap[data.cveMetadata.cveId] = data;
+                } else {
+                    // Assume it's a map: { "CVE-XXXX": { record } }
+                    localCvesMap = data;
+                }
                 return localCvesMap;
             }
         } catch (e) {
@@ -157,18 +173,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // Setup data
         const cna = record.containers && record.containers.cna ? record.containers.cna : {};
         const meta = record.cveMetadata || {};
-        
+
         let title = cna.title || meta.cveId || cveId;
         let datePub = meta.datePublished ? new Date(meta.datePublished).toLocaleDateString() : 'N/A';
         let assigner = meta.assignerShortName || 'N/A';
-        
+
         let html = `
             <div class="cve-detail-header">
                 <h2>${title}</h2>
                 <div class="cve-meta-tags">
                     <span class="cve-tag tag-id">${meta.cveId || cveId}</span>
-                    <span class="cve-tag tag-date">📅 Published: ${datePub}</span>
-                    <span class="cve-tag tag-assigner">🏢 Assigner: ${assigner}</span>
+                    <span class="cve-tag tag-date">Published: ${datePub}</span>
+                    <span class="cve-tag tag-assigner">Assigner: ${assigner}</span>
                 </div>
             </div>
             <div class="cve-detail-body">
@@ -177,15 +193,23 @@ document.addEventListener('DOMContentLoaded', () => {
         // Description
         if (cna.descriptions && cna.descriptions[0]) {
             html += `<div class="detail-box">
-                <div class="box-title">📝 Description</div>
+                <div class="box-title">Description</div>
                 <div class="box-content">${cna.descriptions[0].value}</div>
             </div>`;
         }
 
         // Metrics & Weakness
         let metricsHtml = '';
-        if (cna.metrics) {
-            cna.metrics.forEach(m => {
+        let allMetrics = [];
+        if (cna.metrics) allMetrics = allMetrics.concat(cna.metrics);
+        if (record.containers && record.containers.adp) {
+            record.containers.adp.forEach(adp => {
+                if (adp.metrics) allMetrics = allMetrics.concat(adp.metrics);
+            });
+        }
+
+        if (allMetrics.length > 0) {
+            allMetrics.forEach(m => {
                 const cvss = m.cvssV3_1 || m.cvssV3 || m.cvssV4_0;
                 if (cvss) {
                     const sevClass = (cvss.baseSeverity || 'unknown').toLowerCase();
@@ -196,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
-        
+
         let weaknessHtml = '';
         if (cna.problemTypes && cna.problemTypes[0] && cna.problemTypes[0].descriptions) {
             const desc = cna.problemTypes[0].descriptions[0];
@@ -207,13 +231,13 @@ document.addEventListener('DOMContentLoaded', () => {
             html += `<div class="detail-row">`;
             if (metricsHtml) {
                 html += `<div class="detail-box flex-1">
-                    <div class="box-title">📊 Metrics (CVSS)</div>
+                    <div class="box-title">Metrics (CVSS)</div>
                     <div class="box-content">${metricsHtml}</div>
                 </div>`;
             }
             if (weaknessHtml) {
                 html += `<div class="detail-box flex-1">
-                    <div class="box-title">🛑 Weakness (CWE)</div>
+                    <div class="box-title">Weakness (CWE)</div>
                     <div class="box-content">${weaknessHtml}</div>
                 </div>`;
             }
@@ -234,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             affectedHtml += `</ul>`;
             html += `<div class="detail-box">
-                <div class="box-title">🎯 Affected Products</div>
+                <div class="box-title">Affected Products</div>
                 <div class="box-content">${affectedHtml}</div>
             </div>`;
         }
@@ -242,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Solution
         if (cna.solutions && cna.solutions[0]) {
             html += `<div class="detail-box">
-                <div class="box-title">💡 Solution</div>
+                <div class="box-title">Solution</div>
                 <div class="box-content">${cna.solutions[0].value}</div>
             </div>`;
         }
@@ -255,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             refHtml += `</ul>`;
             html += `<div class="detail-box">
-                <div class="box-title">🔗 References</div>
+                <div class="box-title">References</div>
                 <div class="box-content">${refHtml}</div>
             </div>`;
         }
@@ -267,8 +291,8 @@ document.addEventListener('DOMContentLoaded', () => {
         html += `
             <div class="cve-raw-json">
                 <div class="raw-header">
-                    <span>⚙️ Raw JSON Data</span>
-                    <button class="copy-json-btn">📋 Copy</button>
+                    <span>Raw JSON Data</span>
+                    <button class="copy-json-btn">Copy</button>
                 </div>
                 <pre><code id="raw-json-content">${rawJson}</code></pre>
             </div>
@@ -281,8 +305,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (copyBtn) {
             copyBtn.addEventListener('click', () => {
                 navigator.clipboard.writeText(rawJson).then(() => {
-                    copyBtn.textContent = '✅ Copied!';
-                    setTimeout(() => { copyBtn.textContent = '📋 Copy'; }, 2000);
+                    copyBtn.textContent = 'Copied!';
+                    setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
                 }).catch(err => {
                     console.error('Failed to copy: ', err);
                 });
@@ -297,8 +321,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Determine severity class based on local data if available
         let severityClass = '';
+        let cardMetrics = [];
         if (record.containers && record.containers.cna && record.containers.cna.metrics) {
-            for (const m of record.containers.cna.metrics) {
+            cardMetrics = cardMetrics.concat(record.containers.cna.metrics);
+        }
+        if (record.containers && record.containers.adp) {
+            record.containers.adp.forEach(adp => {
+                if (adp.metrics) cardMetrics = cardMetrics.concat(adp.metrics);
+            });
+        }
+
+        if (cardMetrics.length > 0) {
+            for (const m of cardMetrics) {
                 const cvss = m.cvssV3_1 || m.cvssV3 || m.cvssV4_0;
                 if (cvss && cvss.baseSeverity) {
                     const s = cvss.baseSeverity.toUpperCase();
@@ -329,7 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 const fresh = await fetchCveRecord(cveId);
-                
+
                 let baseScore = '';
                 let baseSeverity = '';
                 let vectorString = 'No vector string';
@@ -339,8 +373,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (fresh.containers && fresh.containers.cna) {
                     const cna = fresh.containers.cna;
-                    if (cna.metrics) {
-                        for (const m of cna.metrics) {
+
+                    let popupMetrics = [];
+                    if (cna.metrics) popupMetrics = popupMetrics.concat(cna.metrics);
+                    if (fresh.containers.adp) {
+                        fresh.containers.adp.forEach(adp => {
+                            if (adp.metrics) popupMetrics = popupMetrics.concat(adp.metrics);
+                        });
+                    }
+
+                    if (popupMetrics.length > 0) {
+                        for (const m of popupMetrics) {
                             const cvss = m.cvssV3_1 || m.cvssV3 || m.cvssV4_0;
                             if (cvss) {
                                 baseScore = cvss.baseScore;
@@ -350,9 +393,33 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         }
                     }
-                    if (cna.problemTypes && cna.problemTypes[0] && cna.problemTypes[0].descriptions) {
-                        cwe = cna.problemTypes[0].descriptions[0].cweId || cna.problemTypes[0].descriptions[0].description;
+
+                    // Extract CWE ID from CNA or ADP
+                    let allProblemTypes = [];
+                    if (cna.problemTypes) allProblemTypes = allProblemTypes.concat(cna.problemTypes);
+                    if (fresh.containers.adp) {
+                        fresh.containers.adp.forEach(adp => {
+                            if (adp.problemTypes) allProblemTypes = allProblemTypes.concat(adp.problemTypes);
+                        });
                     }
+
+                    for (const pt of allProblemTypes) {
+                        if (pt.descriptions && pt.descriptions.length > 0) {
+                            const d = pt.descriptions[0];
+                            if (d.cweId) {
+                                cwe = d.cweId;
+                                break;
+                            } else if (d.description && d.description.toUpperCase().startsWith('CWE-')) {
+                                // Fallback: try to extract CWE-XXX from description if cweId is missing
+                                const match = d.description.match(/(CWE-\d+)/i);
+                                if (match) {
+                                    cwe = match[1].toUpperCase();
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
                     if (cna.descriptions && cna.descriptions[0]) {
                         desc = cna.descriptions[0].value;
                     }
@@ -384,27 +451,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const _ = popup.offsetHeight; // force reflow
             const rect = container.getBoundingClientRect();
-            
+
             let left = Math.round(rect.left + rect.width / 2 - popupWidth / 2);
             left = Math.max(8, Math.min(left, vw - popupWidth - 8));
-            
+
             let top = Math.round(rect.top - popup.offsetHeight - 12);
-            
+
             // If it spills off the top, try putting it below the card
             if (top < 8) {
                 top = Math.round(rect.bottom + 12);
             }
-            
+
             // If it spills off the bottom, force it inside the screen
             if (top + popup.offsetHeight > vh - 8) {
                 top = vh - popup.offsetHeight - 8;
             }
-            
+
             // If the popup is extremely tall and still spills off the top, clamp to top
             if (top < 8) {
                 top = 8;
             }
-            
+
             popup.style.left = left + 'px';
             popup.style.top = top + 'px';
             popup.style.visibility = 'visible';
@@ -422,7 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
         container.addEventListener('click', async (ev) => {
             ev.stopPropagation();
             hidePopup();
-            
+
             const modal = document.getElementById('cve-modal');
             const isActive = container.classList.contains('active');
 
