@@ -364,40 +364,61 @@ td:not(.event) { text-align: center; }
     align-items: center;
     justify-content: center;
     z-index: 9999;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
-.cve-modal[hidden] { display: none; }
+.cve-modal[hidden] { opacity: 0; visibility: hidden; pointer-events: none; }
 .cve-modal-backdrop {
     position: absolute; inset: 0; background: rgba(0,0,0,0.65);
 }
 .cve-modal-card {
     position: relative;
-    width: min(98vw, 1100px);
-    max-height: 94vh;
+    width: min(95vw, 1200px);
+    height: 85vh;
     background: var(--card-bg);
     border: 4px solid var(--border-color);
-    border-radius: 12px;
-    padding: 18px;
+    border-radius: 16px;
+    padding: 24px;
     box-shadow: 12px 12px 0 var(--accent-yellow);
-    overflow: hidden;
     display: flex;
     flex-direction: column;
+    animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-.cve-close { position: absolute; right: 14px; top: 10px; background: transparent; border: none; font-size: 18px; cursor: pointer; color: var(--border-color); }
-.cve-modal-header { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
-.cve-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 12px; overflow:auto; padding: 8px; }
+@keyframes modalPop {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+.cve-close { position: absolute; right: 20px; top: 15px; background: transparent; border: none; font-size: 24px; font-weight: bold; cursor: pointer; color: var(--border-color); transition: transform 0.2s; }
+.cve-close:hover { transform: scale(1.2) rotate(90deg); color: var(--accent-red); }
+.cve-modal-header { margin-bottom: 20px; border-bottom: 3px dashed var(--accent-orange); padding-bottom: 10px; }
+.cve-modal-header h3 { font-family: 'Press Start 2P', monospace; font-size: 20px; color: var(--accent-dark-orange); margin: 0; text-shadow: 2px 2px 0 #fff; }
+.cve-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; overflow-y: auto; padding: 10px; padding-bottom: 20px; }
+
+/* CVE grid scrollbar */
+.cve-grid::-webkit-scrollbar { width: 10px; }
+.cve-grid::-webkit-scrollbar-track { background: var(--bg-color); border-radius: 10px; border: 2px solid var(--border-color); }
+.cve-grid::-webkit-scrollbar-thumb { background: var(--accent-yellow); border-radius: 10px; border: 2px solid var(--border-color); }
 
 /* CVE card */
-.cve-card { background: #fff; border: 3px solid var(--border-color); padding: 12px; border-radius: 10px; box-shadow: 4px 4px 0 var(--accent-yellow); position: relative; transition: transform .18s ease, box-shadow .18s ease; cursor: pointer; }
-.cve-card:hover { transform: translateY(-6px); box-shadow: 6px 6px 0 var(--accent-orange); }
-.cve-id { font-family: 'Press Start 2P', monospace; font-size: 12px; color: var(--border-color); margin-bottom:8px; }
-.cve-title { font-weight:700; font-size:13px; margin-bottom:6px; color: #111; }
+.cve-card { 
+    background: #fff; border: 4px solid var(--border-color); padding: 20px; border-radius: 15px; 
+    box-shadow: 6px 6px 0 var(--accent-yellow); position: relative; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; 
+    display: flex; flex-direction: column; justify-content: space-between;
+    height: 100%; min-height: 160px;
+}
+.cve-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 8px 10px 0 var(--accent-orange); }
+.cve-id { font-family: 'Press Start 2P', monospace; font-size: 11px; color: var(--border-color); margin-bottom: 12px; background: var(--bg-color); display: inline-block; padding: 6px 10px; border-radius: 8px; border: 2px solid var(--border-color); box-shadow: 2px 2px 0 var(--border-color); }
+.cve-title { font-family: 'Fredoka One', cursive; font-size: 16px; margin-bottom: 15px; color: #222; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; flex-grow: 1; }
+.cve-severity-tag { font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 12px; padding: 6px 12px; border-radius: 20px; color: #fff; border: 2px solid var(--border-color); box-shadow: 2px 2px 0 var(--border-color); align-self: flex-start; }
 .cve-meta { font-size:12px; color:#333; opacity:0.9; }
 
 /* Popup detail: appears above cards on hover (pointer) or on tap (touch) */
-.cve-popup { display: none; position: absolute; left: 50%; transform: translateX(-50%) translateY(-8px); top: 0; z-index: 2500; width: min(420px, 90vw); max-height: 60vh; overflow:auto; background: var(--card-bg); border: 3px solid var(--border-color); padding: 14px; border-radius: 10px; box-shadow: 10px 10px 0 var(--accent-yellow); box-sizing: border-box; }
-.cve-popup .desc { font-size: 13px; color: var(--accent-dark-orange); margin-bottom: 8px; }
-.cve-popup .cvss { font-weight: 700; color: var(--accent-orange); margin-bottom: 8px; }
-.cve-popup .refs a { color: var(--accent-yellow); text-decoration: underline; }
+.cve-popup { display: none; position: absolute; left: 50%; transform: translateX(-50%) translateY(-8px); top: 0; z-index: 2500; width: min(480px, 90vw); max-height: 60vh; overflow:auto; background: var(--card-bg); border: 4px solid var(--border-color); padding: 20px; border-radius: 15px; box-shadow: 10px 10px 0 var(--accent-red); box-sizing: border-box; }
+.cve-popup .desc { font-family: 'Quicksand', sans-serif; font-size: 14px; color: #111; font-weight: 500; margin-bottom: 12px; line-height: 1.6; }
+.cve-popup .cvss { font-family: 'Fredoka One', cursive; font-size: 14px; color: var(--accent-dark-orange); margin-bottom: 12px; }
+.cve-popup .refs a { color: #000; text-decoration: none; background: var(--accent-yellow); border: 2px solid var(--border-color); padding: 8px 14px; border-radius: 8px; font-family: 'Press Start 2P', monospace; font-size: 9px; box-shadow: 2px 2px 0 var(--border-color); display: inline-block; transition: 0.2s; }
+.cve-popup .refs a:hover { background: var(--accent-orange); transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--border-color); color: var(--border-color); }
 
 @media (pointer: fine) {
   .cve-card:hover .cve-popup { display: block; }
@@ -621,6 +642,15 @@ body.dark-mode .team-cve-title {
     border-top-color: var(--accent-yellow);
 }
 
+body.dark-mode .cve-card { background: #2a2a2a; border-color: #555; box-shadow: 6px 6px 0 var(--accent-orange); }
+body.dark-mode .cve-card:hover { box-shadow: 8px 10px 0 var(--accent-yellow); }
+body.dark-mode .cve-id { background: #111; color: var(--accent-yellow); border-color: #555; box-shadow: 2px 2px 0 #555; }
+body.dark-mode .cve-title { color: #fff; }
+body.dark-mode .cve-popup { background: #2a2a2a; border-color: #555; box-shadow: 10px 10px 0 var(--accent-orange); }
+body.dark-mode .cve-popup .desc { color: #eee; }
+body.dark-mode .cve-grid::-webkit-scrollbar-track { background: #121212; border-color: #555; }
+body.dark-mode .cve-grid::-webkit-scrollbar-thumb { background: var(--accent-orange); border-color: #555; }
+
 /* ========================================================
    🦆 DARK MODE CHO BẢNG XẾP HẠNG (#dataTable)
    ======================================================== */
@@ -727,16 +757,7 @@ body.dark-mode #dataTable tbody tr:last-child td:last-child {
 .small_container a.team-article-btn:hover { background: var(--accent-orange) !important; }
 .team-cve-showall:hover { background:var(--accent-orange); }
 
-.cve-modal { position:fixed; inset:0; background: rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:2000; }
-.cve-modal[hidden]{ display:none; }
-.cve-modal-card { width: 80vw; height: 80vh; max-width: 1200px; max-height: 90vh; overflow: auto; background:var(--card-bg); border:4px solid var(--border-color); border-radius:12px; padding:20px; box-shadow:8px 8px 0 var(--accent-yellow); box-sizing:border-box; }
-.cve-modal-card h2 { font-family:'Press Start 2P',monospace; font-size:18px; color:var(--accent-dark-orange); margin-top:0; }
-.cve-close { position: absolute; right: 14px; top: 10px; background: transparent; border: none; font-size: 18px; cursor: pointer; color: var(--border-color); }
-/* full screen grid for CVEs */
-.cve-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:12px; align-items:start; }
-/* each CVE card shows only the ID */
-.cve-card { display:flex; align-items:center; justify-content:center; height:80px; font-family: 'Press Start 2P', monospace; font-size:12px; letter-spacing:0.6px; text-transform:uppercase; }
-
+/* Removed duplicate cve-modal rules */
 
 /* ===== MOBILE RESPONSIVENESS ===== */
 .hamburger { display: none; }
