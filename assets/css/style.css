@@ -631,6 +631,7 @@ td:not(.event) { text-align: center; }
         overflow-y: hidden;
         padding: 10px 10px;
         align-items: center;
+        justify-content: flex-start; /* Prevent centering from hiding first items */
         scrollbar-width: none; /* Hide scrollbar Firefox */
         -webkit-overflow-scrolling: touch;
     }
