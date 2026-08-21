@@ -596,7 +596,7 @@ td:not(.event) { text-align: center; }
 
     /* Split Mode (Horizontal scroll top, detail bottom) */
     .cve-modal.split-mode .cve-sidebar {
-        width: calc(100% + 20px);
+        width: calc(100% + 40px);
         margin: 0 -10px;
         height: 80px; /* Fixed height for horizontal list */
         min-height: 80px;
