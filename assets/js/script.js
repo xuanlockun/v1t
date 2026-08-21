@@ -153,242 +153,299 @@ document.addEventListener('DOMContentLoaded', () => {
         return placeholder;
     }
 
+    function renderDetailView(container, record, cveId) {
+        // Setup data
+        const cna = record.containers && record.containers.cna ? record.containers.cna : {};
+        const meta = record.cveMetadata || {};
+        
+        let title = cna.title || meta.cveId || cveId;
+        let datePub = meta.datePublished ? new Date(meta.datePublished).toLocaleDateString() : 'N/A';
+        let assigner = meta.assignerShortName || 'N/A';
+        
+        let html = `
+            <div class="cve-detail-header">
+                <h2>${title}</h2>
+                <div class="cve-meta-tags">
+                    <span class="cve-tag tag-id">${meta.cveId || cveId}</span>
+                    <span class="cve-tag tag-date">📅 Published: ${datePub}</span>
+                    <span class="cve-tag tag-assigner">🏢 Assigner: ${assigner}</span>
+                </div>
+            </div>
+            <div class="cve-detail-body">
+        `;
+
+        // Description
+        if (cna.descriptions && cna.descriptions[0]) {
+            html += `<div class="detail-box">
+                <div class="box-title">📝 Description</div>
+                <div class="box-content">${cna.descriptions[0].value}</div>
+            </div>`;
+        }
+
+        // Metrics & Weakness
+        let metricsHtml = '';
+        if (cna.metrics) {
+            cna.metrics.forEach(m => {
+                const cvss = m.cvssV3_1 || m.cvssV3 || m.cvssV4_0;
+                if (cvss) {
+                    const sevClass = (cvss.baseSeverity || 'unknown').toLowerCase();
+                    metricsHtml += `<div class="metric-item">
+                        <span class="metric-score badge-${sevClass}">${cvss.baseScore} ${cvss.baseSeverity}</span>
+                        <span class="metric-vector">${cvss.vectorString}</span>
+                    </div>`;
+                }
+            });
+        }
+        
+        let weaknessHtml = '';
+        if (cna.problemTypes && cna.problemTypes[0] && cna.problemTypes[0].descriptions) {
+            const desc = cna.problemTypes[0].descriptions[0];
+            weaknessHtml = `<div class="weakness-item">${desc.cweId ? `<strong class="cwe-id-badge">${desc.cweId}</strong> ` : ''}${desc.description || ''}</div>`;
+        }
+
+        if (metricsHtml || weaknessHtml) {
+            html += `<div class="detail-row">`;
+            if (metricsHtml) {
+                html += `<div class="detail-box flex-1">
+                    <div class="box-title">📊 Metrics (CVSS)</div>
+                    <div class="box-content">${metricsHtml}</div>
+                </div>`;
+            }
+            if (weaknessHtml) {
+                html += `<div class="detail-box flex-1">
+                    <div class="box-title">🛑 Weakness (CWE)</div>
+                    <div class="box-content">${weaknessHtml}</div>
+                </div>`;
+            }
+            html += `</div>`;
+        }
+
+        // Affected Products
+        if (cna.affected && cna.affected.length > 0) {
+            let affectedHtml = `<ul class="affected-list">`;
+            cna.affected.forEach(a => {
+                let text = `<strong>${a.vendor || 'Unknown'}</strong> / <span>${a.product || 'Unknown'}</span>`;
+                if (a.versions && a.versions.length > 0) {
+                    let v = a.versions[0];
+                    if (v.lessThanOrEqual) text += ` <span class="version-badge"><= ${v.lessThanOrEqual}</span>`;
+                    else if (v.version && v.version !== 'unspecified') text += ` <span class="version-badge">v${v.version}</span>`;
+                }
+                affectedHtml += `<li>${text}</li>`;
+            });
+            affectedHtml += `</ul>`;
+            html += `<div class="detail-box">
+                <div class="box-title">🎯 Affected Products</div>
+                <div class="box-content">${affectedHtml}</div>
+            </div>`;
+        }
+
+        // Solution
+        if (cna.solutions && cna.solutions[0]) {
+            html += `<div class="detail-box">
+                <div class="box-title">💡 Solution</div>
+                <div class="box-content">${cna.solutions[0].value}</div>
+            </div>`;
+        }
+
+        // References
+        if (cna.references && cna.references.length > 0) {
+            let refHtml = `<ul class="ref-list">`;
+            cna.references.forEach(r => {
+                refHtml += `<li><a href="${r.url}" target="_blank" rel="noopener noreferrer">${r.url}</a></li>`;
+            });
+            refHtml += `</ul>`;
+            html += `<div class="detail-box">
+                <div class="box-title">🔗 References</div>
+                <div class="box-content">${refHtml}</div>
+            </div>`;
+        }
+
+        html += `</div>`; // end detail-body
+
+        // Raw JSON
+        const rawJson = JSON.stringify(record, null, 2);
+        html += `
+            <div class="cve-raw-json">
+                <div class="raw-header">
+                    <span>⚙️ Raw JSON Data</span>
+                    <button class="copy-json-btn">📋 Copy</button>
+                </div>
+                <pre><code id="raw-json-content">${rawJson}</code></pre>
+            </div>
+        `;
+
+        container.innerHTML = html;
+
+        // Copy button listener
+        const copyBtn = container.querySelector('.copy-json-btn');
+        if (copyBtn) {
+            copyBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(rawJson).then(() => {
+                    copyBtn.textContent = '✅ Copied!';
+                    setTimeout(() => { copyBtn.textContent = '📋 Copy'; }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+            });
+        }
+    }
+
     function makeCveCardElement(cveId, record) {
         const container = document.createElement('div');
         container.className = 'cve-card';
+        container.tabIndex = 0;
+
+        // Determine severity class based on local data if available
+        let severityClass = '';
+        if (record.containers && record.containers.cna && record.containers.cna.metrics) {
+            for (const m of record.containers.cna.metrics) {
+                const cvss = m.cvssV3_1 || m.cvssV3 || m.cvssV4_0;
+                if (cvss && cvss.baseSeverity) {
+                    const s = cvss.baseSeverity.toUpperCase();
+                    if (s === 'CRITICAL') severityClass = 'severity-critical';
+                    else if (s === 'HIGH') severityClass = 'severity-high';
+                    else if (s === 'MEDIUM') severityClass = 'severity-medium';
+                    else if (s === 'LOW') severityClass = 'severity-low';
+                    break;
+                }
+            }
+        }
+        if (severityClass) container.classList.add(severityClass);
 
         const idEl = document.createElement('div');
         idEl.className = 'cve-id';
         idEl.textContent = record.cveMetadata && record.cveMetadata.cveId ? record.cveMetadata.cveId : cveId;
         container.appendChild(idEl);
 
-        let title = 'Waiting for description...';
-        if (record.containers && record.containers.cna && record.containers.cna.title) {
-            title = record.containers.cna.title;
-        } else if (record.containers && record.containers.cna && record.containers.cna.descriptions && record.containers.cna.descriptions[0]) {
-            title = record.containers.cna.descriptions[0].value;
-        }
-        const titleEl = document.createElement('div');
-        titleEl.className = 'cve-title';
-        titleEl.textContent = title;
-        container.appendChild(titleEl);
-
-        let cvssText = 'Unknown Severity';
-        let sevColor = '#999';
-        if (record.containers && record.containers.cna && record.containers.cna.metrics) {
-            for (const m of record.containers.cna.metrics) {
-                const cvss = m.cvssV3_1 || m.cvssV3 || m.cvssV4_0;
-                if (cvss) {
-                    cvssText = cvss.baseSeverity + ' (' + cvss.baseScore + ')';
-                    const sev = cvss.baseSeverity.toUpperCase();
-                    if (sev === 'CRITICAL') sevColor = '#E65100';
-                    else if (sev === 'HIGH') sevColor = '#FF5252';
-                    else if (sev === 'MEDIUM') sevColor = '#FF9800';
-                    else sevColor = '#FFCA28';
-                    break;
-                }
-            }
-        }
-        const sevTag = document.createElement('div');
-        sevTag.className = 'cve-severity-tag';
-        sevTag.textContent = cvssText;
-        sevTag.style.backgroundColor = sevColor;
-        container.appendChild(sevTag);
-
-        // popup detail element — appended to body so it can float above everything
+        // Hover popup
         const popup = document.createElement('div');
         popup.className = 'cve-popup';
-        const desc = (record.containers && record.containers.cna && record.containers.cna.descriptions && record.containers.cna.descriptions[0] && record.containers.cna.descriptions[0].value) || 'No description available.';
-        const descEl = document.createElement('div');
-        descEl.className = 'desc';
-        descEl.innerHTML = desc;
-        popup.appendChild(descEl);
-
-        // CVSS info if present
-        const cvssEl = document.createElement('div');
-        cvssEl.className = 'cvss';
-        cvssEl.textContent = cvssText;
-        popup.appendChild(cvssEl);
-        popup.appendChild(cvssEl);
-
-        // reference link
-        const refList = document.createElement('div');
-        refList.className = 'refs';
-        if (record.containers && record.containers.cna && record.containers.cna.references && record.containers.cna.references[0]) {
-            const a = document.createElement('a');
-            a.href = record.containers.cna.references[0].url || '#';
-            a.target = '_blank';
-            a.rel = 'noopener noreferrer';
-            a.textContent = 'Reference';
-            a.style.color = 'var(--accent-yellow)';
-            refList.appendChild(a);
-            popup.appendChild(refList);
-        }
-
-        // append popup to body so it floats above modal and other containers
         document.body.appendChild(popup);
 
-        // make card focusable for keyboard users
-        container.tabIndex = 0;
+        async function updateAndShowPopup() {
+            // Don't show popup if in split mode
+            const modal = document.getElementById('cve-modal');
+            if (modal && modal.classList.contains('split-mode')) return;
 
-        // show/hide helpers that position the popup near the card and keep it inside viewport
-        async function showPopup() {
             try {
                 const fresh = await fetchCveRecord(cveId);
-                const newDesc = (fresh.containers && fresh.containers.cna && fresh.containers.cna.descriptions && fresh.containers.cna.descriptions[0] && fresh.containers.cna.descriptions[0].value) || 'No description available.';
-                descEl.innerHTML = newDesc;
-                let newCvss = '';
-                if (fresh.containers && fresh.containers.cna && fresh.containers.cna.metrics) {
-                    for (const m of fresh.containers.cna.metrics) {
-                        if (m.cvssV3_1) { newCvss = `Severity: ${m.cvssV3_1.baseSeverity} (${m.cvssV3_1.baseScore})`; break; }
-                        if (m.cvssV3) { newCvss = `Severity: ${m.cvssV3.baseSeverity} (${m.cvssV3.baseScore})`; break; }
+                
+                let baseScore = '';
+                let baseSeverity = '';
+                let vectorString = 'No vector string';
+                let cwe = 'N/A';
+                let title = fresh.containers && fresh.containers.cna && fresh.containers.cna.title ? fresh.containers.cna.title : 'No Title';
+                let desc = 'No description available.';
+
+                if (fresh.containers && fresh.containers.cna) {
+                    const cna = fresh.containers.cna;
+                    if (cna.metrics) {
+                        for (const m of cna.metrics) {
+                            const cvss = m.cvssV3_1 || m.cvssV3 || m.cvssV4_0;
+                            if (cvss) {
+                                baseScore = cvss.baseScore;
+                                baseSeverity = cvss.baseSeverity;
+                                vectorString = cvss.vectorString;
+                                break;
+                            }
+                        }
+                    }
+                    if (cna.problemTypes && cna.problemTypes[0] && cna.problemTypes[0].descriptions) {
+                        cwe = cna.problemTypes[0].descriptions[0].cweId || cna.problemTypes[0].descriptions[0].description;
+                    }
+                    if (cna.descriptions && cna.descriptions[0]) {
+                        desc = cna.descriptions[0].value;
                     }
                 }
-                cvssEl.textContent = newCvss;
-                refList.innerHTML = '';
-                if (fresh.containers && fresh.containers.cna && fresh.containers.cna.references && fresh.containers.cna.references[0]) {
-                    const a = document.createElement('a');
-                    a.href = fresh.containers.cna.references[0].url || '#';
-                    a.target = '_blank';
-                    a.rel = 'noopener noreferrer';
-                    a.textContent = 'Reference';
-                    a.style.color = 'var(--accent-yellow)';
-                    refList.appendChild(a);
-                    if (!popup.contains(refList)) popup.appendChild(refList);
+
+                let badgesHtml = `<span class="cwe">${cwe}</span>`;
+                if (baseScore !== '') {
+                    badgesHtml += `<span class="severity-badge">${baseScore} | ${baseSeverity}</span>`;
                 }
+
+                popup.innerHTML = `
+                    <div class="title">${title}</div>
+                    <div class="cwe-metrics">${badgesHtml}</div>
+                    <div class="desc">${desc}</div>
+                    <div class="cvss">${vectorString}</div>
+                `;
             } catch (err) {
-                console.warn('Failed to refresh CVE popup content for', cveId, err);
+                console.warn('Failed to refresh popup content', cveId, err);
             }
 
-            // sizing and positioning — ensure popup stays within viewport
             popup.style.display = 'block';
             popup.style.visibility = 'hidden';
 
-            // choose width (cap to viewport)
-            const maxAllowedWidth = Math.floor(window.innerWidth * 0.92);
-            const popupWidth = Math.min(520, maxAllowedWidth);
+            const vw = document.documentElement.clientWidth;
+            const vh = document.documentElement.clientHeight;
+
+            const popupWidth = Math.min(420, vw * 0.92);
             popup.style.width = popupWidth + 'px';
-            popup.style.maxHeight = Math.floor(window.innerHeight * 0.78) + 'px';
 
-            // force reflow so measurements are accurate
-            // read offsetHeight to force layout
-            const _ = popup.offsetHeight;
-
+            const _ = popup.offsetHeight; // force reflow
             const rect = container.getBoundingClientRect();
-            // compute left (centered above card) then clamp to viewport with 8px padding
+            
             let left = Math.round(rect.left + rect.width / 2 - popupWidth / 2);
-            left = Math.max(8, Math.min(left, window.innerWidth - popupWidth - 8));
-
-            // compute popup height after layout
-            let popupHeight = popup.offsetHeight;
-            if (!popupHeight) popupHeight = Math.min(300, Math.floor(window.innerHeight * 0.5));
-
-            // compute top: prefer above, else below, clamp to viewport
-            let top;
-            const spaceAbove = rect.top;
-            const spaceBelow = window.innerHeight - rect.bottom;
-            if (spaceAbove >= popupHeight + 12) {
-                // enough space above
-                top = Math.round(rect.top - popupHeight - 12);
-            } else if (spaceBelow >= popupHeight + 12) {
-                // enough space below
+            left = Math.max(8, Math.min(left, vw - popupWidth - 8));
+            
+            let top = Math.round(rect.top - popup.offsetHeight - 12);
+            
+            // If it spills off the top, try putting it below the card
+            if (top < 8) {
                 top = Math.round(rect.bottom + 12);
-            } else {
-                // not enough space either side — place where more room and clamp
-                if (spaceBelow >= spaceAbove) {
-                    top = Math.round(Math.max(8, rect.bottom + 12));
-                } else {
-                    top = Math.round(Math.max(8, rect.top - popupHeight - 12));
-                }
-                // ensure within viewport
-                if (top + popupHeight > window.innerHeight - 8) top = Math.max(8, window.innerHeight - popupHeight - 8);
-                if (top < 8) top = 8;
             }
-
+            
+            // If it spills off the bottom, force it inside the screen
+            if (top + popup.offsetHeight > vh - 8) {
+                top = vh - popup.offsetHeight - 8;
+            }
+            
+            // If the popup is extremely tall and still spills off the top, clamp to top
+            if (top < 8) {
+                top = 8;
+            }
+            
             popup.style.left = left + 'px';
             popup.style.top = top + 'px';
             popup.style.visibility = 'visible';
-
         }
 
         function hidePopup() {
             popup.style.display = 'none';
         }
 
-        // pointer interactions
-        container.addEventListener('mouseenter', showPopup);
+        container.addEventListener('mouseenter', updateAndShowPopup);
         container.addEventListener('mouseleave', hidePopup);
-        container.addEventListener('focus', showPopup);
+        container.addEventListener('focus', updateAndShowPopup);
         container.addEventListener('blur', hidePopup);
 
-        // For touch devices: toggle popup on click/tap
-        container.addEventListener('touchstart', (ev) => {
+        container.addEventListener('click', async (ev) => {
             ev.stopPropagation();
-            if (container.classList.toggle('popup-open')) {
-                showPopup();
+            hidePopup();
+            
+            const modal = document.getElementById('cve-modal');
+            const isActive = container.classList.contains('active');
+
+            // Remove active from all cards
+            document.querySelectorAll('.cve-card').forEach(c => c.classList.remove('active'));
+
+            if (isActive) {
+                // If it was already active, we are closing it
+                if (modal) modal.classList.remove('split-mode');
             } else {
-                hidePopup();
+                // Otherwise, mark this one active and open split mode
+                container.classList.add('active');
+                if (modal) modal.classList.add('split-mode');
+
+                // Populate detail view
+                const detailView = document.getElementById('cve-detail-view');
+                if (detailView) {
+                    detailView.innerHTML = '<p style="text-align:center; margin-top:50px;">Loading data...</p>';
+                    const fresh = await fetchCveRecord(cveId);
+                    renderDetailView(detailView, fresh, cveId);
+                }
             }
         });
-
-        // also prevent accidental propagation on click after touch
-        container.addEventListener('click', (ev) => { ev.stopPropagation(); });
-
-        // On hover or focus, ensure latest data is loaded (local first, then remote)
-        const refreshPopupFromRecord = async () => {
-            try {
-                const fresh = await fetchCveRecord(cveId);
-                const newDesc = (fresh.containers && fresh.containers.cna && fresh.containers.cna.descriptions && fresh.containers.cna.descriptions[0] && fresh.containers.cna.descriptions[0].value) || 'No description available.';
-                descEl.innerHTML = newDesc;
-
-                let newTitle = 'Waiting for description...';
-                if (fresh.containers && fresh.containers.cna && fresh.containers.cna.title) {
-                    newTitle = fresh.containers.cna.title;
-                } else if (newDesc !== 'No description available.') {
-                    newTitle = newDesc;
-                }
-                titleEl.textContent = newTitle;
-
-                // update cvss
-                let newCvss = 'Unknown Severity';
-                let newSevColor = '#999';
-                if (fresh.containers && fresh.containers.cna && fresh.containers.cna.metrics) {
-                    for (const m of fresh.containers.cna.metrics) {
-                        const cvss = m.cvssV3_1 || m.cvssV3 || m.cvssV4_0;
-                        if (cvss) {
-                            newCvss = cvss.baseSeverity + ' (' + cvss.baseScore + ')';
-                            const sev = cvss.baseSeverity.toUpperCase();
-                            if (sev === 'CRITICAL') newSevColor = '#E65100';
-                            else if (sev === 'HIGH') newSevColor = '#FF5252';
-                            else if (sev === 'MEDIUM') newSevColor = '#FF9800';
-                            else newSevColor = '#FFCA28';
-                            break;
-                        }
-                    }
-                }
-                cvssEl.textContent = newCvss;
-                sevTag.textContent = newCvss;
-                sevTag.style.backgroundColor = newSevColor;
-                // update reference link if present
-                if (fresh.containers && fresh.containers.cna && fresh.containers.cna.references && fresh.containers.cna.references[0]) {
-                    refList.innerHTML = '';
-                    const a = document.createElement('a');
-                    a.href = fresh.containers.cna.references[0].url || '#';
-                    a.target = '_blank';
-                    a.rel = 'noopener noreferrer';
-                    a.textContent = 'Reference';
-                    a.style.color = 'var(--accent-yellow)';
-                    refList.appendChild(a);
-                    // ensure appended to popup
-                    if (!popup.contains(refList)) popup.appendChild(refList);
-                }
-            } catch (err) {
-                console.warn('Failed to refresh CVE popup content for', cveId, err);
-            }
-        };
-
-        container.addEventListener('mouseenter', () => refreshPopupFromRecord());
-        container.addEventListener('focus', () => refreshPopupFromRecord());
 
         return container;
     }

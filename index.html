@@ -167,10 +167,17 @@
             <div class="cve-modal-backdrop"></div>
             <div class="cve-modal-card">
                 <button class="cve-close" id="cve-close" aria-label="Close CVE list">✕</button>
-                <div class="cve-modal-header">
-                    <h3>All CVEs</h3>
+                <div class="cve-modal-content">
+                    <div class="cve-sidebar">
+                        <div class="cve-modal-header">
+                            <h3>All CVEs</h3>
+                        </div>
+                        <div id="cve-grid" class="cve-grid" role="list"></div>
+                    </div>
+                    <div id="cve-detail-view" class="cve-detail-view" hidden>
+                        <!-- Detailed JSON content rendered here -->
+                    </div>
                 </div>
-                <div id="cve-grid" class="cve-grid" role="list"></div>
             </div>
         </div>
 
