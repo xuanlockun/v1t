@@ -18,6 +18,11 @@
     --border-color: #2d2d2d;
 }
 
+@keyframes bgWave {
+    0% { background-position: 0 0, 20px 20px; }
+    100% { background-position: 40px 40px, 60px 60px; }
+}
+
 body {
     background-color: var(--bg-color);
     color: var(--text-color);
@@ -26,11 +31,11 @@ body {
     padding: 0;
     overflow-x: hidden;
     /* Thêm chấm bi mờ mờ cho đúng vibe */
-
     background-image: radial-gradient(rgba(255, 202, 40, 0.15) 15%, transparent 16%), 
                       radial-gradient(rgba(255, 202, 40, 0.15) 15%, transparent 16%);
     background-size: 40px 40px;
     background-position: 0 0, 20px 20px;
+    animation: bgWave 4s linear infinite;
 }
 
 h1 {
@@ -91,7 +96,7 @@ img.logo {
     gap: 25px;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 20px 100px;
 }
 
 /* Stats layout: three-column centered middle card with side cards attached */
@@ -108,6 +113,9 @@ img.logo {
     gap: 20px;
     align-items: stretch; /* equal heights */
     max-width: none;
+    position: relative;
+    z-index: 50;
+    margin-top: 15px; /* Tạo thêm không gian trống phía trên để thẻ không bị lẹm khi phóng to */
 }
 
 /* Side cards: fill their grid column so they remain equal-width and responsive */
@@ -125,6 +133,7 @@ img.logo {
     align-self: stretch;
     width: var(--stats-center-width);
     max-width: 95vw;
+    z-index: 5; /* Đảm bảo luôn nằm trên 2 thẻ bên cạnh kể cả khi mất hover */
 }
 
 /* If expand-x is present allow content-sized width but keep max-width */
@@ -140,7 +149,7 @@ img.logo {
 }
 
 /* Small screens: stack, center card first */
-@media screen and (max-width: 1000px) {
+@media screen and (max-width: 1300px) {
   .stats-layout { display: flex; flex-direction: column; align-items: stretch; gap: 18px; padding: 0 16px; }
   .stats-layout .small_container { width: 100%; max-width: 100%; }
   .stats-layout .small_container.expand-x { width: 100% !important; display: block !important; }
@@ -154,19 +163,165 @@ img.logo {
     border-radius: 15px;
     padding: 25px;
     box-shadow: 8px 8px 0 var(--accent-yellow);
-    transition: transform 260ms cubic-bezier(.2,.9,.3,1), box-shadow 260ms ease, width 260ms ease;
+    transition: transform 260ms cubic-bezier(.2,.9,.3,1), box-shadow 260ms ease;
     display: flex;
     flex-direction: column;
-    will-change: transform, width;
+    will-change: transform;
+    position: relative;
+    z-index: 1;
 }
 
 .small_container:hover {
     transform: translateY(-8px) scale(1.01);
     box-shadow: 10px 14px 0 var(--accent-orange);
+    z-index: 10;
 }
 
+/* ==========================================
+   HERO SECTION ANIMATION (COVER FLOW & FLIP CYCLE)
+   ========================================== */
+/* Trả lại màu gốc cho thẻ giữa, chỉ giữ lại định dạng h2 to hơn một chút */
+.small_container.expand-x h2 {
+    font-size: 16px; 
+    transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Khi hover vào thẻ giữa (thẻ thứ 2) */
+.stats-layout:has(.small_container:nth-child(2):hover) .small_container:nth-child(2) {
+    transform: scale(1.08) translateY(-10px);
+    box-shadow: 15px 20px 0 var(--accent-orange);
+    z-index: 20;
+}
+
+/* Chu kỳ lật và đổi bên cho thẻ trái (Easter Egg: Swap Sides) */
+@keyframes leftCardHoverCycle {
+    0% { transform: perspective(800px) translateX(15%) translateZ(0) rotateY(15deg) scale(0.9); }
+    15% { transform: perspective(800px) translateX(15%) translateZ(0) rotateY(-30deg) scale(0.9); } /* Quay ra */
+    30% { transform: perspective(800px) translateX(15%) translateZ(0) rotateY(30deg) scale(0.9); } /* Quay vào */
+    45% { transform: perspective(800px) translateX(calc(50% + (var(--stats-center-width) / 2) + 20px)) translateZ(-150px) rotateY(0deg) scale(0.8); } /* Bay ra sau thẻ giữa */
+    60% { transform: perspective(800px) translateX(calc(85% + var(--stats-center-width) + 40px)) translateZ(0) rotateY(-15deg) scale(0.9); } /* Tới phải, hướng vào */
+    70% { transform: perspective(800px) translateX(calc(85% + var(--stats-center-width) + 40px)) translateZ(0) rotateY(-15deg) scale(0.9); animation-timing-function: ease-in; } /* Bắt đầu chạy về (gia tốc) */
+    77% { transform: perspective(800px) translateX(calc(50% + (var(--stats-center-width) / 2) + 20px)) translateZ(-150px) rotateY(0deg) scale(0.8); animation-timing-function: ease-out; } /* Đang lướt giữa đường */
+    86% { transform: perspective(800px) translateX(10%) translateZ(0) rotateY(20deg) scale(0.9); animation-timing-function: ease-in-out; } /* Thắng gấp, trượt lố qua nhà một tí (Overshoot) */
+    93% { transform: perspective(800px) translateX(15%) translateZ(0) rotateY(15deg) scale(0.9); } /* Hồi lại vị trí chuẩn */
+    100% { transform: perspective(800px) translateX(15%) translateZ(0) rotateY(15deg) scale(0.9); } /* Nghỉ ngơi trước chu kỳ mới */
+}
+
+/* Chu kỳ lật và đổi bên cho thẻ phải (Easter Egg: Swap Sides) */
+@keyframes rightCardHoverCycle {
+    0% { transform: perspective(800px) translateX(-15%) translateZ(0) rotateY(-15deg) scale(0.9); }
+    15% { transform: perspective(800px) translateX(-15%) translateZ(0) rotateY(30deg) scale(0.9); } /* Quay ra */
+    30% { transform: perspective(800px) translateX(-15%) translateZ(0) rotateY(-30deg) scale(0.9); } /* Quay vào */
+    45% { transform: perspective(800px) translateX(calc(-50% - (var(--stats-center-width) / 2) - 20px)) translateZ(-150px) rotateY(0deg) scale(0.8); } /* Bay ra sau thẻ giữa */
+    60% { transform: perspective(800px) translateX(calc(-85% - var(--stats-center-width) - 40px)) translateZ(0) rotateY(15deg) scale(0.9); } /* Tới trái, hướng vào */
+    70% { transform: perspective(800px) translateX(calc(-85% - var(--stats-center-width) - 40px)) translateZ(0) rotateY(15deg) scale(0.9); animation-timing-function: ease-in; } /* Bắt đầu chạy về (gia tốc) */
+    77% { transform: perspective(800px) translateX(calc(-50% - (var(--stats-center-width) / 2) - 20px)) translateZ(-150px) rotateY(0deg) scale(0.8); animation-timing-function: ease-out; } /* Đang lướt giữa đường */
+    86% { transform: perspective(800px) translateX(-10%) translateZ(0) rotateY(-20deg) scale(0.9); animation-timing-function: ease-in-out; } /* Thắng gấp, trượt lố qua nhà một tí (Overshoot) */
+    93% { transform: perspective(800px) translateX(-15%) translateZ(0) rotateY(-15deg) scale(0.9); } /* Hồi lại vị trí chuẩn */
+    100% { transform: perspective(800px) translateX(-15%) translateZ(0) rotateY(-15deg) scale(0.9); } /* Nghỉ ngơi trước chu kỳ mới */
+}
+
+/* ==========================================
+   HOVER COUNTER LOGIC (STATEFUL 3D EFFECTS)
+   ========================================== */
+/* Transition trick: Nhanh nhạy khi bắt đầu hover, chậm & êm ái khi nhả hover (trở về thẳng ngang hàng) */
+.stats-layout .small_container {
+    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.8s ease, opacity 0.8s ease;
+}
+.stats-layout.trigger-hover .small_container {
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease, opacity 0.4s ease;
+}
+
+/* State 1 & Default: Hướng vào trong */
+.stats-layout:not([data-hover-state]).trigger-hover .small_container:nth-child(1),
+.stats-layout[data-hover-state="1"].trigger-hover .small_container:nth-child(1) {
+    transform: perspective(800px) translateX(15%) rotateY(15deg) scale(0.9);
+    opacity: 0.8;
+    z-index: 1;
+    box-shadow: 2px 2px 0 var(--border-color), inset -10px -10px 20px rgba(0,0,0,0.08);
+}
+.stats-layout:not([data-hover-state]).trigger-hover .small_container:last-child,
+.stats-layout[data-hover-state="1"].trigger-hover .small_container:last-child {
+    transform: perspective(800px) translateX(-15%) rotateY(-15deg) scale(0.9);
+    opacity: 0.8;
+    z-index: 1;
+    box-shadow: -2px 2px 0 var(--border-color), inset 10px -10px 20px rgba(0,0,0,0.08);
+}
+
+/* State 2: Hướng ra ngoài */
+.stats-layout[data-hover-state="2"].trigger-hover .small_container:nth-child(1) {
+    transform: perspective(800px) translateX(15%) rotateY(-15deg) scale(0.9);
+    opacity: 0.8;
+    z-index: 1;
+    /* Đổi bóng chìm cho phù hợp với hướng sáng */
+    box-shadow: 2px 2px 0 var(--border-color), inset 10px -10px 20px rgba(0,0,0,0.08);
+}
+.stats-layout[data-hover-state="2"].trigger-hover .small_container:last-child {
+    transform: perspective(800px) translateX(-15%) rotateY(15deg) scale(0.9);
+    opacity: 0.8;
+    z-index: 1;
+    box-shadow: -2px 2px 0 var(--border-color), inset -10px -10px 20px rgba(0,0,0,0.08);
+}
+
+/* State 3: Easter Egg - Lật và Đổi Bên (Swap Sides) */
+.stats-layout[data-hover-state="3"].trigger-hover .small_container:nth-child(1) {
+    transform: perspective(800px) translateX(15%) rotateY(15deg) scale(0.9);
+    animation: leftCardHoverCycle 4s ease-in-out infinite;
+    animation-delay: 0.4s; 
+    opacity: 0.8;
+    z-index: 1;
+    box-shadow: 2px 2px 0 var(--border-color), inset -10px -10px 20px rgba(0,0,0,0.08);
+}
+.stats-layout[data-hover-state="3"].trigger-hover .small_container:last-child {
+    transform: perspective(800px) translateX(-15%) rotateY(-15deg) scale(0.9);
+    animation: rightCardHoverCycle 4s ease-in-out infinite;
+    animation-delay: 0.4s; 
+    opacity: 0.8;
+    z-index: 1;
+    box-shadow: -2px 2px 0 var(--border-color), inset 10px -10px 20px rgba(0,0,0,0.08);
+}
+
+/* Đảm bảo smooth transition cho tất cả thẻ trong stats-layout */
+/* Khi KHÔNG hover (nhả chuột), dùng transition dài (1.2s) để thẻ bay từ từ về chỗ cũ */
+.stats-layout .small_container {
+    transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease, box-shadow 0.8s ease;
+}
+
+/* Khi CÓ hover (chuột đang nằm trong khu vực layout), dùng transition chuẩn (0.4s) để phản hồi nhanh nhạy */
+.stats-layout.trigger-hover .small_container {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* ==========================================
+   FLOATING WAVE ANIMATIONS (CHILL VIBES)
+   ========================================== */
+@keyframes floatWave {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-5px) rotate(1deg); }
+}
+
+.members-list > *, .socials-list > * {
+    animation: floatWave 3s ease-in-out infinite;
+    display: inline-block; /* Ensure transform applies correctly */
+}
+
+/* Stagger animation delays to create a wave effect */
+.members-list > *:nth-child(2n), .socials-list > *:nth-child(2n) { animation-delay: 0.4s; }
+.members-list > *:nth-child(3n), .socials-list > *:nth-child(3n) { animation-delay: 0.8s; }
+.members-list > *:nth-child(4n), .socials-list > *:nth-child(4n) { animation-delay: 1.2s; }
+.members-list > *:nth-child(5n), .socials-list > *:nth-child(5n) { animation-delay: 1.6s; }
+
 /* Smoothly animate stats rows and modal appearance */
-.stats-row .row { transition: all 220ms ease; }
+.stats-row .row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    transition: all 220ms ease; 
+}
+
 .cve-modal { transition: opacity 220ms ease; }
 .cve-modal[hidden] { opacity: 0; pointer-events: none; }
 .cve-modal:not([hidden]) { opacity: 1; pointer-events: auto; }
@@ -177,27 +332,57 @@ img.logo {
 }
 
 
-/* ===== Navbar 8-Bit ===== */
+/* ===== Navbar Elegant Glassmorphism ===== */
 nav {
-    background: #1b1b1b;
-    border-bottom: 4px solid var(--accent-yellow);
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 202, 40, 0.3);
+    border-radius: 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+    padding: 5px 25px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
     position: sticky;
-    top: 0;
+    top: 25px;
+    margin: 0 auto;
+    max-width: 900px;
+    width: 90%;
     z-index: 1000;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 nav .logo {
     font-family: 'Press Start 2P', monospace;
     color: var(--accent-yellow);
-    font-size: 14px;
+    font-size: 12px;
     display: flex;
     align-items: center;
-    padding: 15px 0;
+    padding: 10px 0;
+    position: relative;
+    cursor: pointer;
+}
+
+/* Hover logo popping out */
+nav .logo .nav-logo-hover {
+    position: absolute;
+    top: 50%;
+    left: 20%;
+    transform: translate(-50%, -50%) scale(0) rotate(45deg);
+    opacity: 0;
+    width: 65px; 
+    height: auto;
+    pointer-events: none; 
+    transition: all 0.5s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+    z-index: -1; 
+    filter: drop-shadow(0 5px 15px rgba(255, 202, 40, 0.5));
+}
+
+nav .logo:hover .nav-logo-hover {
+    transform: translate(-120%, -50%) scale(1) rotate(-15deg);
+    opacity: 1;
 }
 
 nav .logo a {
@@ -206,6 +391,12 @@ nav .logo a {
     background: none;
     box-shadow: none;
     padding-left: 12px;
+    transition: opacity 0.3s ease, color 0.3s ease;
+}
+
+nav .logo:hover a {
+    color: var(--accent-yellow);
+    text-shadow: 0 0 10px rgba(255, 202, 40, 0.5);
 }
 
 nav ul {
@@ -215,58 +406,105 @@ nav ul {
 }
 
 nav ul li {
-    padding: 15px 20px;
+    padding: 5px;
 }
 
 nav ul li a,
 nav ul li button {
-    color: white;
+    color: #ccc;
     font-family: 'Press Start 2P', monospace;
-    font-size: 10px;
+    font-size: 9px;
     text-transform: uppercase;
     text-decoration: none;
-    padding: 10px;
-    border-radius: 8px;
-    transition: 0.2s;
-    background: none;
-    border: 0;
+    padding: 8px 14px;
+    border-radius: 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: transparent;
+    border: 1px solid transparent;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+nav ul li a i,
+nav ul li button i {
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 nav ul li a:hover,
 nav ul li button:hover {
-    background: var(--accent-yellow);
-    color: #111;
-    box-shadow: 3px 3px 0 #000;
+    background: rgba(255, 202, 40, 0.1);
+    color: var(--accent-yellow);
+    border: 1px solid rgba(255, 202, 40, 0.2);
 }
 
-/* Link chung (a) */
+nav ul li a:hover i,
+nav ul li button:hover i {
+    transform: translateY(-2px) scale(1.1);
+}
+
+/* Layout flexbox for members list */
+.members-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 0;
+}
+
+/* Link chung (a) cho thẻ nhỏ */
 .small_container a,
 .small_container .member-name {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     color: var(--text-color);
     font-weight: bold;
     text-decoration: none;
     background: #fff;
     border: 2px solid var(--border-color);
-    padding: 5px 12px;
+    padding: 6px 14px;
     border-radius: 20px;
-    margin: 4px 2px;
     box-shadow: 2px 2px 0 var(--border-color);
-    transition: 0.1s;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
 
 .small_container a:hover {
     background: var(--accent-yellow);
-    transform: translate(-1px, -1px);
-    box-shadow: 3px 3px 0 var(--border-color);
-    color: var(--border-color);
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--border-color);
+    color: #111;
 }
 
 .small_container a:active {
     transform: translate(2px, 2px);
     box-shadow: 0 0 0 var(--border-color);
 }
+
+/* Socials list layout */
+.socials-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding-top: 10px;
+}
+
+.social-link {
+    width: 80%;
+    max-width: 250px;
+    gap: 10px;
+}
+
+/* Specific colors for socials */
+.social-link.discord:hover { background: #5865F2; color: #fff; }
+.social-link.linkedin:hover { background: #0d71bd; color: #fff; }
+.social-link.facebook:hover { background: #1877f2; color: #fff; }
+.social-link.instagram:hover { background: #e4405f; color: #fff; }
+
+.social-link i { font-size: 1.1em; }
 
 /* Bảng xếp hạng mini */
 table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
@@ -401,7 +639,7 @@ td:not(.event) { text-align: center; }
     height: 100%;
     width: 100%;
     gap: 20px;
-    overflow: hidden;
+    /* Removed overflow: hidden so hover shadows can expand into padding */
 }
 
 .cve-sidebar {
@@ -469,7 +707,7 @@ td:not(.event) { text-align: center; }
 }
 
 /* CVE grid & card styling */
-.cve-grid { display: flex; flex-direction: row; flex-wrap: wrap; gap: 15px; overflow-y: auto; overflow-x: hidden; padding: 10px; padding-bottom: 20px; padding-right:20px; align-content: flex-start; }
+.cve-grid { display: flex; flex-direction: row; flex-wrap: wrap; gap: 15px; overflow-y: auto; padding: 24px; padding-bottom: 30px; align-content: flex-start; }
 
 /* When split mode, make it column so cards stack on the left sidebar */
 .cve-modal.split-mode .cve-grid { flex-direction: column; flex-wrap: nowrap; }
@@ -482,13 +720,61 @@ td:not(.event) { text-align: center; }
 /* CVE card minimal rectangle */
 .cve-card { 
     background: #fff; border: 3px solid var(--border-color); padding: 0 15px; border-radius: 12px; 
-    box-shadow: 4px 4px 0 var(--accent-yellow); position: relative; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; 
+    box-shadow: 4px 4px 0 var(--accent-yellow); position: relative; 
+    transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1); cursor: pointer; 
     display: flex; align-items: center; justify-content: center;
     height: 50px; flex-shrink: 0; min-width: 180px; max-width: 100%;
 }
-.cve-modal.split-mode .cve-card { width: 100%; min-width: 0; justify-content: center; }
-.cve-card:hover, .cve-card.active { transform: translateY(-4px) scale(1.02); box-shadow: 6px 6px 0 var(--accent-orange); }
-.cve-modal.split-mode .cve-card:hover, .cve-modal.split-mode .cve-card.active { transform: translateX(8px) scale(1.01); box-shadow: 6px 6px 0 var(--accent-orange); }
+/* Invisible hit area expansion to prevent hover loss in gaps */
+.cve-card::before {
+    content: '';
+    position: absolute;
+    top: -8px; bottom: -8px; left: -8px; right: -8px;
+    z-index: -1;
+}
+.cve-card.active { transform: scale(1.02); box-shadow: 6px 6px 0 var(--accent-orange); }
+
+/* --- Advanced Pure CSS Cover Flow Animation --- */
+/* Default Grid Hover */
+.cve-grid:has(.cve-card:hover) .cve-card {
+    transform: scale(0.95);
+    opacity: 0.7;
+}
+.cve-grid .cve-card:hover {
+    transform: scale(1.05) !important;
+    opacity: 1 !important;
+    z-index: 99 !important;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1) !important;
+}
+
+/* Desktop Split Mode (Vertical List) */
+@media (min-width: 769px) {
+    .cve-modal.split-mode .cve-card { width: 88%; margin: 0 auto; min-width: 0; justify-content: center; z-index: 1; }
+    .cve-modal.split-mode .cve-grid:has(.cve-card:hover) .cve-card:not(:hover) {
+        transform: translateY(-15%) scale(0.95); /* Push cards BEFORE hovered UP */
+    }
+    .cve-modal.split-mode .cve-grid .cve-card:hover ~ .cve-card {
+        transform: translateY(15%) scale(0.95) !important; /* Push cards AFTER hovered DOWN */
+    }
+    .cve-modal.split-mode .cve-grid .cve-card:hover {
+        transform: scale(1.08) !important;
+        z-index: 99 !important;
+    }
+}
+
+/* Mobile Split Mode (Horizontal List) */
+@media (max-width: 768px) {
+    .cve-modal.split-mode .cve-grid:has(.cve-card:hover) .cve-card:not(:hover) {
+        transform: translateX(-15%) scale(0.95); /* Push left cards LEFT */
+    }
+    .cve-modal.split-mode .cve-grid .cve-card:hover ~ .cve-card {
+        transform: translateX(15%) scale(0.95) !important; /* Push right cards RIGHT */
+    }
+    .cve-modal.split-mode .cve-grid .cve-card:hover {
+        transform: scale(1.08) !important;
+        z-index: 99 !important;
+    }
+}
 .cve-card.active { background: var(--accent-yellow); }
 .cve-card.severity-critical { background: #ff4d4d; }
 .cve-card.severity-critical .cve-id { color: #fff; text-shadow: 1px 1px 0 #000; }
@@ -553,7 +839,7 @@ td:not(.event) { text-align: center; }
 
 @media (max-width: 768px) {
     .cve-modal-card { width: 90vw; height: 82vh; padding: 10px; display: flex; flex-direction: column; }
-    .cve-modal-content { flex-direction: column; overflow: hidden; flex: 1; }
+    .cve-modal-content { flex-direction: column; flex: 1; }
     
     /* Default Grid Mode */
     .cve-sidebar {
@@ -596,15 +882,15 @@ td:not(.event) { text-align: center; }
 
     /* Split Mode (Horizontal scroll top, detail bottom) */
     .cve-modal.split-mode .cve-sidebar {
-        width: calc(100% + 40px);
+        width: calc(100% + 20px);
         margin: 0 -10px;
-        height: 80px; /* Fixed height for horizontal list */
-        min-height: 80px;
-        flex: 0 0 80px;
+        height: 100px; /* Increased height to fit scaled hover shadow */
+        min-height: 100px;
+        flex: 0 0 100px;
         border-right: none;
         border-bottom: 2px solid #eaeaea;
-        overflow: hidden; /* We'll scroll the inner grid horizontally */
-        margin-top: 16px
+        overflow: visible; /* Prevent clipping of hover shadows */
+        margin-top: 16px;
     }
     
     /* Hide the 'All CVEs' header in split mode on mobile to save space */
@@ -628,8 +914,8 @@ td:not(.event) { text-align: center; }
         flex-direction: row;
         flex-wrap: nowrap;
         overflow-x: auto;
-        overflow-y: hidden;
-        padding: 10px 10px;
+        overflow-y: visible; /* Prevent vertical clipping */
+        padding: 20px 10px; /* Extra vertical padding for hover */
         align-items: center;
         justify-content: flex-start; /* Prevent centering from hiding first items */
         scrollbar-width: none; /* Hide scrollbar Firefox */
@@ -650,8 +936,8 @@ td:not(.event) { text-align: center; }
 
     .cve-modal.split-mode .cve-detail-view {
         width: 100%;
-        flex: 1 1 auto;
-        height: calc(100% - 80px);
+        flex: 1;
+        min-height: 0; /* Flexbox trick to allow shrinking and prevent overflow */
         overflow-y: auto;
         padding: 15px 10px;
         margin-top: 0;
@@ -863,7 +1149,12 @@ body.dark-mode {
 }
 
 body.dark-mode .bg-overlay { opacity: 0.1; }
-body.dark-mode .small_container a, body.dark-mode .arcade-table td { background: #2a2a2a; color: #fff; }
+body.dark-mode .small_container a, 
+body.dark-mode .small_container .member-name, 
+body.dark-mode .arcade-table td { 
+    background: #2a2a2a; 
+    color: #fff; 
+}
 body.dark-mode .profile-card img { background: #121212; }
 
 body.dark-mode .small_container .team-cve-item {
@@ -954,9 +1245,9 @@ body.dark-mode #dataTable tbody tr:last-child td:last-child {
 .stats-row span { display:inline-flex; white-space:nowrap; background:#fff; border:2px solid var(--border-color); padding:4px 6px; border-radius:6px; font-family:'Press Start 2P', monospace; color:var(--border-color); box-shadow:2px 2px 0 var(--accent-yellow); flex:0 0 auto; font-size:12px; }
 .stats-row span i { font-size: 12px; margin-right:6px; }
 
-/* Allow the overall container to scroll horizontally when a child grows wider; let small_container itself be visible overflow */
-.container { overflow-x:auto; -webkit-overflow-scrolling:touch; }
-.small_container { overflow-x: visible; }
+/* Allow the overall container to be visible so hover animations don't get clipped vertically */
+.container { overflow: visible; }
+.small_container { overflow: visible; }
 /* Make the stats card expand to fit its content */
 .small_container.expand-x { width: -moz-max-content; width: -webkit-max-content; width: max-content; display: inline-block; }
 
@@ -995,32 +1286,137 @@ body.dark-mode #dataTable tbody tr:last-child td:last-child {
     display: inline-block !important;
 }
 .small_container a.team-article-btn:hover { background: var(--accent-orange) !important; }
-.team-cve-showall:hover { background:var(--accent-orange); }
-
-/* Removed duplicate cve-modal rules */
 
 /* ===== MOBILE RESPONSIVENESS ===== */
 .hamburger { display: none; }
 
 @media screen and (max-width: 768px) {
-    nav { padding: 10px 20px; }
+    nav { 
+        padding: 5px 15px; 
+        width: 92%; 
+        margin: 10px auto;
+        border-radius: 20px;
+    }
     nav .logo { padding: 5px 0; }
-    .hamburger { display: block; color: var(--accent-yellow); font-size: 24px; cursor: pointer; }
+    .hamburger { display: block; color: var(--accent-yellow); font-size: 20px; cursor: pointer; }
     
     nav ul {
-        position: absolute; top: 55px; right: 0; width: 100%;
-        flex-direction: column; background-color: #1b1b1b;
-        border-bottom: 4px solid var(--accent-yellow);
+        position: absolute; top: 100%; right: 0; left: 0; width: 100%;
+        margin-top: 10px;
+        flex-direction: column; 
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom: 1px solid rgba(255, 202, 40, 0.3);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.7);
         max-height: 0; overflow: hidden; opacity: 0;
-        transition: max-height 0.3s ease, opacity 0.3s ease;
+        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease, margin-top 0.4s ease;
     }
 
 /* Ensure popup is fixed and always above everything (override earlier rules) */
 .cve-popup { display: none !important; position: fixed !important; left: 0 !important; top: 0 !important; z-index: 99999 !important; width: min(520px, 92vw) !important; max-height: 78vh !important; overflow: auto !important; background: var(--card-bg) !important; border: 3px solid var(--border-color) !important; padding: 14px !important; border-radius: 10px !important; box-shadow: 12px 12px 0 var(--accent-yellow) !important; box-sizing: border-box !important; }
 
-
     nav.active ul { max-height: 500px; opacity: 1; padding-bottom: 10px; }
     nav ul li { padding: 10px 20px; text-align: center; }
     
     h1, .h1-like { font-size: 18px; margin: 30px 10px 10px; }
+}
+/* ========================================================
+   🦆 DARK MODE FIXES (ADDED AS PER REVIEW)
+   ======================================================== */
+body.dark-mode h1,
+body.dark-mode .h1-like {
+    text-shadow: 3px 3px 0 #111, 5px 5px 0 var(--accent-yellow);
+}
+
+body.dark-mode .cve-modal-header h3 {
+    text-shadow: 2px 2px 0 #111;
+}
+
+body.dark-mode .stats-row span {
+    background: #2a2a2a;
+    color: var(--border-color);
+}
+
+body.dark-mode .cve-popup .cvss {
+    color: #ddd;
+    background: rgba(255,255,255,0.05);
+    border-color: #777;
+}
+
+body.dark-mode .cve-detail-header {
+    border-bottom-color: #444;
+}
+
+body.dark-mode .cve-detail-header h2 {
+    color: #fff;
+}
+
+body.dark-mode .cve-tag.tag-date {
+    background: #444;
+    color: #eee;
+}
+
+body.dark-mode .detail-box,
+body.dark-mode .cve-raw-json {
+    background: #1e1e1e;
+    border-color: #444;
+    box-shadow: 0 4px 12px rgba(255,255,255,0.05);
+}
+
+body.dark-mode .box-title,
+body.dark-mode .raw-header {
+    background: #2a2a2a;
+    color: #eee;
+    border-bottom-color: #444;
+}
+
+body.dark-mode .box-content {
+    color: #ddd;
+}
+
+body.dark-mode .metric-vector {
+    color: #ccc;
+    background: #333;
+    border-color: #555;
+}
+
+body.dark-mode .version-badge {
+    background: #3a1a00;
+    color: #ff9800;
+    border-color: #ff9800;
+}
+
+body.dark-mode .ref-list a {
+    color: #64b5f6;
+}
+
+body.dark-mode .copy-json-btn {
+    background: #444;
+    color: #eee;
+    border-color: #666;
+}
+
+body.dark-mode .copy-json-btn:hover {
+    background: #555;
+    border-color: #888;
+}
+
+body.dark-mode .copy-json-btn:active {
+    background: #333;
+}
+
+body.dark-mode .cve-raw-json pre {
+    color: #ddd;
+}
+
+body.dark-mode .cve-close {
+    border-color: var(--border-color);
+    box-shadow: 4px 4px 0 var(--border-color);
+}
+
+body.dark-mode .cve-close:hover {
+    box-shadow: 6px 6px 0 var(--border-color);
 }

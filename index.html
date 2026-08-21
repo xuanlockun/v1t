@@ -89,6 +89,7 @@
         <div class="logo">
             <a class="text-white font-bold text-xl tracking-widest pl-2 font-[family-name:var(--font-roboto)]"
                 href="/">V1T</a>
+            <img class="nav-logo-hover" src="assets/images/V1t_fin.png" alt="V1T Logo" loading="lazy">
         </div>
         <div class="hamburger" id="hamburger">
             <i class="fa-solid fa-bars"></i>
@@ -114,7 +115,7 @@
         <!-- Khối 1: Members -->
         <div class="small_container">
             <h2>MEMBERS</h2>
-            <div style="text-align: center; line-height: 2;">
+            <div class="members-list">
                 <a href="https://ctftime.org/user/172832" target="_blank" rel="noopener noreferrer">Jaze</a>
                 <a href="https://ctftime.org/user/183484" target="_blank" rel="noopener noreferrer">Rawr</a>
                 <a href="https://ctftime.org/user/206379" target="_blank" rel="noopener noreferrer">Maro</a>
@@ -137,18 +138,14 @@
         <!-- Khối 2: Stats -->
         <div class="small_container expand-x">
             <h2>CTF STATS</h2>
-            <div class="stats-row" style="text-align: center; margin-bottom: 15px;">
+            <div class="stats-row">
                 <div class="row first-row">
-                    <span id="highest-rank"><i class="fa-solid fa-trophy" style="padding-right:5px;"></i> Highest:
-                        *</span>
-                    <span id="world-rank" style="margin-left:12px;"><i class="fa-solid fa-earth-americas"
-                            style="padding-right:5px;"></i> World: *</span>
+                    <span id="highest-rank"> <i class="fa-solid fa-trophy" style="padding-right: 5px;"></i> Highest: * </span>
+                    <span id="world-rank"> <i class="fa-solid fa-earth-americas" style="padding-right: 5px;"></i> World: 296 </span>
                 </div>
                 <div class="row second-row">
-                    <span id="current-rank"><i class="fa-solid fa-chart-line" style="padding-right:5px;"></i> Current:
-                        *</span>
-                    <span id="country-rank" style="margin-left:12px;"><i class="fa-solid fa-flag"
-                            style="padding-right:5px; color: #FF9800;"></i> Country: * 🇻🇳</span>
+                    <span id="current-rank"> <i class="fa-solid fa-chart-line" style="padding-right: 5px;"></i> Current: 296 </span>
+                    <span id="country-rank"> <i class="fa-solid fa-flag" style="padding-right: 5px;"></i> Country place: 24 <img src="assets/images/vn.svg" style="padding-left: 5px;" width="17.6"></span>
                 </div>
             </div>
             <div class="center-actions">
@@ -160,57 +157,33 @@
 
                 <div class="team-article-title">ARTICLES</div>
                 <div class="team-article-list">
-                    <button class="team-cve-showall team-article-btn" id="show-articles" type="button"
-                        data-href="articles/">Show Articles</button>
+                    <button class="team-cve-showall team-article-btn" id="show-articles" type="button" data-href="articles/">Show Articles</button>
                     <!-- Articles button navigates to /articles/ via JS (keeps button semantics and consistent styling) -->
                 </div>
             </div>
         </div>
 
-        <!-- CVE modal (full-screen card) -->
-        <div id="cve-modal" class="cve-modal" hidden>
-            <div class="cve-modal-backdrop"></div>
-            <div class="cve-modal-card">
-                <button class="cve-close" id="cve-close" aria-label="Close CVE list">✕</button>
-                <div class="cve-modal-content">
-                    <div class="cve-sidebar">
-                        <div class="cve-modal-header">
-                            <h3>All CVEs</h3>
-                        </div>
-                        <div id="cve-grid" class="cve-grid" role="list"></div>
-                    </div>
-                    <div id="cve-detail-view" class="cve-detail-view" hidden>
-                        <!-- Detailed JSON content rendered here -->
-                    </div>
-                </div>
-            </div>
-        </div>
 
 
         <!-- Khối 3: Socials -->
         <div class="small_container">
             <h2>SOCIALS</h2>
-            <div style="text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                <a href="https://ctftime.org/team/371186" target="_blank" rel="noopener noreferrer" style="width: 80%;">
+            <div class="socials-list">
+                <a href="https://ctftime.org/team/371186" target="_blank" rel="noopener noreferrer" class="social-link ctf">
                     <i class="fa-solid fa-flag-checkered"></i> CTFtime
                 </a>
-                <a href="https://discord.com/invite/WyYTC2EZqK" target="_blank" rel="noopener noreferrer"
-                    style="width: 80%; color: #5865F2;">
+                <a href="https://discord.com/invite/WyYTC2EZqK" target="_blank" rel="noopener noreferrer" class="social-link discord">
                     <i class="fa-brands fa-discord"></i> Discord
                 </a>
-                <a href="https://www.linkedin.com/company/v1t-quack/" target="_blank" rel="noopener noreferrer"
-                    style="width: 80%; color: #0d71bd;">
+                <a href="https://www.linkedin.com/company/v1t-quack/" target="_blank" rel="noopener noreferrer" class="social-link linkedin">
                     <i class="fa-brands fa-linkedin"></i> Linkedin
                 </a>
-                <a href="https://www.facebook.com/profile.php?id=61586992003855" target="_blank"
-                    rel="noopener noreferrer" style="width: 80%; color: #1877f2;">
+                <a href="https://www.facebook.com/profile.php?id=61586992003855" target="_blank" rel="noopener noreferrer" class="social-link facebook">
                     <i class="fa-brands fa-facebook"></i> Facebook
                 </a>
-                <a href="https://www.instagram.com/v1tnamese/" target="_blank" rel="noopener noreferrer"
-                    style="width: 80%; color: #e4405f;">
+                <a href="https://www.instagram.com/v1tnamese/" target="_blank" rel="noopener noreferrer" class="social-link instagram">
                     <i class="fa-brands fa-instagram"></i> Instagram
                 </a>
-
             </div>
         </div>
     </div>
@@ -364,6 +337,25 @@
             <a href="https://r1muru2006.github.io/" target="_blank" rel="noopener noreferrer">BLOG</a>
         </div>
     </div>
+
+        <!-- CVE modal (full-screen card) -->
+        <div id="cve-modal" class="cve-modal" hidden>
+            <div class="cve-modal-backdrop"></div>
+            <div class="cve-modal-card">
+                <button class="cve-close" id="cve-close" aria-label="Close CVE list">✕</button>
+                <div class="cve-modal-content">
+                    <div class="cve-sidebar">
+                        <div class="cve-modal-header">
+                            <h3>All CVEs</h3>
+                        </div>
+                        <div id="cve-grid" class="cve-grid" role="list"></div>
+                    </div>
+                    <div id="cve-detail-view" class="cve-detail-view" hidden>
+                        <!-- CVE details will be injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
 
     <!-- Scripts -->
     <script src="assets/js/commands.js"></script>

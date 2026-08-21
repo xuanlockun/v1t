@@ -77,6 +77,58 @@ function updateRankInfo(rankData) {
 
 document.addEventListener("DOMContentLoaded", fetchGoogleSheetData);
 
+// Hover Counter for Hero Section 3D Effects
+document.addEventListener("DOMContentLoaded", () => {
+    const statsLayout = document.querySelector('.stats-layout');
+    // Thẻ giữa là child thứ 2 trong stats-layout (vì child 3 là thẻ ẩn, child 4 là socials)
+    // Thực tế thẻ giữa mang class 'expand-x'
+    const middleCard = statsLayout ? statsLayout.querySelector('.small_container.expand-x') : null;
+    
+    if (statsLayout && middleCard) {
+        let hoverCount = 0;
+        let isAnimating = false;
+        let shouldRemoveHover = false;
+        
+        middleCard.addEventListener('mouseenter', () => {
+            hoverCount++;
+            let state = hoverCount % 3;
+            if (state === 0) state = 3;
+            
+            statsLayout.setAttribute('data-hover-state', state);
+            statsLayout.classList.add('trigger-hover');
+            shouldRemoveHover = false;
+            
+            if (state === 3) {
+                isAnimating = true;
+            }
+        });
+
+        middleCard.addEventListener('mouseleave', () => {
+            let state = statsLayout.getAttribute('data-hover-state');
+            if (state == "3" && isAnimating) {
+                // Wait for the animation to complete its loop before removing the hover effect
+                shouldRemoveHover = true;
+            } else {
+                statsLayout.classList.remove('trigger-hover');
+            }
+        });
+
+        // Listen for the end of the animation loop on the left card
+        const leftCard = statsLayout.querySelector('.small_container:nth-child(1)');
+        if (leftCard) {
+            leftCard.addEventListener('animationiteration', (e) => {
+                if (e.animationName === 'leftCardHoverCycle') {
+                    if (shouldRemoveHover) {
+                        statsLayout.classList.remove('trigger-hover');
+                        isAnimating = false;
+                        shouldRemoveHover = false;
+                    }
+                }
+            });
+        }
+    }
+});
+
 // CVE modal handlers (safe: check elements exist)
 document.addEventListener('DOMContentLoaded', () => {
     const showBtn = document.getElementById('show-cves');
