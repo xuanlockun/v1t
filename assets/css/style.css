@@ -552,7 +552,7 @@ td:not(.event) { text-align: center; }
 .cve-raw-json pre { margin: 0; padding: 18px; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 14px; color: #333; }
 
 @media (max-width: 768px) {
-    .cve-modal-card { width: 96vw; height: 72vh; padding: 10px; display: flex; flex-direction: column; }
+    .cve-modal-card { width: 90vw; height: 82vh; padding: 10px; display: flex; flex-direction: column; }
     .cve-modal-content { flex-direction: column; overflow: hidden; flex: 1; }
     
     /* Default Grid Mode */
