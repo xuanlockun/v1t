@@ -369,19 +369,18 @@ nav .logo {
 nav .logo .nav-logo-hover {
     position: absolute;
     top: 50%;
-    left: 20%;
+    left: 0;
     transform: translate(-50%, -50%) scale(0) rotate(45deg);
     opacity: 0;
-    width: 65px; 
+    width: 50px; 
     height: auto;
     pointer-events: none; 
     transition: all 0.5s cubic-bezier(0.68, -0.6, 0.32, 1.6);
     z-index: -1; 
-    filter: drop-shadow(0 5px 15px rgba(255, 202, 40, 0.5));
 }
 
 nav .logo:hover .nav-logo-hover {
-    transform: translate(-120%, -50%) scale(1) rotate(-15deg);
+    transform: translate(-90%, -50%) scale(1.2) rotate(-15deg);
     opacity: 1;
 }
 
