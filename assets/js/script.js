@@ -134,12 +134,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const showBtn = document.getElementById('show-cves');
     const modal = document.getElementById('cve-modal');
     const closeBtn = document.getElementById('cve-close');
+    let cveGridRendered = false;
 
     if (showBtn && modal) {
         showBtn.addEventListener('click', async () => {
             modal.hidden = false;
             // render grid (lazy load data first time)
-            await renderCveGrid();
+            if (!cveGridRendered) {
+                await renderCveGrid();
+                cveGridRendered = true;
+            }
             const firstFocusable = modal.querySelector('.cve-close');
             if (firstFocusable) firstFocusable.focus();
         });
@@ -199,6 +203,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return localCvesMapPromise;
     }
 
+    function makePlaceholderCveRecord(cveId) {
+        return { cveMetadata: { cveId }, containers: {} };
+    }
+
+    function isValidCveId(cveId) {
+        return /^CVE-\d{4}-\d{4,}$/.test(cveId);
+    }
+
     async function fetchCveRecord(cveId) {
         if (cveCache[cveId]) return cveCache[cveId];
 
@@ -207,6 +219,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (localMap[cveId]) {
             cveCache[cveId] = localMap[cveId];
             return localMap[cveId];
+        }
+
+        if (!isValidCveId(cveId)) {
+            const placeholder = makePlaceholderCveRecord(cveId);
+            cveCache[cveId] = placeholder;
+            return placeholder;
         }
 
         // try remote MITRE API as fallback
@@ -223,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // if nothing, store minimal placeholder
-        const placeholder = { cveMetadata: { cveId }, containers: {} };
+        const placeholder = makePlaceholderCveRecord(cveId);
         cveCache[cveId] = placeholder;
         return placeholder;
     }
@@ -584,21 +602,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!grid) return;
         grid.innerHTML = '';
         const ids = await loadCveList();
-        // create placeholders first
+        const localMap = await loadLocalCvesMap();
+
         for (const id of ids) {
-            const placeholderCard = document.createElement('div');
-            placeholderCard.className = 'cve-card';
-            placeholderCard.textContent = id;
-            grid.appendChild(placeholderCard);
+            const record = localMap[id] || makePlaceholderCveRecord(id);
+            cveCache[id] = record;
+            grid.appendChild(makeCveCardElement(id, record));
         }
-        // fetch details in parallel and replace cards
-        await Promise.all(ids.map(async (id, idx) => {
-            const record = await fetchCveRecord(id);
-            const card = makeCveCardElement(id, record);
-            // replace placeholder at position idx
-            const existing = grid.children[idx];
-            if (existing) grid.replaceChild(card, existing);
-        }));
     }
 
     // Article button: navigate to articles/ when clicked (keeps semantic button element)
@@ -646,5 +656,3 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 });
-
-document.addEventListener("DOMContentLoaded", fetchGoogleSheetData);
