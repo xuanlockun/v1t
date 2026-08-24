@@ -161,46 +161,70 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // cached details map
-    const cveCache = {}; // cveId -> record object
+    // In-memory RAM store for all CVE data (single fetch, cached forever in RAM)
+    const cveStore = {}; // cveId -> record object
+    let cveStoreInitialized = false;
+    let cveStorePromise = null;
 
-    let localCvesMap = null;
-    let localCvesMapPromise = null;
-    async function loadLocalCvesMap() {
-        if (localCvesMap !== null) return localCvesMap;
-        if (localCvesMapPromise) return localCvesMapPromise;
+    async function getOrInitCveStore() {
+        if (cveStoreInitialized) return cveStore;
+        if (cveStorePromise) return cveStorePromise;
 
-        localCvesMapPromise = (async () => {
-        try {
-            const res = await fetch('assets/data/cves-local.json');
-            if (res.ok) {
-                const data = await res.json();
-                localCvesMap = {};
-                // Handle different JSON structures intelligently
-                if (Array.isArray(data)) {
-                    // Array of CVE records
-                    data.forEach(item => {
-                        if (item.cveMetadata && item.cveMetadata.cveId) {
-                            localCvesMap[item.cveMetadata.cveId] = item;
+        cveStorePromise = (async () => {
+            try {
+                const res = await fetch('assets/data/cves-local.json');
+                if (res.ok) {
+                    const text = await res.text();
+                    try {
+                        const data = JSON.parse(text);
+                        if (Array.isArray(data)) {
+                            data.forEach(item => {
+                                if (item && item.cveMetadata && item.cveMetadata.cveId) {
+                                    cveStore[item.cveMetadata.cveId] = item;
+                                }
+                            });
+                        } else if (data && data.dataType === "CVE_RECORD" && data.cveMetadata && data.cveMetadata.cveId) {
+                            cveStore[data.cveMetadata.cveId] = data;
+                        } else if (typeof data === 'object' && data !== null) {
+                            Object.assign(cveStore, data);
                         }
-                    });
-                } else if (data.dataType === "CVE_RECORD" && data.cveMetadata && data.cveMetadata.cveId) {
-                    // Single bare CVE record
-                    localCvesMap[data.cveMetadata.cveId] = data;
-                } else {
-                    // Assume it's a map: { "CVE-XXXX": { record } }
-                    localCvesMap = data;
+                    } catch (parseErr) {
+                        // Fallback: Support concatenated multi-JSON objects (NDJSON / raw paste)
+                        let depth = 0, start = -1, inString = false, escape = false;
+                        for (let i = 0; i < text.length; i++) {
+                            const char = text[i];
+                            if (escape) { escape = false; continue; }
+                            if (char === '\\') { escape = true; continue; }
+                            if (char === '"') { inString = !inString; continue; }
+                            if (!inString) {
+                                if (char === '{') {
+                                    if (depth === 0) start = i;
+                                    depth++;
+                                } else if (char === '}') {
+                                    depth--;
+                                    if (depth === 0 && start !== -1) {
+                                        try {
+                                            const item = JSON.parse(text.slice(start, i + 1));
+                                            if (item && item.cveMetadata && item.cveMetadata.cveId) {
+                                                cveStore[item.cveMetadata.cveId] = item;
+                                            }
+                                        } catch (e) {}
+                                        start = -1;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-                return localCvesMap;
+            } catch (e) {
+                console.warn('Failed to load cves-local.json', e);
             }
-        } catch (e) {
-            console.warn('Failed to load cves-local.json', e);
-        }
-        localCvesMap = {}; // fallback to empty object
-        return localCvesMap;
+
+            cveStoreInitialized = true;
+            return cveStore;
         })();
 
-        return localCvesMapPromise;
+        return cveStorePromise;
     }
 
     function makePlaceholderCveRecord(cveId) {
@@ -209,41 +233,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function isValidCveId(cveId) {
         return /^CVE-\d{4}-\d{4,}$/.test(cveId);
-    }
-
-    async function fetchCveRecord(cveId) {
-        if (cveCache[cveId]) return cveCache[cveId];
-
-        // check local JSON first
-        const localMap = await loadLocalCvesMap();
-        if (localMap[cveId]) {
-            cveCache[cveId] = localMap[cveId];
-            return localMap[cveId];
-        }
-
-        if (!isValidCveId(cveId)) {
-            const placeholder = makePlaceholderCveRecord(cveId);
-            cveCache[cveId] = placeholder;
-            return placeholder;
-        }
-
-        // try remote MITRE API as fallback
-        const apiUrl = `https://cveawg.mitre.org/api/cve/${cveId}`;
-        try {
-            const r = await fetch(apiUrl, { cache: 'no-store' });
-            if (r.ok) {
-                const json = await r.json();
-                cveCache[cveId] = json;
-                return json;
-            }
-        } catch (e) {
-            // ignore remote error
-        }
-
-        // if nothing, store minimal placeholder
-        const placeholder = makePlaceholderCveRecord(cveId);
-        cveCache[cveId] = placeholder;
-        return placeholder;
     }
 
     function renderDetailView(container, record, cveId) {
@@ -391,18 +380,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function makeCveCardElement(cveId, record) {
-        const container = document.createElement('div');
-        container.className = 'cve-card';
-        container.tabIndex = 0;
-
-        // Determine severity class based on local data if available
-        let severityClass = '';
+    function getSeverityClass(record) {
         let cardMetrics = [];
-        if (record.containers && record.containers.cna && record.containers.cna.metrics) {
+        if (record && record.containers && record.containers.cna && record.containers.cna.metrics) {
             cardMetrics = cardMetrics.concat(record.containers.cna.metrics);
         }
-        if (record.containers && record.containers.adp) {
+        if (record && record.containers && record.containers.adp) {
             record.containers.adp.forEach(adp => {
                 if (adp.metrics) cardMetrics = cardMetrics.concat(adp.metrics);
             });
@@ -413,14 +396,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cvss = m.cvssV3_1 || m.cvssV3 || m.cvssV4_0;
                 if (cvss && cvss.baseSeverity) {
                     const s = cvss.baseSeverity.toUpperCase();
-                    if (s === 'CRITICAL') severityClass = 'severity-critical';
-                    else if (s === 'HIGH') severityClass = 'severity-high';
-                    else if (s === 'MEDIUM') severityClass = 'severity-medium';
-                    else if (s === 'LOW') severityClass = 'severity-low';
-                    break;
+                    if (s === 'CRITICAL') return 'severity-critical';
+                    if (s === 'HIGH') return 'severity-high';
+                    if (s === 'MEDIUM') return 'severity-medium';
+                    if (s === 'LOW') return 'severity-low';
                 }
             }
         }
+        return '';
+    }
+
+    function makeCveCardElement(cveId, record) {
+        const container = document.createElement('div');
+        container.className = 'cve-card';
+        container.tabIndex = 0;
+
+        // Determine severity class based on local data if available
+        const severityClass = getSeverityClass(record);
         if (severityClass) container.classList.add(severityClass);
 
         const idEl = document.createElement('div');
@@ -433,13 +425,14 @@ document.addEventListener('DOMContentLoaded', () => {
         popup.className = 'cve-popup';
         document.body.appendChild(popup);
 
-        async function updateAndShowPopup() {
+        function updateAndShowPopup() {
             // Don't show popup if in split mode
             const modal = document.getElementById('cve-modal');
             if (modal && modal.classList.contains('split-mode')) return;
 
             try {
-                const fresh = await fetchCveRecord(cveId);
+                // Direct access from RAM store - instant, 0 network fetch
+                const fresh = cveStore[cveId] || record || makePlaceholderCveRecord(cveId);
 
                 let baseScore = '';
                 let baseSeverity = '';
@@ -581,12 +574,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 container.classList.add('active');
                 if (modal) modal.classList.add('split-mode');
 
-                // Populate detail view
                 const detailView = document.getElementById('cve-detail-view');
                 if (detailView) {
-                    detailView.innerHTML = '<p style="text-align:center; margin-top:50px;">Loading data...</p>';
-                    const fresh = await fetchCveRecord(cveId);
-                    renderDetailView(detailView, fresh, cveId);
+                    const current = cveStore[cveId] || record;
+                    const hasData = current && current.containers && current.containers.cna && Object.keys(current.containers.cna).length > 0;
+
+                    if (hasData) {
+                        // 1. Data exists in RAM - Instant render with 0 fetch
+                        renderDetailView(detailView, current, cveId);
+                    } else if (isValidCveId(cveId)) {
+                        // 2. Not in local data - fetch on-demand from API once and save to RAM
+                        detailView.innerHTML = '<p style="text-align:center; margin-top:50px; color:#888;">Loading details from API...</p>';
+                        try {
+                            const apiUrl = `https://cveawg.mitre.org/api/cve/${cveId}`;
+                            const r = await fetch(apiUrl, { cache: 'no-store' });
+                            if (r.ok) {
+                                const json = await r.json();
+                                cveStore[cveId] = json;
+                                renderDetailView(detailView, json, cveId);
+                                const sevClass = getSeverityClass(json);
+                                if (sevClass) container.classList.add(sevClass);
+                            } else {
+                                renderDetailView(detailView, current || makePlaceholderCveRecord(cveId), cveId);
+                            }
+                        } catch (e) {
+                            renderDetailView(detailView, current || makePlaceholderCveRecord(cveId), cveId);
+                        }
+                    } else {
+                        renderDetailView(detailView, current || makePlaceholderCveRecord(cveId), cveId);
+                    }
                 }
             }
         });
@@ -601,14 +617,48 @@ document.addEventListener('DOMContentLoaded', () => {
         const grid = document.getElementById('cve-grid');
         if (!grid) return;
         grid.innerHTML = '';
+        
+        // Fetch both files ONCE and cache in RAM
         const ids = await loadCveList();
-        const localMap = await loadLocalCvesMap();
+        const store = await getOrInitCveStore();
 
-        for (const id of ids) {
-            const record = localMap[id] || makePlaceholderCveRecord(id);
-            cveCache[id] = record;
-            grid.appendChild(makeCveCardElement(id, record));
+        // Merge: keep ids from cves-list.json first, and append any extra from cveStore in RAM
+        const allIds = [...ids];
+        Object.keys(store).forEach(k => {
+            if (!allIds.includes(k)) {
+                allIds.push(k);
+            }
+        });
+
+        const cardsMap = {};
+        for (const id of allIds) {
+            const record = store[id] || makePlaceholderCveRecord(id);
+            store[id] = record;
+            const cardEl = makeCveCardElement(id, record);
+            cardsMap[id] = cardEl;
+            grid.appendChild(cardEl);
         }
+
+        // Asynchronously try to fetch details for missing items from API (once per item)
+        allIds.forEach(async (id) => {
+            if ((!store[id] || !store[id].containers || !store[id].containers.cna || Object.keys(store[id].containers.cna).length === 0) && isValidCveId(id)) {
+                try {
+                    const apiUrl = `https://cveawg.mitre.org/api/cve/${id}`;
+                    const r = await fetch(apiUrl, { cache: 'no-store' });
+                    if (r.ok) {
+                        const json = await r.json();
+                        store[id] = json;
+                        const card = cardsMap[id];
+                        if (card) {
+                            const sevClass = getSeverityClass(json);
+                            if (sevClass) card.classList.add(sevClass);
+                        }
+                    }
+                } catch (e) {
+                    // ignore network/CORS error
+                }
+            }
+        });
     }
 
     // Article button: navigate to articles/ when clicked (keeps semantic button element)
@@ -626,21 +676,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) modal.hidden = true; });
     }
 
-    // Expose debug helpers to window for easier console testing when opened via file://
+    // Expose debug helpers to window for easier console testing
     try {
         window.debugCves = {
-            loadCveList: async () => {
-                const ids = await loadCveList();
-                console.log('cve list', ids);
-                return ids;
-            },
-            fetchCveRecord: async (id) => {
-                const rec = await fetchCveRecord(id);
-                console.log('cve record', id, rec);
-                return rec;
-            },
-            renderCveGrid: async () => { await renderCveGrid(); console.log('renderCveGrid done'); },
-            cache: cveCache
+            store: cveStore,
+            getStore: getOrInitCveStore,
+            renderCveGrid: async () => { await renderCveGrid(); console.log('renderCveGrid done'); }
         };
     } catch (e) {
         /* ignore if window not writable */
