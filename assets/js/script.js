@@ -161,8 +161,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const cveCache = {}; // cveId -> record object
 
     let localCvesMap = null;
+    let localCvesMapPromise = null;
     async function loadLocalCvesMap() {
         if (localCvesMap !== null) return localCvesMap;
+        if (localCvesMapPromise) return localCvesMapPromise;
+
+        localCvesMapPromise = (async () => {
         try {
             const res = await fetch('assets/data/cves-local.json');
             if (res.ok) {
@@ -190,6 +194,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         localCvesMap = {}; // fallback to empty object
         return localCvesMap;
+        })();
+
+        return localCvesMapPromise;
     }
 
     async function fetchCveRecord(cveId) {
