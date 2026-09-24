@@ -84,13 +84,13 @@
         </div></section>
         <section class="work product-shell" id="work">
             <div class="section-heading"><h2><i class="fa-solid fa-shield"></i> Featured work</h2><a href="#contact">View all projects →</a></div>
-            <div class="work-grid"><article><div class="mockup wp"><i class="fa-brands fa-wordpress"></i></div><h3>WordPress Security<br>Hardening for Toolkit</h3><span>Security review</span></article><article><div class="mockup analytics"><i class="fa-solid fa-chart-line"></i></div><h3>Custom Dashboard<br>for Analytics Platform</h3><span>Web development</span></article><article><div class="mockup tools"><i class="fa-solid fa-list-check"></i></div><h3>Internal Tooling Suite<br>for Marketing Team</h3><span>Software engineering</span></article></div>
+            <div class="work-grid"><article><div class="mockup wp"><i class="fa-brands fa-wordpress"></i></div><h3>WordPress Security<br>&amp; Vulnerability Research</h3><span>Security research</span></article><article><div class="mockup analytics"><i class="fa-solid fa-code"></i></div><h3>Custom Web<br>Development</h3><span>Made-to-order websites</span></article><article><div class="mockup tools"><i class="fa-solid fa-flag"></i></div><h3>Security Event &amp; CTF<br>Consulting and Support</h3><span>Event security</span></article></div>
         </section>
-        <section class="stats product-shell"><div><i class="fa-solid fa-shield-halved"></i><strong>300+</strong><span>Security Reviews<br>Completed</span></div><div><i class="fa-solid fa-code"></i><strong>150+</strong><span>Projects<br>Delivered</span></div><div><i class="fa-solid fa-users"></i><strong>80+</strong><span>Happy Teams<br>Worldwide</span></div><div><i class="fa-regular fa-calendar"></i><strong>5+</strong><span>Years of Practical<br>Experience</span></div></section>
-        <section class="commitment product-shell"><div><span class="pixel-label">Our commitment</span><h2>Building a safer<br>and better web.</h2></div><div><p>Security, quality, and transparency are at the core of everything we do. We're committed to responsible disclosure, secure development practices, and long-term partnerships.</p><a class="pixel-button" href="/#team">Learn about us</a></div><div class="sprout">🌱</div></section>
-        <section class="contact-band" id="contact"><div class="product-shell"><div class="mail-art">✉</div><h2>Have a project<br>in mind?</h2><p>Let's build something secure, reliable,<br>and scalable together.</p><a class="pixel-button dark" href="mailto:contact@v1t.site">Start a conversation</a></div></section>
+        <section class="stats product-shell"><div><i class="fa-solid fa-shield-halved"></i><strong>20+</strong><span>CVEs<br>Discovered</span></div><div><i class="fa-solid fa-users"></i><strong>3+</strong><span>Companies<br>Trust Us</span></div><div><i class="fa-regular fa-calendar"></i><strong>2+</strong><span>Years of Practical<br>Experience</span></div><div><i class="fa-solid fa-code"></i><strong>5+</strong><span>Projects<br>Delivered</span></div></section>
+        <section class="commitment product-shell"><div><span class="pixel-label">Our commitment</span><h2>Building a safer<br>and better web.</h2></div><div><p>Security, quality, and transparency are at the core of everything we do. We're committed to responsible disclosure, secure development practices, and long-term partnerships.</p><a class="pixel-button" href="/#team">Learn about us</a></div><div class="sprout" aria-hidden="true"><i class="fa-solid fa-seedling"></i><span></span></div></section>
+        <section class="contact-band" id="contact"><div class="product-shell"><div class="mail-art"><i class="fa-regular fa-envelope"></i></div><div class="contact-copy"><h2>Have a project<br>in mind?</h2><p>Let's build something secure, reliable, and scalable together.</p></div><form class="contact-form" id="contact-form"><label for="contact-email">Your work email</label><div><input id="contact-email" name="email" type="email" autocomplete="email" placeholder="you@company.com" required><button class="pixel-button" type="submit">Start a conversation</button></div></form></div></section>
     </main>
-    <footer class="product-footer product-shell"><div><b>V1T</b><p>Security review and software<br>engineering for teams that ship.</p></div><div><strong>Services</strong><a href="#services">V1T Security</a><a href="#services">V1T Forge</a><a href="#services">Audit &amp; Research</a></div><div><strong>Company</strong><a href="/#team">About Us</a><a href="/careers/">Careers</a><a href="#contact">Contact</a></div><div><strong>Resources</strong><a href="/articles/">Articles</a><a href="/ctf/">CTF</a><a href="/">Home</a></div><div><strong>Follow us</strong><p class="socials"><i class="fa-brands fa-github"></i><i class="fa-brands fa-x-twitter"></i><i class="fa-brands fa-linkedin"></i></p></div><small>© 2026 V1T Services. All rights reserved.</small></footer>
+    <footer class="product-footer product-shell"><div><b>V1T</b><p>Security review and software<br>engineering for teams that ship.</p></div><div><strong>Services</strong><a href="#services">V1T Security</a><a href="#services">V1T Forge</a><a href="#services">Audit &amp; Research</a></div><div><strong>Company</strong><a href="/#team">About Us</a><a href="/careers/">Careers</a><a href="#contact">Contact</a></div><div><strong>Resources</strong><a href="/articles/">Articles</a><a href="/ctf/">CTF</a><a href="/">Home</a></div><div><strong>Follow us</strong><p class="socials"><a href="https://discord.com/invite/WyYTC2EZqK" target="_blank" rel="noopener noreferrer" aria-label="V1T on Discord"><i class="fa-brands fa-discord"></i></a><a href="https://www.instagram.com/v1tnamese/" target="_blank" rel="noopener noreferrer" aria-label="V1T on Instagram"><i class="fa-brands fa-instagram"></i></a><a href="https://www.linkedin.com/company/v1t-quack/" target="_blank" rel="noopener noreferrer" aria-label="V1T on LinkedIn"><i class="fa-brands fa-linkedin"></i></a></p></div><small>© 2026 V1T Services. All rights reserved.</small></footer>
 
     <script>
         const nav = document.querySelector('nav');
@@ -112,6 +112,15 @@
             darkModeToggle.innerHTML = enabled
                 ? '<i class="fa-solid fa-sun"></i> Light Mode'
                 : '<i class="fa-solid fa-moon"></i> Dark Mode';
+        });
+
+        document.getElementById('contact-form').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const email = document.getElementById('contact-email').value.trim();
+            if (!email) return;
+            const subject = encodeURIComponent('Project inquiry from ' + email);
+            const body = encodeURIComponent('Hi V1T,\n\nI would like to discuss a project.\n\nMy email: ' + email);
+            window.location.href = 'mailto:contact@v1t.site?subject=' + subject + '&body=' + body;
         });
     </script>
 </body>
