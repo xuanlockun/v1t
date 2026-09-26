@@ -149,12 +149,138 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Dynamic Team Members Store (loaded from assets/data/members.json)
+    const TEAM_MEMBERS = {};
+    let membersDataPromise = null;
+
+    function renderTeamProfiles(members) {
+        const container = document.getElementById('profile-container') || document.querySelector('.profile-container');
+        if (!container || !Array.isArray(members)) return;
+
+        container.innerHTML = members.map(m => {
+            const quoteClass = m.quoteClass || 'quote';
+            const quoteText = m.quote ? `<p class="${quoteClass}">${m.quote}</p>` : '';
+            const blogLink = m.blog ? `<a href="${m.blog}" target="_blank" rel="noopener noreferrer">BLOG</a>` : '';
+            const role = m.role || 'Member';
+            const avatar = m.avatar || `assets/images/${(m.id || m.name).toLowerCase()}.png`;
+
+            return `
+                <div class="profile-card">
+                    <img src="${avatar}" alt="${m.name}" loading="lazy" onerror="this.onerror=null; this.src='assets/images/v1t.png';">
+                    <h3>${m.name}</h3>
+                    <h4>${role}</h4>
+                    ${quoteText}
+                    ${blogLink}
+                </div>
+            `;
+        }).join('');
+    }
+
+    function renderMembersList(members) {
+        const listEl = document.getElementById('members-list') || document.querySelector('.members-list');
+        if (!listEl || !Array.isArray(members)) return;
+
+        listEl.innerHTML = members.map(m => {
+            if (m.ctftime) {
+                return `<a href="${m.ctftime}" target="_blank" rel="noopener noreferrer">${m.name}</a>`;
+            } else {
+                return `<span class="member-name">${m.name}</span>`;
+            }
+        }).join('\n                ');
+    }
+
+    async function loadMembersData() {
+        if (membersDataPromise) return membersDataPromise;
+
+        membersDataPromise = (async () => {
+            try {
+                const res = await fetch('assets/data/members.json');
+                if (res.ok) {
+                    const list = await res.json();
+                    if (Array.isArray(list)) {
+                        list.forEach(m => {
+                            if (!m || !m.name) return;
+                            const memberInfo = {
+                                id: m.id || m.name.toLowerCase(),
+                                name: m.name,
+                                avatar: m.avatar || `assets/images/${(m.id || m.name).toLowerCase()}.png`,
+                                role: m.role || 'Member',
+                                quote: m.quote || '',
+                                quoteClass: m.quoteClass || 'quote',
+                                blog: m.blog || null,
+                                ctftime: m.ctftime || null
+                            };
+
+                            if (m.id) TEAM_MEMBERS[m.id.toLowerCase().trim()] = memberInfo;
+                            TEAM_MEMBERS[m.name.toLowerCase().trim()] = memberInfo;
+
+                            if (Array.isArray(m.aliases)) {
+                                m.aliases.forEach(alias => {
+                                    if (alias) TEAM_MEMBERS[String(alias).toLowerCase().trim()] = memberInfo;
+                                });
+                            }
+                        });
+
+                        // Render both sections if present on current page
+                        renderTeamProfiles(list);
+                        renderMembersList(list);
+
+                        return list;
+                    }
+                }
+            } catch (e) {
+                console.warn('Failed to load members.json', e);
+            }
+            return [];
+        })();
+
+        return membersDataPromise;
+    }
+
+    // Load members immediately on script initialization
+    loadMembersData();
+
+    function getFinderInfo(finderInput) {
+        if (!finderInput) return null;
+        if (typeof finderInput === 'object') {
+            const name = finderInput.name || finderInput.finder || 'Finder';
+            const key = name.toLowerCase().trim();
+            const base = TEAM_MEMBERS[key] || {};
+            return {
+                name: name,
+                avatar: finderInput.avatar || base.avatar || `assets/images/${key}.png`,
+                role: finderInput.role || base.role || 'Finder'
+            };
+        }
+        const name = String(finderInput).trim();
+        const key = name.toLowerCase();
+        if (TEAM_MEMBERS[key]) {
+            return { ...TEAM_MEMBERS[key] };
+        }
+        return {
+            name: name,
+            avatar: `assets/images/${key}.png`,
+            role: 'Finder'
+        };
+    }
+
     async function loadCveList() {
         const listUrl = 'assets/data/cves-list.json';
         try {
             const res = await fetch(listUrl);
-            const ids = await res.json();
-            return Array.isArray(ids) ? ids : [];
+            const rawList = await res.json();
+            if (!Array.isArray(rawList)) return [];
+            return rawList.map(item => {
+                if (typeof item === 'string') {
+                    return { id: item, finders: [] };
+                }
+                const id = item.id || item.cveId || item.cve || '';
+                let finders = item.finders || item.finder || [];
+                if (!Array.isArray(finders)) {
+                    finders = finders ? [finders] : [];
+                }
+                return { id, finders };
+            }).filter(item => Boolean(item.id));
         } catch (e) {
             console.warn('Failed to load cves-list.json', e);
             return [];
@@ -235,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return /^CVE-\d{4}-\d{4,}$/.test(cveId);
     }
 
-    function renderDetailView(container, record, cveId) {
+    function renderDetailView(container, record, cveId, finders = []) {
         // Setup data
         const cna = record.containers && record.containers.cna ? record.containers.cna : {};
         const meta = record.cveMetadata || {};
@@ -255,6 +381,29 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="cve-detail-body">
         `;
+
+        // Discovered By / Finders section
+        const resolvedFinders = (finders || []).map(getFinderInfo).filter(Boolean);
+        if (resolvedFinders.length > 0) {
+            html += `
+                <div class="detail-box cve-finders-box">
+                    <div class="box-title"><i class="fa-solid fa-award"></i> Discovered By</div>
+                    <div class="box-content">
+                        <div class="finders-grid">
+                            ${resolvedFinders.map(f => `
+                                <div class="finder-card">
+                                    <img src="${f.avatar}" class="finder-card-avatar" alt="${f.name}" onerror="this.onerror=null;this.src='assets/images/v1t.png';">
+                                    <div class="finder-card-details">
+                                        <div class="finder-card-name">${f.name}</div>
+                                        <div class="finder-card-role">${f.role}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
 
         // Description
         if (cna.descriptions && cna.descriptions[0]) {
@@ -406,7 +555,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return '';
     }
 
-    function makeCveCardElement(cveId, record) {
+    function makeCveCardElement(cveId, record, finders = []) {
         const container = document.createElement('div');
         container.className = 'cve-card';
         container.tabIndex = 0;
@@ -419,6 +568,24 @@ document.addEventListener('DOMContentLoaded', () => {
         idEl.className = 'cve-id';
         idEl.textContent = record.cveMetadata && record.cveMetadata.cveId ? record.cveMetadata.cveId : cveId;
         container.appendChild(idEl);
+
+        // Finder Avatars on Card
+        const resolvedFinders = (finders || []).map(getFinderInfo).filter(Boolean);
+        if (resolvedFinders.length > 0) {
+            const findersEl = document.createElement('div');
+            findersEl.className = 'cve-card-finders';
+            resolvedFinders.forEach(f => {
+                const img = document.createElement('img');
+                img.className = 'finder-avatar';
+                img.src = f.avatar;
+                img.alt = f.name;
+                img.title = `Finder: ${f.name} (${f.role})`;
+                img.loading = 'lazy';
+                img.onerror = () => { img.src = 'assets/images/v1t.png'; };
+                findersEl.appendChild(img);
+            });
+            container.appendChild(findersEl);
+        }
 
         // Hover popup
         const popup = document.createElement('div');
@@ -500,8 +667,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     badgesHtml += `<span class="severity-badge">${baseScore} | ${baseSeverity}</span>`;
                 }
 
+                let findersPopupHtml = '';
+                if (resolvedFinders.length > 0) {
+                    findersPopupHtml = `
+                        <div class="cve-popup-finders">
+                            <span class="finders-label"><i class="fa-solid fa-user-shield"></i> Finder:</span>
+                            <div class="finders-chips">
+                                ${resolvedFinders.map(f => `
+                                    <span class="finder-chip" title="${f.role}">
+                                        <img src="${f.avatar}" class="finder-chip-avatar" alt="${f.name}" onerror="this.onerror=null;this.src='assets/images/v1t.png';">
+                                        <span class="finder-chip-name">${f.name}</span>
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
                 popup.innerHTML = `
                     <div class="title">${title}</div>
+                    ${findersPopupHtml}
                     <div class="cwe-metrics">${badgesHtml}</div>
                     <div class="desc">${desc}</div>
                     <div class="cvss">${vectorString}</div>
@@ -581,7 +766,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (hasData) {
                         // 1. Data exists in RAM - Instant render with 0 fetch
-                        renderDetailView(detailView, current, cveId);
+                        renderDetailView(detailView, current, cveId, finders);
                     } else if (isValidCveId(cveId)) {
                         // 2. Not in local data - fetch on-demand from API once and save to RAM
                         detailView.innerHTML = '<p style="text-align:center; margin-top:50px; color:#888;">Loading details from API...</p>';
@@ -591,17 +776,17 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (r.ok) {
                                 const json = await r.json();
                                 cveStore[cveId] = json;
-                                renderDetailView(detailView, json, cveId);
+                                renderDetailView(detailView, json, cveId, finders);
                                 const sevClass = getSeverityClass(json);
                                 if (sevClass) container.classList.add(sevClass);
                             } else {
-                                renderDetailView(detailView, current || makePlaceholderCveRecord(cveId), cveId);
+                                renderDetailView(detailView, current || makePlaceholderCveRecord(cveId), cveId, finders);
                             }
                         } catch (e) {
-                            renderDetailView(detailView, current || makePlaceholderCveRecord(cveId), cveId);
+                            renderDetailView(detailView, current || makePlaceholderCveRecord(cveId), cveId, finders);
                         }
                     } else {
-                        renderDetailView(detailView, current || makePlaceholderCveRecord(cveId), cveId);
+                        renderDetailView(detailView, current || makePlaceholderCveRecord(cveId), cveId, finders);
                     }
                 }
             }
@@ -618,29 +803,59 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!grid) return;
         grid.innerHTML = '';
         
-        // Fetch both files ONCE and cache in RAM
-        const ids = await loadCveList();
-        const store = await getOrInitCveStore();
+        // Fetch all files ONCE and cache in RAM
+        const [listItems, store] = await Promise.all([
+            loadCveList(),
+            getOrInitCveStore(),
+            loadMembersData()
+        ]);
 
-        // Merge: keep ids from cves-list.json first, and append any extra from cveStore in RAM
-        const allIds = [...ids];
-        Object.keys(store).forEach(k => {
-            if (!allIds.includes(k)) {
-                allIds.push(k);
+        const findersMap = {};
+        listItems.forEach(item => {
+            if (item && item.id) {
+                if (!findersMap[item.id]) findersMap[item.id] = [];
+                if (item.finders && item.finders.length > 0) {
+                    findersMap[item.id] = findersMap[item.id].concat(item.finders);
+                }
+            }
+        });
+
+        // Also check if any item in store has finders
+        Object.keys(store).forEach(id => {
+            if (!findersMap[id]) findersMap[id] = [];
+            const rec = store[id];
+            if (rec && rec.finders) {
+                findersMap[id] = findersMap[id].concat(rec.finders);
             }
         });
 
         const cardsMap = {};
-        for (const id of allIds) {
+        const renderedIds = new Set();
+
+        for (const item of listItems) {
+            const id = item.id;
+            renderedIds.add(id);
             const record = store[id] || makePlaceholderCveRecord(id);
             store[id] = record;
-            const cardEl = makeCveCardElement(id, record);
+            const finders = item.finders && item.finders.length > 0 ? item.finders : (findersMap[id] || []);
+            const cardEl = makeCveCardElement(id, record, finders);
             cardsMap[id] = cardEl;
             grid.appendChild(cardEl);
         }
 
+        // Append any extra CVEs present in store but not in cves-list.json
+        Object.keys(store).forEach(k => {
+            if (!renderedIds.has(k)) {
+                renderedIds.add(k);
+                const record = store[k];
+                const cardEl = makeCveCardElement(k, record, findersMap[k] || []);
+                cardsMap[k] = cardEl;
+                grid.appendChild(cardEl);
+            }
+        });
+
         // Asynchronously try to fetch details for missing items from API (once per item)
-        allIds.forEach(async (id) => {
+        renderedIds.forEach(async (id) => {
             if ((!store[id] || !store[id].containers || !store[id].containers.cna || Object.keys(store[id].containers.cna).length === 0) && isValidCveId(id)) {
                 try {
                     const apiUrl = `https://cveawg.mitre.org/api/cve/${id}`;
