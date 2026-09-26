@@ -218,6 +218,12 @@ img.logo {
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
+    padding: 18px;
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 14px;
+    box-shadow: 5px 5px 0 var(--accent-yellow);
 }
 
 .deck-title {
@@ -2530,6 +2536,12 @@ body.dark-mode .stage-title {
 body.dark-mode .deck-title {
     color: #FFB300;
     border-bottom-color: rgba(255, 202, 40, 0.4);
+}
+
+body.dark-mode .deck-wing {
+    background: #21232B;
+    border-color: #383E4C;
+    box-shadow: 5px 5px 0 #000;
 }
 
 body.dark-mode .member-tag {
