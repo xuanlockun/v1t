@@ -36,8 +36,7 @@
     <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Link file CSS -->
-    <link rel="stylesheet" href="assets/css/style.css?v=20260926_cockpit_v3">
+    <link rel="stylesheet" href="assets/css/style.css?v=20260927_mobile_scroll_opt">
     <link rel="stylesheet" href="assets/css/ansi.css">
     <script type="application/ld+json">
     {
@@ -117,17 +116,152 @@
         <div class="hero-stage-layout">
             <!-- Left Command Unit: Logo + V1T TEAM + Nút CVE & Articles -->
             <div class="stage-brand-crown" id="stage-center">
-                <div class="brand-mascot-wrap" id="duck-toggle" role="button" tabindex="0" aria-label="Toggle Cockpit Cards" title="Click the duck to toggle cockpit cards!">
-                    <img class="logo stage-logo" src="assets/images/V1t_fin.png" alt="V1T Logo" loading="eager" fetchpriority="high">
+                <div class="brand-mascot-wrap" id="duck-toggle" role="button" tabindex="0"
+                    aria-label="Toggle Cockpit Cards" title="Click the duck to toggle cockpit cards!">
+                    <!-- Floating Cartoon Pixel Focus Arrows -->
+                    <div class="duck-arrows-wrap" aria-hidden="true">
+                        <div class="duck-arrow duck-arrow-tl">
+                            <svg viewBox="0 0 16 16" class="duck-pixel-arrow-svg">
+                                <path class="arrow-body" d="M1 6h6V2h2v2h2v2h2v1h1v2h-1v1h-2v2h-2v2H7v-4H1V6z" />
+                                <path class="arrow-shine" d="M2 7h5V4h1v2h2v2h2v1h-2v1H8v2H7V9H2V7z" />
+                            </svg>
+                        </div>
+                        <div class="duck-arrow duck-arrow-tr">
+                            <svg viewBox="0 0 16 16" class="duck-pixel-arrow-svg">
+                                <path class="arrow-body" d="M1 6h6V2h2v2h2v2h2v1h1v2h-1v1h-2v2h-2v2H7v-4H1V6z" />
+                                <path class="arrow-shine" d="M2 7h5V4h1v2h2v2h2v1h-2v1H8v2H7V9H2V7z" />
+                            </svg>
+                        </div>
+                        <div class="duck-arrow duck-arrow-l">
+                            <svg viewBox="0 0 16 16" class="duck-pixel-arrow-svg">
+                                <path class="arrow-body" d="M1 6h6V2h2v2h2v2h2v1h1v2h-1v1h-2v2h-2v2H7v-4H1V6z" />
+                                <path class="arrow-shine" d="M2 7h5V4h1v2h2v2h2v1h-2v1H8v2H7V9H2V7z" />
+                            </svg>
+                        </div>
+                        <div class="duck-arrow duck-arrow-r">
+                            <svg viewBox="0 0 16 16" class="duck-pixel-arrow-svg">
+                                <path class="arrow-body" d="M1 6h6V2h2v2h2v2h2v1h1v2h-1v1h-2v2h-2v2H7v-4H1V6z" />
+                                <path class="arrow-shine" d="M2 7h5V4h1v2h2v2h2v1h-2v1H8v2H7V9H2V7z" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <img class="logo stage-logo" src="assets/images/V1t_fin.png" alt="V1T Logo" loading="eager"
+                        fetchpriority="high">
                     <div class="duck-click-pill" id="duck-hint">
                         <span class="pill-dot"></span>
-                        <span class="pill-text">CLICK DUCK!</span>
+                        <span class="pill-text">CLICK THE DUCK!</span>
                     </div>
                 </div>
                 <h1 class="stage-title">V1T TEAM</h1>
                 <div class="stage-actions">
                     <button class="hub-btn hub-btn-cve" id="show-cves" type="button">Show all CVEs</button>
-                    <button class="hub-btn hub-btn-article" id="show-articles" type="button" data-href="articles/">Show Articles</button>
+                    <button class="hub-btn hub-btn-article" id="show-articles" type="button" data-href="articles/">Show
+                        Articles</button>
+                </div>
+
+                <!-- Cyber Pod Console: CISA KEV Radar (Infinity Auto Slider) & Client Fingerprint (ifconfig.net spec) -->
+                <div class="stage-cyber-pod" id="stage-cyber-pod" aria-label="Security & Telemetry Pod">
+                    <!-- Minimalist Dual-Channel Header Bar (Acts as button when collapsed on mobile) -->
+                    <div class="pod-header-bar" id="pod-header-bar">
+                        <div class="pod-channel-nav" id="pod-channel-nav" role="tablist" aria-label="Pod Channels">
+                            <button class="channel-tab active" id="tab-kev" type="button" role="tab"
+                                aria-selected="true" data-tab="kev">
+                                <span class="tab-label">CISA KEV</span>
+                            </button>
+                            <span class="channel-sep">/</span>
+                            <button class="channel-tab" id="tab-trace" type="button" role="tab" aria-selected="false"
+                                data-tab="trace">
+                                <span class="tab-label">TRACE</span>
+                            </button>
+                            <span class="channel-glider-line" id="channel-glider"></span>
+                        </div>
+                        <button class="pod-collapse-btn" id="pod-collapse-btn" type="button" aria-label="Collapse Pod" title="Collapse Pod"><i class="fas fa-chevron-up"></i></button>
+                    </div>
+
+                    <!-- Pod Core Content (Carousel Viewport) -->
+                    <div class="pod-content-wrapper" id="pod-content-wrapper">
+                        <!-- Sliding Deck Carousel Viewport -->
+                        <div class="pod-carousel-viewport" id="pod-carousel-viewport">
+                            <div class="pod-views-carousel" id="pod-views-carousel">
+                                <!-- Pane 1: CISA KEV Radar -->
+                                <div class="pod-view-pane pane-kev" id="pane-kev" role="tabpanel">
+                                    <div class="kev-slider-viewport" id="kev-slider-viewport">
+                                        <div class="kev-marquee-track" id="kev-marquee-track">
+                                            <div class="kev-marquee-group" id="kev-group-1"></div>
+                                            <div class="kev-marquee-group" id="kev-group-2" aria-hidden="true"></div>
+                                        </div>
+                                    </div>
+                                    <div class="kev-slider-footer">
+                                        <span class="kev-stream-tag">Known Exploited Vulnerabilities</span>
+                                        <span class="kev-hover-hint">Scroll / Drag • Hover pauses</span>
+                                    </div>
+                                </div>
+
+                                <!-- Pane 2: Client Fingerprint (ifconfig.net spec) -->
+                                <div class="pod-view-pane pane-trace" id="pane-trace" role="tabpanel">
+                                    <div class="trace-table-scroll" id="trace-table-scroll">
+                                        <div class="trace-actions-group" id="header-trace-actions" style="display: flex;">
+                                            <button class="trace-act-btn" id="trace-copy-btn" type="button"
+                                                title="Copy JSON Client Spec">COPY</button>
+                                            <button class="trace-act-btn" id="trace-rescan-btn" type="button"
+                                                title="Rescan client environment">↺ SCAN</button>
+                                        </div>
+                                        <div class="trace-row">
+                                            <span class="trace-key">IP</span>
+                                            <span class="trace-val clickable-val" id="trace-ip"
+                                                title="Click to copy IP">Detecting...</span>
+                                        </div>
+                                        <div class="trace-row">
+                                            <span class="trace-key">DECIMAL</span>
+                                            <span class="trace-val" id="trace-ip-decimal">--</span>
+                                        </div>
+                                        <div class="trace-row">
+                                            <span class="trace-key">COUNTRY</span>
+                                            <span class="trace-val" id="trace-country">--</span>
+                                        </div>
+                                        <div class="trace-row">
+                                            <span class="trace-key">REGION/CITY</span>
+                                            <span class="trace-val" id="trace-city">--</span>
+                                        </div>
+                                        <div class="trace-row">
+                                            <span class="trace-key">COORDS</span>
+                                            <span class="trace-val" id="trace-coords">--</span>
+                                        </div>
+                                        <div class="trace-row">
+                                            <span class="trace-key">TIMEZONE</span>
+                                            <span class="trace-val" id="trace-tz">--</span>
+                                        </div>
+                                        <div class="trace-row">
+                                            <span class="trace-key">ASN / ISP</span>
+                                            <span class="trace-val" id="trace-asn-isp">--</span>
+                                        </div>
+                                        <div class="trace-row">
+                                            <span class="trace-key">BROWSER</span>
+                                            <span class="trace-val" id="trace-ua">--</span>
+                                        </div>
+                                        <div class="trace-row">
+                                            <span class="trace-key">GPU/CORE</span>
+                                            <span class="trace-val" id="trace-gpu">--</span>
+                                        </div>
+                                        <div class="trace-row">
+                                            <span class="trace-key">DISPLAY</span>
+                                            <span class="trace-val" id="trace-display">--</span>
+                                        </div>
+                                        <div class="trace-row">
+                                            <span class="trace-key">LATENCY</span>
+                                            <span class="trace-val" id="trace-ping">-- ms</span>
+                                        </div>
+                                        <div class="trace-row">
+                                            <span class="trace-key">DEFENSE</span>
+                                            <span class="trace-val trace-defense-status" id="trace-defense">SHIELD
+                                                SECURED</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -137,7 +271,7 @@
                 <div class="deck-card deck-members">
                     <div class="deck-card-header">
                         <h2 class="deck-title"><i class="fa-solid fa-users"></i> MEMBERS</h2>
-                        <span class="deck-badge" id="members-count-badge">SQUAD</span>
+                        <span class="deck-badge" id="members-count-badge">-- DUCKS</span>
                     </div>
                     <div class="deck-card-body">
                         <div class="members-cloud" id="members-list"></div>
@@ -148,27 +282,31 @@
                 <div class="deck-card deck-socials">
                     <div class="deck-card-header">
                         <h2 class="deck-title"><i class="fa-solid fa-share-nodes"></i> SOCIALS</h2>
-                        <span class="deck-badge">CONNECT</span>
                     </div>
                     <div class="deck-card-body">
                         <div class="socials-cloud">
-                            <a href="https://ctftime.org/team/371186" target="_blank" rel="noopener noreferrer" class="social-text-link ctf">
+                            <a href="https://ctftime.org/team/371186" target="_blank" rel="noopener noreferrer"
+                                class="social-text-link ctf">
                                 <span class="social-left"><i class="fa-solid fa-flag-checkered"></i> CTFtime</span>
                                 <i class="fa-solid fa-arrow-up-right-from-square social-arrow"></i>
                             </a>
-                            <a href="https://discord.com/invite/WyYTC2EZqK" target="_blank" rel="noopener noreferrer" class="social-text-link discord">
+                            <a href="https://discord.com/invite/WyYTC2EZqK" target="_blank" rel="noopener noreferrer"
+                                class="social-text-link discord">
                                 <span class="social-left"><i class="fa-brands fa-discord"></i> Discord</span>
                                 <i class="fa-solid fa-arrow-up-right-from-square social-arrow"></i>
                             </a>
-                            <a href="https://www.linkedin.com/company/v1t-quack/" target="_blank" rel="noopener noreferrer" class="social-text-link linkedin">
+                            <a href="https://www.linkedin.com/company/v1t-quack/" target="_blank"
+                                rel="noopener noreferrer" class="social-text-link linkedin">
                                 <span class="social-left"><i class="fa-brands fa-linkedin"></i> LinkedIn</span>
                                 <i class="fa-solid fa-arrow-up-right-from-square social-arrow"></i>
                             </a>
-                            <a href="https://www.facebook.com/profile.php?id=61586992003855" target="_blank" rel="noopener noreferrer" class="social-text-link facebook">
+                            <a href="https://www.facebook.com/profile.php?id=61586992003855" target="_blank"
+                                rel="noopener noreferrer" class="social-text-link facebook">
                                 <span class="social-left"><i class="fa-brands fa-facebook"></i> Facebook</span>
                                 <i class="fa-solid fa-arrow-up-right-from-square social-arrow"></i>
                             </a>
-                            <a href="https://www.instagram.com/v1tnamese/" target="_blank" rel="noopener noreferrer" class="social-text-link instagram">
+                            <a href="https://www.instagram.com/v1tnamese/" target="_blank" rel="noopener noreferrer"
+                                class="social-text-link instagram">
                                 <span class="social-left"><i class="fa-brands fa-instagram"></i> Instagram</span>
                                 <i class="fa-solid fa-arrow-up-right-from-square social-arrow"></i>
                             </a>
@@ -180,7 +318,6 @@
                 <div class="deck-card deck-centerpiece">
                     <div class="deck-card-header">
                         <h2 class="deck-title"><i class="fa-solid fa-terminal"></i> CURL THE DUCK</h2>
-                        <span class="deck-badge status-online"><span class="dot-pulse"></span> ONLINE</span>
                     </div>
                     <div class="deck-card-body terminal-body">
                         <div class="terminal-shell" id="small_container">
@@ -219,7 +356,7 @@
     <!-- Scripts -->
     <script src="assets/js/commands.js"></script>
     <script src="assets/js/terminal.js"></script>
-    <script src="assets/js/script.js?v=20260926_cockpit"></script>
+    <script src="assets/js/script.js?v=20260927_mobile_scroll_opt"></script>
 </body>
 
 </html>

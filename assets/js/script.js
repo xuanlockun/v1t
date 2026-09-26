@@ -83,21 +83,21 @@ document.addEventListener("DOMContentLoaded", () => {
     // Thẻ giữa là child thứ 2 trong stats-layout (vì child 3 là thẻ ẩn, child 4 là socials)
     // Thực tế thẻ giữa mang class 'expand-x'
     const middleCard = statsLayout ? statsLayout.querySelector('.small_container.expand-x') : null;
-    
+
     if (statsLayout && middleCard) {
         let hoverCount = 0;
         let isAnimating = false;
         let shouldRemoveHover = false;
-        
+
         middleCard.addEventListener('mouseenter', () => {
             hoverCount++;
             let state = hoverCount % 3;
             if (state === 0) state = 3;
-            
+
             statsLayout.setAttribute('data-hover-state', state);
             statsLayout.classList.add('trigger-hover');
             shouldRemoveHover = false;
-            
+
             if (state === 3) {
                 isAnimating = true;
             }
@@ -158,13 +158,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const toggleHeroCockpit = () => {
             const isActive = heroStage.classList.toggle('cockpit-active');
             if (duckHintText) {
-                duckHintText.textContent = isActive ? 'COLLAPSE ✕' : 'CLICK DUCK!';
+                duckHintText.textContent = isActive ? 'COLLAPSE ✕' : 'CLICK THE DUCK!';
             }
             // Trigger duck hop animation
             const duckImg = duckToggle.querySelector('.stage-logo');
             if (duckImg) {
                 duckImg.classList.add('duck-hop');
                 setTimeout(() => duckImg.classList.remove('duck-hop'), 600);
+            }
+            if (isActive && typeof window.onCockpitOpen === 'function') {
+                window.onCockpitOpen();
+            } else if (!isActive && typeof window.onCockpitClose === 'function') {
+                window.onCockpitClose();
             }
         };
 
@@ -204,14 +209,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
+    /**
+     * Hàm tính toán số lượng thành viên thực tế từ dữ liệu
+     * Lọc và đếm chính xác số lượng member hợp lệ trong danh sách
+     * @param {Array} membersList - Danh sách member từ members.json
+     * @returns {number} Số lượng thành viên tính được
+     */
+    function calculateMembersCount(membersList) {
+        if (Array.isArray(membersList) && membersList.length > 0) {
+            return membersList.filter(m => m && (m.name || m.id)).length;
+        }
+        // Fallback: nếu danh sách DOM đã được render
+        const rendered = document.querySelectorAll('#members-list .member-tag, .members-cloud .member-tag');
+        return rendered ? rendered.length : 0;
+    }
+
+    /**
+     * Cập nhật badge số lượng member trên hero card dựa vào hàm tính toán động
+     * @param {Array|number} source - Danh sách member hoặc số đếm đã tính
+     */
+    function updateMembersCountBadge(source) {
+        const countBadge = document.getElementById('members-count-badge');
+        if (!countBadge) return;
+
+        const count = typeof source === 'number' ? source : calculateMembersCount(source);
+        countBadge.textContent = `${count} DUCKS`;
+        countBadge.setAttribute('data-count', String(count));
+    }
+
+    // Gắn vào window để có thể gọi hoặc kiểm tra từ bên ngoài
+    window.calculateMembersCount = calculateMembersCount;
+    window.updateMembersCountBadge = updateMembersCountBadge;
+
     function renderMembersList(members) {
         const listEl = document.getElementById('members-list') || document.querySelector('.members-list') || document.querySelector('.members-cloud');
         if (!listEl || !Array.isArray(members)) return;
 
-        const countBadge = document.getElementById('members-count-badge');
-        if (countBadge) {
-            countBadge.textContent = `${members.length} DUCKS`;
-        }
+        // Gọi hàm tính toán số lượng động và hiển thị lên badge
+        updateMembersCountBadge(members);
 
         listEl.innerHTML = members.map(m => {
             if (m.ctftime) {
@@ -367,7 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                             if (item && item.cveMetadata && item.cveMetadata.cveId) {
                                                 cveStore[item.cveMetadata.cveId] = item;
                                             }
-                                        } catch (e) {}
+                                        } catch (e) { }
                                         start = -1;
                                     }
                                 }
@@ -835,7 +870,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const grid = document.getElementById('cve-grid');
         if (!grid) return;
         grid.innerHTML = '';
-        
+
         // Fetch all files ONCE and cache in RAM
         const [listItems, store] = await Promise.all([
             loadCveList(),
@@ -943,5 +978,824 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.cve-popup').forEach(p => { p.style.display = 'none'; });
         }
     });
+
+    /* ========================================================
+       CYBER POD: CISA KEV RADAR (INFINITY AUTO SLIDER) & CLIENT FINGERPRINT (IFCONFIG.NET SPEC)
+       ======================================================== */
+    function initCyberPod() {
+        const pod = document.getElementById('stage-cyber-pod');
+        if (!pod) return;
+
+        const tabKev = document.getElementById('tab-kev');
+        const tabTrace = document.getElementById('tab-trace');
+        const channelGlider = document.getElementById('channel-glider');
+        const viewsCarousel = document.getElementById('pod-views-carousel');
+        const statusLiveStream = document.getElementById('status-live-stream');
+        const headerTraceActions = document.getElementById('header-trace-actions');
+        const carouselViewport = document.getElementById('pod-carousel-viewport');
+        const podCollapseBtn = document.getElementById('pod-collapse-btn');
+        const podHeaderBar = document.getElementById('pod-header-bar');
+
+        function expandMobilePod(targetTab) {
+            if (window.innerWidth > 768) return;
+            if (!pod.classList.contains('mobile-expanded')) {
+                pod.classList.add('mobile-expanded');
+                if (targetTab) {
+                    switchTab(targetTab);
+                }
+                if (!kevList || !kevList.length) {
+                    loadKevData();
+                } else {
+                    renderKevMarquee();
+                }
+                setTimeout(() => {
+                    updateGroupHeight();
+                    currentScroll = 0;
+                    applyTransform();
+                    resumeKevMarquee();
+                    if (tabTrace && tabTrace.classList.contains('active')) {
+                        runClientTrace();
+                    }
+                    const activeTab = tabTrace && tabTrace.classList.contains('active') ? tabTrace : tabKev;
+                    updateChannelGlider(activeTab);
+                }, 60);
+            }
+        }
+
+        function collapseMobilePod() {
+            if (window.innerWidth <= 768 && pod.classList.contains('mobile-expanded')) {
+                pod.classList.remove('mobile-expanded');
+                pauseKevMarquee();
+                setTimeout(() => {
+                    const activeTab = tabTrace && tabTrace.classList.contains('active') ? tabTrace : tabKev;
+                    updateChannelGlider(activeTab);
+                }, 50);
+            }
+        }
+
+        // On mobile: tapping the button expands the pod
+        if (pod) {
+            pod.addEventListener('click', (e) => {
+                if (window.innerWidth > 768) return;
+                if (!pod.classList.contains('mobile-expanded')) {
+                    const clickedTab = e.target.closest('.channel-tab');
+                    const target = clickedTab ? clickedTab.getAttribute('data-tab') : (tabTrace && tabTrace.classList.contains('active') ? 'trace' : 'kev');
+                    expandMobilePod(target);
+                }
+            });
+        }
+
+        if (podCollapseBtn) {
+            podCollapseBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                collapseMobilePod();
+            });
+        }
+
+        function updateChannelGlider(activeTab) {
+            if (!channelGlider || !activeTab) return;
+            const tabRect = activeTab.getBoundingClientRect();
+            const navRect = activeTab.parentElement ? activeTab.parentElement.getBoundingClientRect() : null;
+            if (tabRect.width > 0 && navRect && navRect.width > 0) {
+                const left = tabRect.left - navRect.left;
+                const width = tabRect.width;
+                channelGlider.style.left = `${left}px`;
+                channelGlider.style.width = `${width}px`;
+            }
+        }
+
+        // Minimalist Dual-Channel Switcher
+        function switchTab(target) {
+            if (target === 'trace') {
+                if (tabKev) {
+                    tabKev.classList.remove('active');
+                    tabKev.setAttribute('aria-selected', 'false');
+                }
+                if (tabTrace) {
+                    tabTrace.classList.add('active');
+                    tabTrace.setAttribute('aria-selected', 'true');
+                    updateChannelGlider(tabTrace);
+                }
+                if (viewsCarousel) viewsCarousel.setAttribute('data-active', 'trace');
+                if (statusLiveStream) statusLiveStream.style.display = 'none';
+                if (headerTraceActions) headerTraceActions.style.display = 'flex';
+                pauseKevMarquee();
+                runClientTrace();
+            } else {
+                if (tabTrace) {
+                    tabTrace.classList.remove('active');
+                    tabTrace.setAttribute('aria-selected', 'false');
+                }
+                if (tabKev) {
+                    tabKev.classList.add('active');
+                    tabKev.setAttribute('aria-selected', 'true');
+                    updateChannelGlider(tabKev);
+                }
+                if (viewsCarousel) viewsCarousel.removeAttribute('data-active');
+                if (statusLiveStream) statusLiveStream.style.display = 'inline-flex';
+                resumeKevMarquee();
+            }
+        }
+
+        if (tabKev) tabKev.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && !pod.classList.contains('mobile-expanded')) {
+                expandMobilePod('kev');
+                return;
+            }
+            switchTab('kev');
+        });
+        if (tabTrace) tabTrace.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && !pod.classList.contains('mobile-expanded')) {
+                expandMobilePod('trace');
+                return;
+            }
+            switchTab('trace');
+        });
+
+        // Horizontal Swipe Gestures on Carousel
+        if (carouselViewport) {
+            let touchStartX = 0;
+            let touchStartY = 0;
+            carouselViewport.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    touchStartX = e.touches[0].clientX;
+                    touchStartY = e.touches[0].clientY;
+                }
+            }, { passive: true });
+
+            carouselViewport.addEventListener('touchend', (e) => {
+                if (e.changedTouches.length === 1) {
+                    const dx = e.changedTouches[0].clientX - touchStartX;
+                    const dy = e.changedTouches[0].clientY - touchStartY;
+                    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+                        if (dx < 0) {
+                            switchTab('trace');
+                        } else {
+                            switchTab('kev');
+                        }
+                    }
+                }
+            }, { passive: true });
+        }
+
+        // ========================================================
+        // 1. CISA KEV RADAR INTERACTIVE INFINITY MARQUEE MODULE
+        // ========================================================
+        let kevList = [];
+        const marqueeTrack = document.getElementById('kev-marquee-track');
+        const sliderViewport = document.getElementById('kev-slider-viewport');
+        const group1 = document.getElementById('kev-group-1');
+        const group2 = document.getElementById('kev-group-2');
+
+        let currentScroll = 0;
+        let groupHeight = 0;
+        let isHovered = false;
+        let isTabActive = true;
+        let isMouseDown = false;
+        let hasDragged = false;
+        let startY = 0;
+        let startScroll = 0;
+        let lastFrameTime = performance.now();
+        const SCROLL_SPEED = 28; // pixels per second
+
+        function updateGroupHeight() {
+            if (group1 && group1.offsetHeight > 0) {
+                groupHeight = group1.offsetHeight;
+            }
+        }
+
+        function applyTransform() {
+            if (!marqueeTrack) return;
+            marqueeTrack.style.transform = `translateY(-${currentScroll}px)`;
+        }
+
+        function loopScrollBounds() {
+            if (groupHeight <= 0) updateGroupHeight();
+            if (groupHeight > 0) {
+                while (currentScroll >= groupHeight) currentScroll -= groupHeight;
+                while (currentScroll < 0) currentScroll += groupHeight;
+            } else {
+                currentScroll = 0;
+            }
+        }
+
+        let isTouching = false;
+        let momentumAnimationId = null;
+        let autoResumeTimer = null;
+        let isManualPaused = false;
+
+        function stopMomentum() {
+            if (momentumAnimationId) {
+                cancelAnimationFrame(momentumAnimationId);
+                momentumAnimationId = null;
+            }
+        }
+
+        function clearAutoResumeTimer() {
+            if (autoResumeTimer) {
+                clearTimeout(autoResumeTimer);
+                autoResumeTimer = null;
+            }
+        }
+
+        function updateHintDisplay() {
+            const hintEl = sliderViewport ? sliderViewport.parentElement.querySelector('.kev-hover-hint') : null;
+            if (!hintEl) return;
+            if (window.innerWidth <= 768) {
+                if (isManualPaused) {
+                    hintEl.innerHTML = '<span style="color:var(--accent-orange,#FF6D00);font-weight:700">⏸ PAUSED</span> • Tap to play';
+                } else {
+                    hintEl.textContent = 'Swipe to scroll • Tap to pause';
+                }
+            } else {
+                hintEl.textContent = 'Scroll / Drag • Hover pauses';
+            }
+        }
+
+        function scheduleAutoResume(delayMs = 3200) {
+            clearAutoResumeTimer();
+            if (isManualPaused) return;
+            autoResumeTimer = setTimeout(() => {
+                if (!isTouching && !momentumAnimationId && !isMouseDown) {
+                    isHovered = false;
+                    lastFrameTime = performance.now();
+                    updateHintDisplay();
+                }
+            }, delayMs);
+        }
+
+        // Animation frame loop
+        function marqueeTick(now) {
+            const dt = Math.min((now - lastFrameTime) / 1000, 0.1);
+            lastFrameTime = now;
+
+            if (isTabActive && !isHovered && !isMouseDown && !isTouching && !momentumAnimationId && !isManualPaused && kevList.length > 0) {
+                if (groupHeight <= 0) updateGroupHeight();
+                if (groupHeight > 0) {
+                    currentScroll += SCROLL_SPEED * dt;
+                    loopScrollBounds();
+                    applyTransform();
+                }
+            }
+
+            requestAnimationFrame(marqueeTick);
+        }
+        requestAnimationFrame(marqueeTick);
+
+        function createKevCard(item) {
+            const card = document.createElement('div');
+            card.className = 'kev-slide-card';
+
+            const id = item.cveID || item.id || 'CVE-2024-XXXX';
+            const threat = item.threatLevel || (item.knownRansomwareCampaignUse === 'Known' ? 'CRITICAL' : 'HIGH');
+            const vendor = item.vendorProject || 'Vendor';
+            const product = item.product || 'System';
+            const desc = item.shortDescription || item.vulnerabilityName || 'In-the-wild exploitation detected.';
+            const isRansom = item.knownRansomwareCampaignUse === 'Known';
+            const date = item.dateAdded ? item.dateAdded : 'Active Status';
+            const cwes = Array.isArray(item.cwes) && item.cwes.length
+                ? item.cwes.join(', ')
+                : (typeof item.cwes === 'string' && item.cwes.trim() ? item.cwes.trim() : (item.cwe || 'CWE-N/A'));
+
+            card.innerHTML = `
+                <div class="kev-card-head">
+                    <a href="https://nvd.nist.gov/vuln/detail/${encodeURIComponent(id)}" target="_blank" rel="noopener noreferrer" class="kev-cve-link">${id}</a>
+                    <span class="kev-threat-pill">${threat}</span>
+                </div>
+                <div class="kev-target-line">${vendor} • ${product}</div>
+                <div class="kev-desc-line">${desc}</div>
+                <div class="kev-card-footer">
+                    <span>${cwes}</span>
+                    <span>${date}</span>
+                </div>
+            `;
+            return card;
+        }
+
+        function renderKevMarquee() {
+            if (!group1 || !group2 || !kevList.length) return;
+            group1.innerHTML = '';
+            group2.innerHTML = '';
+
+            kevList.forEach(item => {
+                group1.appendChild(createKevCard(item));
+                group2.appendChild(createKevCard(item));
+            });
+
+            requestAnimationFrame(() => {
+                updateGroupHeight();
+            });
+        }
+
+        function pauseKevMarquee() {
+            isTabActive = false;
+            stopMomentum();
+            clearAutoResumeTimer();
+        }
+
+        function resumeKevMarquee() {
+            isTabActive = true;
+            isManualPaused = false;
+            isHovered = false;
+            stopMomentum();
+            clearAutoResumeTimer();
+            lastFrameTime = performance.now();
+            updateGroupHeight();
+            loopScrollBounds();
+            applyTransform();
+            updateHintDisplay();
+        }
+
+
+        // --- Interaction Handlers: Hover, Wheel, Drag & Touch ---
+        if (sliderViewport) {
+            updateHintDisplay();
+            window.addEventListener('resize', updateHintDisplay);
+
+            // Hover: pause auto-scroll
+            sliderViewport.addEventListener('mouseenter', () => {
+                isHovered = true;
+                updateGroupHeight();
+            });
+
+            sliderViewport.addEventListener('mouseleave', () => {
+                if (!isMouseDown && !isTouching) {
+                    if (!isManualPaused) {
+                        isHovered = false;
+                    }
+                    lastFrameTime = performance.now();
+                }
+            });
+
+            // Wheel: user can freely scroll up/down with mouse wheel / trackpad!
+            sliderViewport.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                isHovered = true;
+                updateGroupHeight();
+                currentScroll += e.deltaY * 0.75;
+                loopScrollBounds();
+                applyTransform();
+            }, { passive: false });
+
+            // Drag to scroll
+            sliderViewport.addEventListener('mousedown', (e) => {
+                if (e.button !== 0) return; // Only left button
+                isMouseDown = true;
+                hasDragged = false;
+                startY = e.clientY;
+                startScroll = currentScroll;
+                updateGroupHeight();
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isMouseDown) return;
+                const dy = e.clientY - startY;
+                if (Math.abs(dy) > 4) {
+                    hasDragged = true;
+                }
+                currentScroll = startScroll - dy;
+                loopScrollBounds();
+                applyTransform();
+            });
+
+            window.addEventListener('mouseup', () => {
+                if (isMouseDown) {
+                    isMouseDown = false;
+                    if (!sliderViewport.matches(':hover') && !isManualPaused) {
+                        isHovered = false;
+                    }
+                    lastFrameTime = performance.now();
+                    setTimeout(() => { hasDragged = false; }, 60);
+                }
+            });
+
+            // Prevent link click if the user was dragging
+            sliderViewport.addEventListener('click', (e) => {
+                if (hasDragged) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }, true);
+
+            // Mobile Touch support with Momentum Physics & Reading Pause
+            let touchStartY = 0;
+            let touchStartX = 0;
+            let touchStartScroll = 0;
+            let touchPoints = [];
+
+            sliderViewport.addEventListener('touchstart', (e) => {
+                if (e.touches.length !== 1) return;
+                stopMomentum();
+                clearAutoResumeTimer();
+
+                isTouching = true;
+                isHovered = true;
+                hasDragged = false;
+
+                const touch = e.touches[0];
+                touchStartY = touch.clientY;
+                touchStartX = touch.clientX;
+                touchStartScroll = currentScroll;
+                touchPoints = [{ y: touch.clientY, time: performance.now() }];
+
+                updateGroupHeight();
+            }, { passive: true });
+
+            sliderViewport.addEventListener('touchmove', (e) => {
+                if (!isTouching || e.touches.length !== 1) return;
+                const touch = e.touches[0];
+                const dy = touch.clientY - touchStartY;
+                const dx = touch.clientX - touchStartX;
+
+                // Vertical swipe gesture
+                if (Math.abs(dy) >= Math.abs(dx)) {
+                    if (Math.abs(dy) > 5) {
+                        hasDragged = true;
+                    }
+                    // Prevent page scroll when swiping inside KEV
+                    if (e.cancelable) {
+                        e.preventDefault();
+                    }
+                    currentScroll = touchStartScroll - dy;
+                    loopScrollBounds();
+                    applyTransform();
+
+                    const now = performance.now();
+                    touchPoints.push({ y: touch.clientY, time: now });
+                    while (touchPoints.length > 1 && (now - touchPoints[0].time) > 100) {
+                        touchPoints.shift();
+                    }
+                } else if (Math.abs(dx) > Math.abs(dy) * 2 && Math.abs(dx) > 50) {
+                    // Swipe left to switch to TRACE tab
+                    if (dx < -50 && tabTrace) {
+                        hasDragged = true;
+                        switchTab('trace');
+                        isTouching = false;
+                    }
+                }
+            }, { passive: false });
+
+            sliderViewport.addEventListener('touchend', (e) => {
+                if (!isTouching) return;
+                isTouching = false;
+
+                const now = performance.now();
+
+                if (hasDragged && touchPoints.length >= 2) {
+                    const first = touchPoints[0];
+                    const last = touchPoints[touchPoints.length - 1];
+                    const dt = Math.max(last.time - first.time, 1);
+                    const dy = last.y - first.y;
+
+                    // Launch momentum if touch moved recently (< 80ms)
+                    if (dt > 10 && (now - last.time) < 80) {
+                        let velocity = -(dy / dt) * 1000;
+                        const MAX_V = 2400;
+                        velocity = Math.max(-MAX_V, Math.min(MAX_V, velocity));
+
+                        if (Math.abs(velocity) > 60) {
+                            let lastT = performance.now();
+                            function runMomentum(t) {
+                                const delta = Math.min((t - lastT) / 1000, 0.05);
+                                lastT = t;
+
+                                currentScroll += velocity * delta;
+                                loopScrollBounds();
+                                applyTransform();
+
+                                velocity *= Math.pow(0.93, delta * 60);
+
+                                if (Math.abs(velocity) > 12 && !isTouching) {
+                                    momentumAnimationId = requestAnimationFrame(runMomentum);
+                                } else {
+                                    momentumAnimationId = null;
+                                    scheduleAutoResume(3200);
+                                }
+                            }
+                            stopMomentum();
+                            momentumAnimationId = requestAnimationFrame(runMomentum);
+                            return;
+                        }
+                    }
+                    scheduleAutoResume(3200);
+                } else if (!hasDragged) {
+                    // Tap on card or viewport (not link) toggles pause/play
+                    const link = e.target.closest('.kev-cve-link');
+                    if (!link) {
+                        isManualPaused = !isManualPaused;
+                        isHovered = isManualPaused;
+                        updateHintDisplay();
+                        if (!isManualPaused) {
+                            lastFrameTime = performance.now();
+                        }
+                    }
+                }
+
+                if (hasDragged) {
+                    setTimeout(() => { hasDragged = false; }, 120);
+                }
+            }, { passive: true });
+
+            sliderViewport.addEventListener('touchcancel', () => {
+                isTouching = false;
+                stopMomentum();
+                scheduleAutoResume(2000);
+                setTimeout(() => { hasDragged = false; }, 60);
+            });
+        }
+
+        // Fetch KEV data once: cache in sessionStorage for fast reuse
+        async function loadKevData() {
+            try {
+                const cached = sessionStorage.getItem('v1t_cisa_kev_v2');
+                if (cached) {
+                    try {
+                        const parsed = JSON.parse(cached);
+                        if (Array.isArray(parsed) && parsed.length) {
+                            kevList = parsed;
+                            renderKevMarquee();
+                            return;
+                        }
+                    } catch (e) { }
+                }
+
+                // 1. Local fallback data
+                const localRes = await fetch('assets/data/cisa-kev.json');
+                if (localRes.ok) {
+                    kevList = await localRes.json();
+                    sessionStorage.setItem('v1t_cisa_kev_v2', JSON.stringify(kevList));
+                    renderKevMarquee();
+                }
+
+                // 2. Fetch fresh live feed from official CISA GitHub mirror (CORS enabled)
+                fetch('https://raw.githubusercontent.com/cisagov/kev-data/main/known_exploited_vulnerabilities.json')
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && Array.isArray(data.vulnerabilities) && data.vulnerabilities.length) {
+                            const fresh = data.vulnerabilities.slice(0, 12);
+                            kevList = fresh;
+                            sessionStorage.setItem('v1t_cisa_kev_v2', JSON.stringify(fresh));
+                            renderKevMarquee();
+                        }
+                    })
+                    .catch(() => { });
+            } catch (err) {
+                console.warn('CISA KEV load notice:', err);
+            }
+        }
+
+        loadKevData();
+
+        // ========================================================
+        // 2. CLIENT FINGERPRINT (IFCONFIG.NET SPECIFICATION)
+        // ========================================================
+        let traceExecuted = false;
+        let lastTracePayload = null;
+
+        async function runClientTrace() {
+            const traceIp = document.getElementById('trace-ip');
+            const traceIpDecimal = document.getElementById('trace-ip-decimal');
+            const traceCountry = document.getElementById('trace-country');
+            const traceCity = document.getElementById('trace-city');
+            const traceCoords = document.getElementById('trace-coords');
+            const traceTz = document.getElementById('trace-tz');
+            const traceAsnIsp = document.getElementById('trace-asn-isp');
+            const traceUa = document.getElementById('trace-ua');
+            const traceGpu = document.getElementById('trace-gpu');
+            const traceDisplay = document.getElementById('trace-display');
+            const tracePing = document.getElementById('trace-ping');
+            const traceDefense = document.getElementById('trace-defense');
+
+            // 1. Browser & Hardware Specs
+            let gpuInfo = 'Standard GPU';
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                if (gl) {
+                    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                    if (debugInfo) {
+                        const rawGpu = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+                        gpuInfo = rawGpu
+                            .replace(/ANGLE \((.+)\)/, '$1')
+                            .replace(/Direct3D.+/, '')
+                            .replace(/vs_.+/, '')
+                            .trim();
+                        if (gpuInfo.length > 20) gpuInfo = gpuInfo.substring(0, 19) + '...';
+                    }
+                }
+            } catch (e) { }
+
+            const cores = navigator.hardwareConcurrency ? `${navigator.hardwareConcurrency}C` : '';
+            if (traceGpu) traceGpu.textContent = cores ? `${gpuInfo} (${cores})` : gpuInfo;
+
+            // Display
+            if (traceDisplay) {
+                traceDisplay.textContent = `${window.screen.width}x${window.screen.height} (${window.screen.colorDepth}-bit)`;
+            }
+
+            // User Agent
+            if (traceUa) {
+                const ua = navigator.userAgent;
+                let browserName = 'Browser';
+                if (ua.includes('Chrome/')) browserName = 'Chrome';
+                else if (ua.includes('Firefox/')) browserName = 'Firefox';
+                else if (ua.includes('Safari/')) browserName = 'Safari';
+                else if (ua.includes('Edg/')) browserName = 'Edge';
+
+                let osName = 'OS';
+                if (ua.includes('Windows')) osName = 'Windows';
+                else if (ua.includes('Macintosh')) osName = 'macOS';
+                else if (ua.includes('Linux')) osName = 'Linux';
+                else if (ua.includes('Android')) osName = 'Android';
+                else if (ua.includes('iPhone') || ua.includes('iPad')) osName = 'iOS';
+
+                traceUa.textContent = `${osName} • ${browserName}`;
+            }
+
+            // 2. Measure Latency Ping
+            const t0 = performance.now();
+            try {
+                await fetch('assets/images/V1t_fin.png?t=' + Date.now(), { method: 'HEAD', cache: 'no-store' });
+                const rtt = Math.round(performance.now() - t0);
+                if (tracePing) tracePing.textContent = `${rtt}ms RTT • TLS 1.3`;
+            } catch (e) {
+                if (tracePing) tracePing.textContent = `~22ms (Direct)`;
+            }
+
+            // 3. Privacy Shield
+            const dnt = navigator.doNotTrack === '1' || navigator.globalPrivacyControl;
+            if (traceDefense) {
+                traceDefense.textContent = dnt ? 'SHIELD ACTIVE' : 'MONITORED';
+                traceDefense.className = `trace-val trace-defense-status ${dnt ? 'defense-high' : 'defense-std'}`;
+            }
+
+            // 4. Fetch Rich Ifconfig Data from ipwho.is (CORS enabled, full ifconfig.net fields)
+            try {
+                let data = null;
+                const ipwhoRes = await fetch('https://ipwho.is/').catch(() => null);
+                if (ipwhoRes && ipwhoRes.ok) {
+                    data = await ipwhoRes.json();
+                }
+
+                if (data && data.success) {
+                    const ip = data.ip || '127.0.0.1';
+                    if (traceIp) traceIp.textContent = ip;
+
+                    // IP Decimal calculation
+                    const parts = ip.split('.').map(Number);
+                    if (parts.length === 4) {
+                        const dec = ((parts[0] << 24) >>> 0) + (parts[1] << 16) + (parts[2] << 8) + parts[3];
+                        if (traceIpDecimal) traceIpDecimal.textContent = dec.toString();
+                    }
+
+                    const flag = (data.flag && data.flag.emoji) ? data.flag.emoji : '🌐';
+                    const country = data.country || 'Unknown';
+                    const countryCode = data.country_code || '';
+                    if (traceCountry) traceCountry.textContent = `${country} (${countryCode}) ${flag}`;
+
+                    const region = data.region || '';
+                    const city = data.city || '';
+                    if (traceCity) traceCity.textContent = city ? `${city}, ${region}` : (region || 'Unknown');
+
+                    if (data.latitude && data.longitude) {
+                        const lat = data.latitude.toFixed(3);
+                        const lon = data.longitude.toFixed(3);
+                        if (traceCoords) traceCoords.textContent = `${lat}°N, ${lon}°E`;
+                    }
+
+                    if (data.timezone && data.timezone.id) {
+                        const tz = data.timezone.id;
+                        const utc = data.timezone.utc ? ` (${data.timezone.utc})` : '';
+                        if (traceTz) traceTz.textContent = `${tz}${utc}`;
+                    }
+
+                    const asn = (data.connection && data.connection.asn) ? `AS${data.connection.asn}` : '';
+                    const isp = (data.connection && data.connection.isp) ? data.connection.isp : '';
+                    if (traceAsnIsp) traceAsnIsp.textContent = (asn && isp) ? `${asn} • ${isp}` : (isp || asn || 'Unknown');
+
+                    // Save payload for clipboard
+                    lastTracePayload = {
+                        ip: ip,
+                        ip_decimal: traceIpDecimal ? traceIpDecimal.textContent : null,
+                        country: country,
+                        country_iso: countryCode,
+                        city: city,
+                        region: region,
+                        coordinates: traceCoords ? traceCoords.textContent : null,
+                        time_zone: traceTz ? traceTz.textContent : null,
+                        asn: asn,
+                        isp: isp,
+                        user_agent: navigator.userAgent,
+                        gpu: gpuInfo,
+                        display: traceDisplay ? traceDisplay.textContent : null,
+                        latency: tracePing ? tracePing.textContent : null
+                    };
+                } else {
+                    // Fallback to cloudflare trace
+                    const cfRes = await fetch('https://1.1.1.1/cdn-cgi/trace').catch(() => null);
+                    if (cfRes && cfRes.ok) {
+                        const text = await cfRes.text();
+                        const ipMatch = text.match(/ip=([^\n]+)/);
+                        const locMatch = text.match(/loc=([^\n]+)/);
+                        const ip = ipMatch ? ipMatch[1] : '127.0.0.1';
+                        if (traceIp) traceIp.textContent = ip;
+                        if (traceCountry) traceCountry.textContent = locMatch ? `Country: ${locMatch[1]}` : 'Global';
+                    }
+                }
+            } catch (err) {
+                if (traceIp) traceIp.textContent = '127.0.0.1 [SECURE]';
+            }
+
+            traceExecuted = true;
+        }
+
+        // Rescan button
+        const rescanBtn = document.getElementById('trace-rescan-btn');
+        if (rescanBtn) {
+            rescanBtn.addEventListener('click', () => {
+                const traceIp = document.getElementById('trace-ip');
+                if (traceIp) traceIp.textContent = 'Rescanning...';
+                setTimeout(runClientTrace, 250);
+            });
+        }
+
+        // Copy JSON Button
+        const copyBtn = document.getElementById('trace-copy-btn');
+        if (copyBtn) {
+            copyBtn.addEventListener('click', async () => {
+                const payload = lastTracePayload || {
+                    ip: document.getElementById('trace-ip')?.textContent,
+                    country: document.getElementById('trace-country')?.textContent,
+                    city: document.getElementById('trace-city')?.textContent,
+                    gpu: document.getElementById('trace-gpu')?.textContent
+                };
+                try {
+                    await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+                    const orig = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<span>✔ COPIED!</span>';
+                    setTimeout(() => { copyBtn.innerHTML = orig; }, 1600);
+                } catch (e) { }
+            });
+        }
+
+        // Copy IP on click
+        const traceIpEl = document.getElementById('trace-ip');
+        if (traceIpEl) {
+            traceIpEl.addEventListener('click', async () => {
+                const ip = traceIpEl.textContent;
+                if (ip && !ip.includes('.')) return;
+                try {
+                    await navigator.clipboard.writeText(ip);
+                    const orig = traceIpEl.textContent;
+                    traceIpEl.textContent = '✔ Copied to clipboard!';
+                    setTimeout(() => { traceIpEl.textContent = orig; }, 1200);
+                } catch (e) { }
+            });
+        }
+
+        // Mobile swipe right on TRACE table to return to KEV tab
+        const traceTableScroll = document.getElementById('trace-table-scroll');
+        if (traceTableScroll) {
+            let traceTouchStartX = 0;
+            let traceTouchStartY = 0;
+            traceTableScroll.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    traceTouchStartX = e.touches[0].clientX;
+                    traceTouchStartY = e.touches[0].clientY;
+                }
+            }, { passive: true });
+
+            traceTableScroll.addEventListener('touchend', (e) => {
+                if (e.changedTouches.length === 1) {
+                    const dx = e.changedTouches[0].clientX - traceTouchStartX;
+                    const dy = e.changedTouches[0].clientY - traceTouchStartY;
+                    if (dx > 60 && Math.abs(dx) > Math.abs(dy) * 1.8 && tabKev) {
+                        switchTab('kev');
+                    }
+                }
+            }, { passive: true });
+        }
+
+        // Window hooks for cockpit toggle
+        window.onCockpitOpen = () => {
+            if (typeof resumeKevMarquee === 'function') resumeKevMarquee();
+            if (!traceExecuted && typeof runClientTrace === 'function') {
+                runClientTrace();
+            }
+            requestAnimationFrame(() => {
+                const activeTab = tabTrace && tabTrace.classList.contains('active') ? tabTrace : tabKev;
+                updateChannelGlider(activeTab);
+            });
+        };
+
+        window.onCockpitClose = () => {
+            if (typeof pauseKevMarquee === 'function') pauseKevMarquee();
+            if (pod) {
+                pod.classList.remove('mobile-expanded');
+            }
+        };
+    }
+
+    initCyberPod();
 
 });
