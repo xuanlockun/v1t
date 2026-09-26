@@ -37,7 +37,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Link file CSS -->
-    <link rel="stylesheet" href="assets/css/style.css?v=20260926_9">
+    <link rel="stylesheet" href="assets/css/style.css?v=20260926_cockpit">
     <link rel="stylesheet" href="assets/css/ansi.css">
     <script type="application/ld+json">
     {
@@ -112,75 +112,83 @@
         </ul>
     </nav>
 
-    <!-- Unified Hero Command Stage (Compact, Balanced & Minimalist) -->
-    <section class="hero-unified-stage">
-        <!-- Top Brand Crown: Logo + Title + Dual Action Buttons -->
-        <div class="stage-brand-crown">
-            <div class="brand-mascot-wrap">
-                <img class="logo stage-logo" src="assets/images/V1t_fin.png" alt="V1T Logo" loading="eager" fetchpriority="high">
-            </div>
-            <h1 class="stage-title">V1T TEAM</h1>
-            <div class="stage-actions">
-                <button class="hub-btn hub-btn-cve" id="show-cves" type="button">Show all CVEs</button>
-                <button class="hub-btn hub-btn-article" id="show-articles" type="button" data-href="articles/">Show Articles</button>
-            </div>
-        </div>
+    <!-- Interactive Hero Cockpit Section -->
+    <section class="hero-unified-stage" id="hero-stage">
+        <div class="hero-stage-layout">
+            <!-- Cánh Trái: Members & Socials -->
+            <div class="stage-wing-left" id="stage-left">
+                <!-- Card 1: Members -->
+                <div class="deck-card deck-members">
+                    <div class="deck-card-header">
+                        <h2 class="deck-title"><i class="fa-solid fa-users"></i> MEMBERS</h2>
+                        <span class="deck-badge" id="members-count-badge">SQUAD</span>
+                    </div>
+                    <div class="deck-card-body">
+                        <div class="members-cloud" id="members-list"></div>
+                    </div>
+                </div>
 
-        <!-- 3-Deck Panoramic Stage: Members (Left) | Curl The Duck Terminal (Center) | Socials (Right) -->
-        <div class="stage-tri-deck">
-            <!-- Card 1: Members -->
-            <div class="deck-card deck-members">
-                <div class="deck-card-header">
-                    <h2 class="deck-title"><i class="fa-solid fa-users"></i> MEMBERS</h2>
-                    <span class="deck-badge" id="members-count-badge">SQUAD</span>
-                </div>
-                <div class="deck-card-body">
-                    <div class="members-cloud" id="members-list"></div>
-                </div>
-            </div>
-
-            <!-- Card 2: Curl The Duck Terminal -->
-            <div class="deck-card deck-centerpiece">
-                <div class="deck-card-header">
-                    <h2 class="deck-title"><i class="fa-solid fa-terminal"></i> CURL THE DUCK</h2>
-                    <span class="deck-badge status-online"><span class="dot-pulse"></span> ONLINE</span>
-                </div>
-                <div class="deck-card-body terminal-body">
-                    <div class="terminal-shell" id="small_container">
-                        <pre class="terminal" id="main-terminal"><code>$ curl v1t.site
-> Fetching duck energy...</code></pre>
+                <!-- Card 2: Socials -->
+                <div class="deck-card deck-socials">
+                    <div class="deck-card-header">
+                        <h2 class="deck-title"><i class="fa-solid fa-share-nodes"></i> SOCIALS</h2>
+                        <span class="deck-badge">CONNECT</span>
+                    </div>
+                    <div class="deck-card-body">
+                        <div class="socials-cloud">
+                            <a href="https://ctftime.org/team/371186" target="_blank" rel="noopener noreferrer" class="social-text-link ctf">
+                                <span class="social-left"><i class="fa-solid fa-flag-checkered"></i> CTFtime</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square social-arrow"></i>
+                            </a>
+                            <a href="https://discord.com/invite/WyYTC2EZqK" target="_blank" rel="noopener noreferrer" class="social-text-link discord">
+                                <span class="social-left"><i class="fa-brands fa-discord"></i> Discord</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square social-arrow"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/company/v1t-quack/" target="_blank" rel="noopener noreferrer" class="social-text-link linkedin">
+                                <span class="social-left"><i class="fa-brands fa-linkedin"></i> LinkedIn</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square social-arrow"></i>
+                            </a>
+                            <a href="https://www.facebook.com/profile.php?id=61586992003855" target="_blank" rel="noopener noreferrer" class="social-text-link facebook">
+                                <span class="social-left"><i class="fa-brands fa-facebook"></i> Facebook</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square social-arrow"></i>
+                            </a>
+                            <a href="https://www.instagram.com/v1tnamese/" target="_blank" rel="noopener noreferrer" class="social-text-link instagram">
+                                <span class="social-left"><i class="fa-brands fa-instagram"></i> Instagram</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square social-arrow"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Card 3: Socials -->
-            <div class="deck-card deck-socials">
-                <div class="deck-card-header">
-                    <h2 class="deck-title"><i class="fa-solid fa-share-nodes"></i> SOCIALS</h2>
-                    <span class="deck-badge">CONNECT</span>
+            <!-- Trục Giữa: Logo + V1T TEAM + Nút CVE & Articles -->
+            <div class="stage-brand-crown" id="stage-center">
+                <div class="brand-mascot-wrap" id="duck-toggle" role="button" tabindex="0" aria-label="Toggle Cockpit Cards" title="Click the duck to toggle cockpit cards!">
+                    <img class="logo stage-logo" src="assets/images/V1t_fin.png" alt="V1T Logo" loading="eager" fetchpriority="high">
+                    <div class="duck-click-pill" id="duck-hint">
+                        <span class="pill-dot"></span>
+                        <span class="pill-text">CLICK DUCK!</span>
+                    </div>
                 </div>
-                <div class="deck-card-body">
-                    <div class="socials-cloud">
-                        <a href="https://ctftime.org/team/371186" target="_blank" rel="noopener noreferrer" class="social-text-link ctf">
-                            <span class="social-left"><i class="fa-solid fa-flag-checkered"></i> CTFtime</span>
-                            <i class="fa-solid fa-arrow-up-right-from-square social-arrow"></i>
-                        </a>
-                        <a href="https://discord.com/invite/WyYTC2EZqK" target="_blank" rel="noopener noreferrer" class="social-text-link discord">
-                            <span class="social-left"><i class="fa-brands fa-discord"></i> Discord</span>
-                            <i class="fa-solid fa-arrow-up-right-from-square social-arrow"></i>
-                        </a>
-                        <a href="https://www.linkedin.com/company/v1t-quack/" target="_blank" rel="noopener noreferrer" class="social-text-link linkedin">
-                            <span class="social-left"><i class="fa-brands fa-linkedin"></i> LinkedIn</span>
-                            <i class="fa-solid fa-arrow-up-right-from-square social-arrow"></i>
-                        </a>
-                        <a href="https://www.facebook.com/profile.php?id=61586992003855" target="_blank" rel="noopener noreferrer" class="social-text-link facebook">
-                            <span class="social-left"><i class="fa-brands fa-facebook"></i> Facebook</span>
-                            <i class="fa-solid fa-arrow-up-right-from-square social-arrow"></i>
-                        </a>
-                        <a href="https://www.instagram.com/v1tnamese/" target="_blank" rel="noopener noreferrer" class="social-text-link instagram">
-                            <span class="social-left"><i class="fa-brands fa-instagram"></i> Instagram</span>
-                            <i class="fa-solid fa-arrow-up-right-from-square social-arrow"></i>
-                        </a>
+                <h1 class="stage-title">V1T TEAM</h1>
+                <div class="stage-actions">
+                    <button class="hub-btn hub-btn-cve" id="show-cves" type="button">Show all CVEs</button>
+                    <button class="hub-btn hub-btn-article" id="show-articles" type="button" data-href="articles/">Show Articles</button>
+                </div>
+            </div>
+
+            <!-- Cánh Phải: Curl The Duck Terminal -->
+            <div class="stage-wing-right" id="stage-right">
+                <div class="deck-card deck-centerpiece">
+                    <div class="deck-card-header">
+                        <h2 class="deck-title"><i class="fa-solid fa-terminal"></i> CURL THE DUCK</h2>
+                        <span class="deck-badge status-online"><span class="dot-pulse"></span> ONLINE</span>
+                    </div>
+                    <div class="deck-card-body terminal-body">
+                        <div class="terminal-shell" id="small_container">
+                            <pre class="terminal" id="main-terminal"><code>$ curl v1t.site
+> Fetching duck energy...</code></pre>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -213,7 +221,7 @@
     <!-- Scripts -->
     <script src="assets/js/commands.js"></script>
     <script src="assets/js/terminal.js"></script>
-    <script src="assets/js/script.js?v=20260926_2"></script>
+    <script src="assets/js/script.js?v=20260926_cockpit"></script>
 </body>
 
 </html>

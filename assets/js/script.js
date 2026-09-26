@@ -149,6 +149,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Interactive Hero Cockpit Toggle
+    const duckToggle = document.getElementById('duck-toggle');
+    const heroStage = document.getElementById('hero-stage');
+    const duckHintText = document.querySelector('#duck-hint .pill-text');
+
+    if (duckToggle && heroStage) {
+        const toggleHeroCockpit = () => {
+            const isActive = heroStage.classList.toggle('cockpit-active');
+            if (duckHintText) {
+                duckHintText.textContent = isActive ? 'COLLAPSE ✕' : 'CLICK DUCK!';
+            }
+            // Trigger duck hop animation
+            const duckImg = duckToggle.querySelector('.stage-logo');
+            if (duckImg) {
+                duckImg.classList.add('duck-hop');
+                setTimeout(() => duckImg.classList.remove('duck-hop'), 600);
+            }
+        };
+
+        duckToggle.addEventListener('click', toggleHeroCockpit);
+        duckToggle.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleHeroCockpit();
+            }
+        });
+    }
+
     // Dynamic Team Members Store (loaded from assets/data/members.json)
     const TEAM_MEMBERS = {};
     let membersDataPromise = null;
