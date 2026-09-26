@@ -37,7 +37,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Link file CSS -->
-    <link rel="stylesheet" href="assets/css/style.css?v=20260926_7">
+    <link rel="stylesheet" href="assets/css/style.css?v=20260926_8">
     <link rel="stylesheet" href="assets/css/ansi.css">
     <script type="application/ld+json">
     {
@@ -112,55 +112,60 @@
         </ul>
     </nav>
 
-    <!-- Minimalist Open Hero Section (No Cards) -->
-    <div class="hero-open-hub">
-        <!-- Cánh Trái: Members -->
-        <div class="hub-wing hub-members">
-            <h2 class="hub-title">MEMBERS</h2>
-            <div class="members-cloud" id="members-list"></div>
-        </div>
-
-        <!-- Trục Giữa: Logo + V1T TEAM + Nút CVE & Articles -->
-        <div class="hub-center">
-            <div class="hub-logo-wrap">
-                <img class="logo" src="assets/images/V1t_fin.png" alt="V1T Logo" loading="eager" fetchpriority="high">
+    <!-- Unified Hero Command Stage (Compact, Balanced & Minimalist) -->
+    <section class="hero-unified-stage">
+        <!-- Top Brand Crown: Logo + Title + Dual Action Buttons -->
+        <div class="stage-brand-crown">
+            <div class="brand-mascot-wrap">
+                <img class="logo stage-logo" src="assets/images/V1t_fin.png" alt="V1T Logo" loading="eager" fetchpriority="high">
             </div>
-            <h1>V1T TEAM</h1>
-            <div class="hub-actions">
+            <h1 class="stage-title">V1T TEAM</h1>
+            <div class="stage-actions">
                 <button class="hub-btn hub-btn-cve" id="show-cves" type="button">Show all CVEs</button>
                 <button class="hub-btn hub-btn-article" id="show-articles" type="button" data-href="articles/">Show Articles</button>
             </div>
         </div>
 
-        <!-- Cánh Phải: Socials -->
-        <div class="hub-wing hub-socials">
-            <h2 class="hub-title">SOCIALS</h2>
-            <div class="socials-cloud">
-                <a href="https://ctftime.org/team/371186" target="_blank" rel="noopener noreferrer" class="social-text-link ctf">
-                    CTFtime
-                </a>
-                <a href="https://discord.com/invite/WyYTC2EZqK" target="_blank" rel="noopener noreferrer" class="social-text-link discord">
-                    Discord
-                </a>
-                <a href="https://www.linkedin.com/company/v1t-quack/" target="_blank" rel="noopener noreferrer" class="social-text-link linkedin">
-                    LinkedIn
-                </a>
-                <a href="https://www.facebook.com/profile.php?id=61586992003855" target="_blank" rel="noopener noreferrer" class="social-text-link facebook">
-                    Facebook
-                </a>
-                <a href="https://www.instagram.com/v1tnamese/" target="_blank" rel="noopener noreferrer" class="social-text-link instagram">
-                    Instagram
-                </a>
+        <!-- 3-Deck Panoramic Stage: Members (Left) | Curl The Duck Terminal (Center) | Socials (Right) -->
+        <div class="stage-tri-deck">
+            <!-- Cánh Trái: Members -->
+            <div class="deck-wing deck-members">
+                <h2 class="deck-title">MEMBERS</h2>
+                <div class="members-cloud" id="members-list"></div>
+            </div>
+
+            <!-- Trục Giữa: Curl The Duck Terminal -->
+            <div class="deck-centerpiece">
+                <h2 class="deck-title terminal-title">CURL THE DUCK</h2>
+                <div class="terminal-shell" id="small_container">
+                    <pre class="terminal shadow" id="main-terminal"><code>$ curl v1t.site
+> Fetching duck energy...</code></pre>
+                </div>
+            </div>
+
+            <!-- Cánh Phải: Socials -->
+            <div class="deck-wing deck-socials">
+                <h2 class="deck-title">SOCIALS</h2>
+                <div class="socials-cloud">
+                    <a href="https://ctftime.org/team/371186" target="_blank" rel="noopener noreferrer" class="social-text-link ctf">
+                        CTFtime
+                    </a>
+                    <a href="https://discord.com/invite/WyYTC2EZqK" target="_blank" rel="noopener noreferrer" class="social-text-link discord">
+                        Discord
+                    </a>
+                    <a href="https://www.linkedin.com/company/v1t-quack/" target="_blank" rel="noopener noreferrer" class="social-text-link linkedin">
+                        LinkedIn
+                    </a>
+                    <a href="https://www.facebook.com/profile.php?id=61586992003855" target="_blank" rel="noopener noreferrer" class="social-text-link facebook">
+                        Facebook
+                    </a>
+                    <a href="https://www.instagram.com/v1tnamese/" target="_blank" rel="noopener noreferrer" class="social-text-link instagram">
+                        Instagram
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-
-    <!-- Terminal Section -->
-    <h2 class="h1-like">CURL THE DUCK</h2>
-    <div id="small_container">
-        <pre class="terminal shadow" id="main-terminal"><code>$ curl v1t.site
-> Fetching duck energy...</code></pre>
-    </div>
+    </section>
 
     <!-- Members Profile Section -->
     <h2 id="team" class="h1-like">MEET THE DUCK</h2>

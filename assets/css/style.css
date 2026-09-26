@@ -99,131 +99,73 @@ img.logo {
 }
 
 /* =========================================
-   MINIMALIST HERO OPEN HUB (NO CARDS)
+   UNIFIED HERO COMMAND STAGE (COMPACT & BALANCED)
    ========================================= */
-.hero-open-hub {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
+.hero-unified-stage {
+    max-width: 1380px;
+    margin: 15px auto 45px;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 40px;
-    max-width: 1350px;
-    margin: 25px auto 40px;
-    padding: 10px 40px;
     position: relative;
     z-index: 10;
 }
 
-/* Wing columns (Members & Socials) */
-.hub-wing {
+/* 1. Top Brand Crown: Logo + V1T TEAM + Action Buttons */
+.stage-brand-crown {
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-
-.hub-title {
-    font-family: 'Press Start 2P', monospace;
-    font-size: 13px;
-    color: var(--accent-orange);
-    border-bottom: 2px dashed var(--accent-yellow);
-    padding-bottom: 8px;
-    margin-bottom: 20px;
     text-align: center;
-    letter-spacing: 1px;
+    margin-bottom: 25px;
 }
 
-/* Members Cloud */
-.members-cloud {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px 8px;
-    max-width: 360px;
+.brand-mascot-wrap {
+    margin-bottom: 2px;
 }
 
-.member-tag {
-    display: inline-block;
-    padding: 7px 14px;
-    font-family: 'Quicksand', sans-serif;
-    font-size: 13.5px;
-    font-weight: 700;
-    color: var(--text-color);
-    background: rgba(255, 255, 255, 0.85);
-    border: 1.5px solid var(--border-color);
-    border-radius: 999px;
-    text-decoration: none;
-    box-shadow: 2px 2px 0 var(--border-color);
-    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
-    cursor: default;
-}
-
-a.member-tag {
-    cursor: pointer;
-}
-
-.member-tag:hover {
-    background: var(--accent-yellow);
-    color: #111;
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 3px 4px 0 var(--border-color);
-}
-
-/* Centerpiece (Logo + V1T TEAM + Actions) */
-.hub-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    min-width: 320px;
-    max-width: 440px;
-}
-
-.hub-logo-wrap {
-    margin-bottom: 5px;
-}
-
-.hub-center img.logo {
-    max-width: 135px;
+.stage-logo {
+    max-width: 110px;
     height: auto;
     margin: 0 auto;
-    filter: drop-shadow(0 10px 18px rgba(0,0,0,0.14));
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.12));
     animation: duckBounce 2.5s infinite ease-in-out;
     cursor: pointer;
     transition: transform 0.3s ease;
 }
 
-.hub-center img.logo:hover {
+.stage-logo:hover {
     transform: scale(1.1) rotate(4deg);
 }
 
-.hub-center h1 {
+.stage-title {
     font-family: 'Press Start 2P', monospace;
-    font-size: clamp(22px, 3.2vw, 32px);
+    font-size: clamp(22px, 3vw, 30px);
     color: var(--accent-dark-orange);
     text-shadow: 3px 3px 0 #FFF, 5px 5px 0 var(--accent-yellow);
-    margin: 15px 0 25px;
+    margin: 10px 0 16px;
     letter-spacing: 1px;
-    line-height: 1.3;
+    line-height: 1.25;
 }
 
-/* Central Action Buttons */
-.hub-actions {
+.stage-actions {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
-    max-width: 280px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
 }
 
 .hub-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 13px 22px;
+    padding: 11px 22px;
     border-radius: 12px;
     font-family: 'Press Start 2P', monospace;
-    font-size: 11px;
+    font-size: 10.5px;
     cursor: pointer;
     border: 2.5px solid var(--border-color);
     box-shadow: 3px 3px 0 var(--border-color);
@@ -262,14 +204,108 @@ a.member-tag {
     box-shadow: 1px 1px 0 var(--border-color);
 }
 
+/* 2. Tri-Deck Panoramic Stage: Left=Members, Center=Terminal, Right=Socials */
+.stage-tri-deck {
+    display: grid;
+    grid-template-columns: minmax(220px, 290px) minmax(460px, 660px) minmax(180px, 220px);
+    gap: 24px;
+    align-items: start;
+    justify-content: center;
+    width: 100%;
+}
+
+.deck-wing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.deck-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    color: var(--accent-orange);
+    border-bottom: 2px dashed var(--accent-yellow);
+    padding-bottom: 7px;
+    margin-bottom: 15px;
+    text-align: center;
+    letter-spacing: 0.8px;
+    white-space: nowrap;
+}
+
+.deck-centerpiece {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+/* Members Cloud */
+.members-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 6px;
+    max-width: 290px;
+}
+
+.member-tag {
+    display: inline-block;
+    padding: 6px 12px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-color);
+    background: rgba(255, 255, 255, 0.88);
+    border: 1.5px solid var(--border-color);
+    border-radius: 999px;
+    text-decoration: none;
+    box-shadow: 2px 2px 0 var(--border-color);
+    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    cursor: default;
+}
+
+a.member-tag {
+    cursor: pointer;
+}
+
+.member-tag:hover {
+    background: var(--accent-yellow);
+    color: #111;
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 3px 3px 0 var(--border-color);
+}
+
+/* Terminal Deck Centerpiece */
+.terminal-shell#small_container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.deck-centerpiece .terminal {
+    background: #1b1b1b !important;
+    color: #4CAF50;
+    font-family: 'Courier New', monospace;
+    padding: 14px 18px !important;
+    border-radius: 12px;
+    border: 3.5px solid var(--border-color) !important;
+    box-shadow: 6px 6px 0 var(--accent-yellow);
+    overflow-x: auto;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 11px;
+    line-height: 1.32;
+}
+
 /* Socials Cloud */
 .socials-cloud {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 9px;
     width: 100%;
-    max-width: 220px;
+    max-width: 200px;
 }
 
 .social-text-link {
@@ -277,21 +313,22 @@ a.member-tag {
     align-items: center;
     justify-content: center;
     width: 100%;
-    padding: 9px 20px;
+    padding: 8px 16px;
     font-family: 'Quicksand', sans-serif;
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 700;
     color: var(--text-color);
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.88);
     border: 1.5px solid var(--border-color);
     border-radius: 999px;
     text-decoration: none;
     box-shadow: 2px 2px 0 var(--border-color);
     transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    box-sizing: border-box;
 }
 
 .social-text-link:hover {
-    transform: translateX(4px);
+    transform: translateX(3px);
     box-shadow: 3px 3px 0 var(--border-color);
 }
 
@@ -301,38 +338,67 @@ a.member-tag {
 .social-text-link.facebook:hover { background: #1877F2; color: #fff; border-color: #1877F2; }
 .social-text-link.instagram:hover { background: #E4405F; color: #fff; border-color: #E4405F; }
 
-/* Responsive Layout */
-@media screen and (max-width: 980px) {
-    .hero-open-hub {
-        grid-template-columns: 1fr;
-        gap: 35px;
-        padding: 10px 20px;
+/* Responsive Adjustments */
+@media screen and (max-width: 1120px) {
+    .stage-tri-deck {
+        grid-template-columns: minmax(180px, 240px) 1fr minmax(160px, 200px);
+        gap: 16px;
     }
+    .deck-title { font-size: 11px; }
+}
 
-    .hub-center {
-        order: -1;
-        width: 100%;
+@media screen and (max-width: 880px) {
+    .stage-tri-deck {
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+    .deck-centerpiece {
+        grid-column: 1 / -1;
+        order: 1;
+    }
+    .deck-members {
+        order: 2;
+    }
+    .deck-socials {
+        order: 3;
+    }
+    .members-cloud {
         max-width: 100%;
     }
-
-    .hub-actions {
-        max-width: 320px;
-        margin: 0 auto;
+    .socials-cloud {
+        max-width: 100%;
     }
+}
 
-    .members-cloud {
-        max-width: 500px;
+@media screen and (max-width: 580px) {
+    .stage-tri-deck {
+        grid-template-columns: 1fr;
+        gap: 28px;
     }
-
+    .deck-centerpiece { order: 1; }
+    .deck-members { order: 2; }
+    .deck-socials { order: 3; }
+    .stage-actions {
+        flex-direction: column;
+        width: 100%;
+        max-width: 280px;
+    }
+    .hub-btn {
+        width: 100%;
+    }
+    .deck-centerpiece .terminal {
+        font-size: 8.5px;
+        line-height: 1.25;
+        padding: 12px 10px !important;
+    }
     .socials-cloud {
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
-        max-width: 450px;
     }
-
     .social-text-link {
         width: auto;
+        padding: 7px 16px;
     }
 }
 
@@ -2455,7 +2521,17 @@ body.dark-mode .social-icon-box {
     color: #FFCA28;
 }
 
-/* ===== MINIMALIST OPEN HUB DARK MODE ===== */
+/* ===== UNIFIED COMMAND STAGE DARK MODE ===== */
+body.dark-mode .stage-title {
+    color: #FFD54F;
+    text-shadow: 3px 3px 0 #000, 5px 5px 0 rgba(255, 202, 40, 0.4);
+}
+
+body.dark-mode .deck-title {
+    color: #FFB300;
+    border-bottom-color: rgba(255, 202, 40, 0.4);
+}
+
 body.dark-mode .member-tag {
     background: #1e1e1e;
     color: #f1f1f1;
@@ -2467,12 +2543,7 @@ body.dark-mode .member-tag:hover {
     background: var(--accent-yellow);
     color: #111;
     border-color: var(--accent-yellow);
-    box-shadow: 3px 4px 0 #000;
-}
-
-body.dark-mode .hub-center h1 {
-    color: #FFD54F;
-    text-shadow: 3px 3px 0 #000, 5px 5px 0 rgba(255, 202, 40, 0.4);
+    box-shadow: 3px 3px 0 #000;
 }
 
 body.dark-mode .hub-btn-cve {
