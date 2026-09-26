@@ -103,15 +103,15 @@ img.logo {
    ========================================= */
 .hero-unified-stage {
     max-width: 1420px;
-    margin: 40px auto 45px;
+    margin: 15px auto 30px;
     padding: 0 20px;
-    min-height: 480px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     position: relative;
     z-index: 10;
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* Hero Cockpit Stage Layout */
@@ -146,7 +146,24 @@ img.logo {
     flex-shrink: 0;
     padding: 8px 16px;
     margin: 0 16px;
+    position: relative;
     transition: all 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.stage-brand-crown::before {
+    content: '';
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 280px;
+    height: 280px;
+    background: radial-gradient(circle, rgba(255, 202, 40, 0.16) 0%, rgba(255, 152, 0, 0.05) 55%, transparent 75%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -1;
+    filter: blur(14px);
+    transition: opacity 0.5s ease;
 }
 
 /* Wing Right: Curl The Duck Terminal */
@@ -167,6 +184,8 @@ img.logo {
     pointer-events: none;
     max-width: 0;
     width: 0;
+    max-height: 0;
+    height: 0;
     margin: 0;
     padding: 0;
     overflow: hidden;
@@ -179,6 +198,8 @@ img.logo {
     pointer-events: none;
     max-width: 0;
     width: 0;
+    max-height: 0;
+    height: 0;
     margin: 0;
     padding: 0;
     overflow: hidden;
@@ -187,7 +208,11 @@ img.logo {
 
 .hero-unified-stage:not(.cockpit-active) .stage-brand-crown {
     animation: heroFloatingCrown 3.5s ease-in-out infinite;
-    margin: 35px auto 45px;
+    margin: 15px auto 10px;
+}
+
+.hero-unified-stage:not(.cockpit-active) .stage-logo {
+    max-width: 140px;
 }
 
 @keyframes heroFloatingCrown {
@@ -204,6 +229,8 @@ img.logo {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
+    max-height: 600px;
+    height: auto;
     transform: translateX(0) scale(1);
 }
 
@@ -211,11 +238,18 @@ img.logo {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
+    max-height: 600px;
+    height: auto;
     transform: translateX(0) scale(1);
 }
 
 .hero-unified-stage.cockpit-active .stage-brand-crown {
     animation: none;
+    margin: 0 16px;
+}
+
+.hero-unified-stage.cockpit-active .stage-logo {
+    max-width: 105px;
 }
 
 /* Duck Mascot Interactive Hub */
@@ -229,13 +263,13 @@ img.logo {
 }
 
 .stage-logo {
-    max-width: 110px;
+    max-width: 135px;
     height: auto;
     margin: 0 auto;
     filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.12));
     animation: duckBounce 2.5s infinite ease-in-out;
     cursor: pointer;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .brand-mascot-wrap:hover .stage-logo {
