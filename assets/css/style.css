@@ -154,19 +154,19 @@ img.logo {
     transition: opacity 0.5s ease;
 }
 
-/* Right Deck Cluster (Cards Grid): 2 columns (Top: Members & Socials | Bottom: Curl Duck Terminal) */
+/* Right Deck Cluster (Cards Grid): Row 1 has Members (3/4) & Socials (1/4) | Row 2 has Curl Duck (Full) */
 .stage-cards-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 3fr 1fr;
     gap: 16px;
     width: 100%;
-    max-width: 860px;
+    max-width: 920px;
     flex-shrink: 0;
     transition: all 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
     transform-origin: left center;
 }
 
-/* Row 1: Members (Left) & Socials (Right) */
+/* Row 1: Members (3/4 Width) & Socials (1/4 Width) */
 .stage-cards-grid .deck-members {
     grid-column: 1 / 2;
     min-height: 200px;
@@ -175,6 +175,12 @@ img.logo {
 .stage-cards-grid .deck-socials {
     grid-column: 2 / 3;
     min-height: 200px;
+    padding: 14px 12px;
+}
+
+.stage-cards-grid .deck-socials .social-text-link {
+    padding: 6px 10px;
+    font-size: 12px;
 }
 
 /* Row 2: Curl The Duck Terminal (Full width across bottom) */
