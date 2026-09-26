@@ -177,14 +177,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderMembersList(members) {
-        const listEl = document.getElementById('members-list') || document.querySelector('.members-list');
+        const listEl = document.getElementById('members-list') || document.querySelector('.members-list') || document.querySelector('.members-cloud');
         if (!listEl || !Array.isArray(members)) return;
 
         listEl.innerHTML = members.map(m => {
             if (m.ctftime) {
-                return `<a href="${m.ctftime}" target="_blank" rel="noopener noreferrer">${m.name}</a>`;
+                return `<a href="${m.ctftime}" target="_blank" rel="noopener noreferrer" class="member-tag">${m.name}</a>`;
             } else {
-                return `<span class="member-name">${m.name}</span>`;
+                return `<span class="member-tag">${m.name}</span>`;
             }
         }).join('\n                ');
     }

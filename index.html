@@ -37,7 +37,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Link file CSS -->
-    <link rel="stylesheet" href="assets/css/style.css?v=20260926_5">
+    <link rel="stylesheet" href="assets/css/style.css?v=20260926_7">
     <link rel="stylesheet" href="assets/css/ansi.css">
     <script type="application/ld+json">
     {
@@ -112,76 +112,44 @@
         </ul>
     </nav>
 
-    <!-- Header Logo -->
-    <h1>V1T TEAM</h1>
-    <img class="logo" src="assets/images/V1t_fin.png" alt="V1T Logo" loading="eager" fetchpriority="high">
-
-    <!-- 3 Khối Thông Tin (Grid Layout) -->
-    <div class="container stats-layout">
-        <!-- Khối 1: Members -->
-        <div class="small_container">
-            <h2>MEMBERS</h2>
-            <div class="members-list" id="members-list"></div>
+    <!-- Minimalist Open Hero Section (No Cards) -->
+    <div class="hero-open-hub">
+        <!-- Cánh Trái: Members -->
+        <div class="hub-wing hub-members">
+            <h2 class="hub-title">MEMBERS</h2>
+            <div class="members-cloud" id="members-list"></div>
         </div>
 
-        <!-- Khối 2: Stats -->
-        <div class="small_container expand-x">
-            <h2>CTF STATS</h2>
-            <div class="stats-row">
-                <div class="row first-row">
-                    <span id="highest-rank"> <i class="fa-solid fa-trophy" style="padding-right: 5px;"></i> Highest: *
-                    </span>
-                    <span id="world-rank"> <i class="fa-solid fa-earth-americas" style="padding-right: 5px;"></i> World:
-                        296 </span>
-                </div>
-                <div class="row second-row">
-                    <span id="current-rank"> <i class="fa-solid fa-chart-line" style="padding-right: 5px;"></i> Current:
-                        296 </span>
-                    <span id="country-rank"> <i class="fa-solid fa-flag" style="padding-right: 5px;"></i> Country place:
-                        24 <img src="assets/images/vn.svg" style="padding-left: 5px;" width="17.6"></span>
-                </div>
+        <!-- Trục Giữa: Logo + V1T TEAM + Nút CVE & Articles -->
+        <div class="hub-center">
+            <div class="hub-logo-wrap">
+                <img class="logo" src="assets/images/V1t_fin.png" alt="V1T Logo" loading="eager" fetchpriority="high">
             </div>
-            <div class="center-actions">
-                <div class="team-cve-title">CVES</div>
-                <div class="team-cve-list">
-                    <button class="team-cve-showall" id="show-cves" type="button">Show all CVEs</button>
-                    <!-- Full CVE listing is shown in a modal/card to preserve page layout -->
-                </div>
-
-                <div class="team-article-title">ARTICLES</div>
-                <div class="team-article-list">
-                    <button class="team-cve-showall team-article-btn" id="show-articles" type="button"
-                        data-href="articles/">Show Articles</button>
-                    <!-- Articles button navigates to /articles/ via JS (keeps button semantics and consistent styling) -->
-                </div>
+            <h1>V1T TEAM</h1>
+            <div class="hub-actions">
+                <button class="hub-btn hub-btn-cve" id="show-cves" type="button">Show all CVEs</button>
+                <button class="hub-btn hub-btn-article" id="show-articles" type="button" data-href="articles/">Show Articles</button>
             </div>
         </div>
 
-
-
-        <!-- Khối 3: Socials -->
-        <div class="small_container">
-            <h2>SOCIALS</h2>
-            <div class="socials-list">
-                <a href="https://ctftime.org/team/371186" target="_blank" rel="noopener noreferrer"
-                    class="social-link ctf">
-                    <i class="fa-solid fa-flag-checkered"></i> CTFtime
+        <!-- Cánh Phải: Socials -->
+        <div class="hub-wing hub-socials">
+            <h2 class="hub-title">SOCIALS</h2>
+            <div class="socials-cloud">
+                <a href="https://ctftime.org/team/371186" target="_blank" rel="noopener noreferrer" class="social-text-link ctf">
+                    CTFtime
                 </a>
-                <a href="https://discord.com/invite/WyYTC2EZqK" target="_blank" rel="noopener noreferrer"
-                    class="social-link discord">
-                    <i class="fa-brands fa-discord"></i> Discord
+                <a href="https://discord.com/invite/WyYTC2EZqK" target="_blank" rel="noopener noreferrer" class="social-text-link discord">
+                    Discord
                 </a>
-                <a href="https://www.linkedin.com/company/v1t-quack/" target="_blank" rel="noopener noreferrer"
-                    class="social-link linkedin">
-                    <i class="fa-brands fa-linkedin"></i> Linkedin
+                <a href="https://www.linkedin.com/company/v1t-quack/" target="_blank" rel="noopener noreferrer" class="social-text-link linkedin">
+                    LinkedIn
                 </a>
-                <a href="https://www.facebook.com/profile.php?id=61586992003855" target="_blank"
-                    rel="noopener noreferrer" class="social-link facebook">
-                    <i class="fa-brands fa-facebook"></i> Facebook
+                <a href="https://www.facebook.com/profile.php?id=61586992003855" target="_blank" rel="noopener noreferrer" class="social-text-link facebook">
+                    Facebook
                 </a>
-                <a href="https://www.instagram.com/v1tnamese/" target="_blank" rel="noopener noreferrer"
-                    class="social-link instagram">
-                    <i class="fa-brands fa-instagram"></i> Instagram
+                <a href="https://www.instagram.com/v1tnamese/" target="_blank" rel="noopener noreferrer" class="social-text-link instagram">
+                    Instagram
                 </a>
             </div>
         </div>
