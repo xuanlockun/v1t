@@ -1177,7 +1177,7 @@ body.dark-mode .trace-row {
 
 .trace-key {
     font-family: 'Press Start 2P', monospace;
-    font-size: 6.5px;
+    font-size: 8px;
     color: #777;
     min-width: 65px;
     flex-shrink: 0;
@@ -1191,7 +1191,7 @@ body.dark-mode .trace-key {
     font-family: 'Quicksand', sans-serif;
     font-weight: 700;
     color: #111;
-    font-size: 10.5px;
+    font-size: 12px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
