@@ -1007,5 +1007,201 @@
         }
       ]
     }
+  },
+  {
+    "dataType": "CVE_RECORD",
+    "dataVersion": "5.2",
+    "cveMetadata": {
+      "cveId": "CVE-2026-AFU"
+    },
+    "containers": {
+      "cna": {
+        "providerMetadata": {
+          "shortName": "WPScan"
+        },
+        "credits": [
+          {
+            "lang": "en",
+            "value": "V1T",
+            "type": "finder"
+          },
+          {
+            "lang": "en",
+            "value": "WPScan",
+            "type": "coordinator"
+          }
+        ],
+        "source": {
+          "discovery": "EXTERNAL"
+        },
+        "x_generator": {
+          "engine": "WPScan CVE Generator"
+        }
+      },
+      "adp": [
+        {
+          "metrics": [
+            {
+              "cvssV3_1": {
+                "baseSeverity": "CRITICAL"
+              }
+            },
+            {
+              "other": {
+                "type": "ssvc"
+              }
+            }
+          ],
+          "title": "CISA ADP Vulnrichment"
+        }
+      ]
+    }
+  },
+  {
+    "dataType": "CVE_RECORD",
+    "dataVersion": "5.2",
+    "cveMetadata": {
+      "cveId": "CVE-2026-IDOR"
+    },
+    "containers": {
+      "cna": {
+        "providerMetadata": {
+          "shortName": "WPScan"
+        },
+        "credits": [
+          {
+            "lang": "en",
+            "value": "V1T",
+            "type": "finder"
+          },
+          {
+            "lang": "en",
+            "value": "WPScan",
+            "type": "coordinator"
+          }
+        ],
+        "source": {
+          "discovery": "EXTERNAL"
+        },
+        "x_generator": {
+          "engine": "WPScan CVE Generator"
+        }
+      },
+      "adp": [
+        {
+          "metrics": [
+            {
+              "cvssV3_1": {
+                "baseSeverity": "HIGH"
+              }
+            },
+            {
+              "other": {
+                "type": "ssvc"
+              }
+            }
+          ],
+          "title": "CISA ADP Vulnrichment"
+        }
+      ]
+    }
+  },
+  {
+    "dataType": "CVE_RECORD",
+    "dataVersion": "5.2",
+    "cveMetadata": {
+      "cveId": "CVE-2026-XSS"
+    },
+    "containers": {
+      "cna": {
+        "providerMetadata": {
+          "shortName": "WPScan"
+        },
+        "credits": [
+          {
+            "lang": "en",
+            "value": "V1T",
+            "type": "finder"
+          },
+          {
+            "lang": "en",
+            "value": "WPScan",
+            "type": "coordinator"
+          }
+        ],
+        "source": {
+          "discovery": "EXTERNAL"
+        },
+        "x_generator": {
+          "engine": "WPScan CVE Generator"
+        }
+      },
+      "adp": [
+        {
+          "metrics": [
+            {
+              "cvssV3_1": {
+                "baseSeverity": "HIGH"
+              }
+            },
+            {
+              "other": {
+                "type": "ssvc"
+              }
+            }
+          ],
+          "title": "CISA ADP Vulnrichment"
+        }
+      ]
+    }
+  },
+  {
+    "dataType": "CVE_RECORD",
+    "dataVersion": "5.2",
+    "cveMetadata": {
+      "cveId": "CVE-2026-BAC"
+    },
+    "containers": {
+      "cna": {
+        "providerMetadata": {
+          "shortName": "WPScan"
+        },
+        "credits": [
+          {
+            "lang": "en",
+            "value": "V1T",
+            "type": "finder"
+          },
+          {
+            "lang": "en",
+            "value": "WPScan",
+            "type": "coordinator"
+          }
+        ],
+        "source": {
+          "discovery": "EXTERNAL"
+        },
+        "x_generator": {
+          "engine": "WPScan CVE Generator"
+        }
+      },
+      "adp": [
+        {
+          "metrics": [
+            {
+              "cvssV3_1": {
+                "baseSeverity": "MEDIUM"
+              }
+            },
+            {
+              "other": {
+                "type": "ssvc"
+              }
+            }
+          ],
+          "title": "CISA ADP Vulnrichment"
+        }
+      ]
+    }
   }
 ]

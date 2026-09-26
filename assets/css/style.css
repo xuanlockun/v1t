@@ -23,12 +23,18 @@
     100% { background-position: 40px 40px, 60px 60px; }
 }
 
+html {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 body {
     background-color: var(--bg-color);
     color: var(--text-color);
     font-family: 'Quicksand', 'Fredoka One', cursive, sans-serif;
     margin: 0;
     padding: 0;
+    max-width: 100%;
     overflow-x: hidden;
     /* Thêm chấm bi mờ mờ cho đúng vibe */
     background-image: radial-gradient(rgba(255, 202, 40, 0.15) 15%, transparent 16%), 
@@ -160,11 +166,13 @@ img.logo {
 /* Right Deck Cluster (Cards Grid): Row 1 has Members (3/4) & Socials (1/4) | Row 2 has Curl Duck (Full) */
 .stage-cards-grid {
     display: grid;
-    grid-template-columns: 3fr 1fr;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
     gap: 16px;
     width: 100%;
     max-width: 920px;
+    min-width: 0;
     flex-shrink: 0;
+    box-sizing: border-box;
     transition: all 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
     transform-origin: left center;
 }
@@ -240,7 +248,7 @@ img.logo {
 }
 
 .hero-unified-stage.cockpit-active .stage-logo {
-    max-width: 272px;
+    max-width: 200px;
 }
 
 .hero-unified-stage.cockpit-active .stage-cards-grid {
@@ -403,6 +411,8 @@ img.logo {
     display: flex;
     flex-direction: column;
     width: 100%;
+    min-width: 0;
+    max-width: 100%;
     box-sizing: border-box;
     transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease;
 }
@@ -534,10 +544,12 @@ a.member-tag {
 .terminal-shell#small_container {
     width: 100% !important;
     max-width: 100% !important;
+    min-width: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
     display: flex;
     flex: 1;
+    overflow: hidden;
 }
 
 .deck-centerpiece .terminal {
@@ -549,7 +561,10 @@ a.member-tag {
     border: 2px solid var(--border-color) !important;
     box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     box-sizing: border-box;
     font-size: 11px;
     line-height: 1.32;
@@ -625,11 +640,48 @@ a.member-tag {
     border-color: #dc2743;
 }
 
-/* Responsive Adjustments: Tablet (max-width: 1100px) */
-@media screen and (max-width: 1100px) {
+/* ========================================================
+   RESPONSIVE DESIGN SYSTEM: METICULOUS MULTI-BREAKPOINT SUITE
+   ======================================================== */
+
+/* Tier 1: Laptop & Medium Desktop (max-width: 1240px) */
+@media screen and (max-width: 1240px) {
+    .hero-stage-layout {
+        width: 100%;
+        max-width: 1140px;
+        padding: 0 16px;
+    }
+    
+    .hero-unified-stage.cockpit-active .stage-brand-crown {
+        width: 270px;
+        max-width: 280px;
+    }
+    
+    .hero-unified-stage.cockpit-active .stage-logo {
+        max-width: 175px !important;
+    }
+    
+    .hero-unified-stage.cockpit-active .stage-cards-grid {
+        max-width: 820px;
+        grid-template-columns: minmax(0, 2.75fr) minmax(0, 1.25fr);
+        gap: 14px;
+    }
+}
+
+/* Tier 2: Tablet Landscape & Small Laptop (max-width: 1024px) */
+@media screen and (max-width: 1024px) {
+    .hero-unified-stage {
+        padding: 65px 16px 15px 16px;
+        margin: 10px 0 25px 0;
+    }
+
     .hero-stage-layout {
         flex-direction: column;
         align-items: center;
+        width: 100%;
+        max-width: 820px;
+        padding: 0;
+        margin: 0 auto;
         gap: 0;
     }
     
@@ -639,15 +691,35 @@ a.member-tag {
     
     .stage-brand-crown {
         order: 1;
-        margin: 10px auto !important;
         width: 100% !important;
-        max-width: 400px !important;
+        max-width: 460px !important;
+        margin: 0 auto 6px auto !important;
+    }
+
+    .hero-unified-stage.cockpit-active .stage-brand-crown {
+        width: 100% !important;
+        max-width: 460px !important;
+    }
+    
+    .hero-unified-stage.cockpit-active .stage-logo {
+        max-width: 130px !important;
+    }
+
+    .stage-actions {
+        flex-direction: row;
+        justify-content: center;
+        gap: 12px;
+        width: 100%;
+        max-width: 380px;
     }
     
     .stage-cards-grid {
         order: 2;
-        width: 100%;
-        max-width: 780px;
+        width: 100% !important;
+        max-width: 820px !important;
+        min-width: 0 !important;
+        grid-template-columns: minmax(0, 2.6fr) minmax(0, 1.4fr);
+        gap: 14px;
         transform-origin: top center;
     }
     
@@ -655,72 +727,301 @@ a.member-tag {
         max-height: 0;
         max-width: 100%;
         width: 100%;
-        transform: translateY(-20px) scale(0.9);
+        transform: translateY(-16px) scale(0.96);
     }
     
     .hero-unified-stage.cockpit-active .stage-cards-grid {
-        max-height: 1400px;
+        max-height: 1600px;
         max-width: 100%;
         width: 100%;
         transform: translateY(0) scale(1);
     }
 }
 
-/* Responsive Adjustments: Mobile (< 700px) */
-@media screen and (max-width: 700px) {
+/* Tier 3: Tablet Portrait & Large Phone (max-width: 768px) */
+@media screen and (max-width: 768px) {
+    .hero-unified-stage {
+        padding: 55px 12px 15px 12px;
+        margin: 10px 0 20px 0;
+    }
+
+    .hero-stage-layout {
+        width: 100%;
+        max-width: 600px;
+        padding: 0;
+        margin: 0 auto;
+    }
+    
+    .stage-brand-crown {
+        max-width: 360px !important;
+    }
+
+    .stage-logo {
+        max-width: 110px;
+    }
+    
+    .hero-unified-stage.cockpit-active .stage-logo {
+        max-width: 105px !important;
+    }
+    
+    .stage-title {
+        font-size: 20px;
+        margin: 10px 0;
+    }
+
+    .stage-actions {
+        flex-direction: row;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        max-width: 320px;
+        margin: 0 auto;
+    }
+    
+    .hub-btn {
+        font-size: 11px;
+        padding: 10px 14px;
+    }
+    
     .stage-cards-grid {
         grid-template-columns: 1fr;
         gap: 14px;
+        max-width: 100% !important;
+        width: 100% !important;
     }
     
     .stage-cards-grid .deck-members,
     .stage-cards-grid .deck-socials,
     .stage-cards-grid .deck-centerpiece {
         grid-column: 1 / -1;
+        width: 100%;
+        min-width: 0;
     }
-}
 
-/* Responsive Adjustments: Mobile (< 768px) */
-@media screen and (max-width: 768px) {
-    .hero-unified-stage {
-        margin: 15px auto 30px;
-        padding: 0 14px;
-    }
-    
-    .stage-actions {
-        flex-direction: column;
-        width: 100%;
-        max-width: 280px;
-        gap: 10px;
-    }
-    
-    .hub-btn {
-        width: 100%;
-    }
-    
-    .stage-logo {
-        max-width: 90px;
-    }
-    
-    .stage-title {
-        font-size: 20px;
-    }
-    
     .deck-card {
         padding: 14px 14px;
         border-radius: 14px;
     }
     
+    .socials-cloud {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    
     .deck-centerpiece .terminal {
-        font-size: clamp(7.5px, 2.3vw, 9.5px);
-        line-height: 1.25;
-        padding: 10px 8px !important;
+        font-size: clamp(7.5px, 2.1vw, 9.5px);
+        line-height: 1.28;
+        padding: 10px 10px !important;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    .profile-container {
+        padding: 16px 12px;
+        gap: 18px;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+}
+
+/* Tier 4: Standard Mobile (max-width: 520px) */
+@media screen and (max-width: 520px) {
+    .hero-unified-stage {
+        padding: 50px 8px 10px 8px;
+        margin: 5px 0 15px 0;
+    }
+    
+    .hero-stage-layout {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 4px;
+    }
+    
+    .stage-brand-crown {
+        max-width: 100% !important;
+    }
+
+    .stage-logo {
+        max-width: 95px;
+    }
+    
+    .hero-unified-stage.cockpit-active .stage-logo {
+        max-width: 95px !important;
+    }
+    
+    .stage-title {
+        font-size: 18px;
+        margin: 10px 0;
+    }
+
+    .stage-actions {
+        flex-direction: column;
+        width: 100%;
+        max-width: 270px;
+        gap: 8px;
+        margin: 0 auto;
+    }
+    
+    .hub-btn {
+        width: 100%;
+        font-size: 11px;
+        padding: 11px 16px;
+    }
+    
+    .stage-cards-grid {
+        gap: 12px;
+        width: 100%;
+    }
+    
+    .deck-card {
+        padding: 12px 10px;
+        border-radius: 12px;
+        box-shadow: 4px 4px 0 var(--accent-yellow);
+        border-width: 2px;
+    }
+    
+    .deck-card-header {
+        padding-bottom: 7px;
+        margin-bottom: 10px;
+    }
+    
+    .deck-card-header .deck-title {
+        font-size: 9.5px;
+        gap: 6px;
+    }
+    
+    .deck-badge {
+        font-size: 7px;
+        padding: 3px 6px;
+    }
+    
+    .members-cloud {
+        gap: 5px 4px;
+    }
+    
+    .member-tag {
+        font-size: 11px;
+        padding: 5px 8px;
+        border-width: 1.5px;
     }
     
     .socials-cloud {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 8px;
+        gap: 7px;
+    }
+    
+    .deck-socials .social-text-link {
+        padding: 8px 10px;
+        font-size: 11.5px;
+        border-radius: 8px;
+    }
+    
+    .deck-centerpiece .terminal {
+        font-size: clamp(6.2px, 2vw, 8px);
+        line-height: 1.24;
+        padding: 8px 8px !important;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    .profile-container {
+        padding: 12px 8px;
+        gap: 14px;
+        grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+    }
+    
+    .profile-card {
+        padding: 14px 10px;
+        border-width: 3px;
+        border-radius: 16px;
+        box-shadow: 6px 6px 0 var(--accent-orange);
+    }
+    
+    .profile-card img {
+        width: 75px;
+        height: 75px;
+        margin-bottom: 10px;
+        border-width: 3px;
+    }
+    
+    .profile-card h3 {
+        font-size: 9.5px;
+    }
+    
+    .profile-card h4 {
+        font-size: 12px;
+    }
+    
+    .profile-card .quote {
+        font-size: 11px;
+    }
+}
+
+/* Tier 5: Compact Mobile (max-width: 375px) */
+@media screen and (max-width: 375px) {
+    .hero-unified-stage {
+        padding: 45px 4px 10px 4px;
+    }
+    
+    .hero-stage-layout {
+        padding: 0 2px;
+    }
+    
+    .stage-logo {
+        max-width: 82px;
+    }
+    
+    .hero-unified-stage.cockpit-active .stage-logo {
+        max-width: 82px !important;
+    }
+    
+    .stage-title {
+        font-size: 16px;
+    }
+    
+    .hub-btn {
+        font-size: 10px;
+        padding: 9px 12px;
+    }
+    
+    .deck-card {
+        padding: 10px 8px;
+        box-shadow: 3px 3px 0 var(--accent-yellow);
+        border-radius: 10px;
+    }
+    
+    .deck-card-header .deck-title {
+        font-size: 8.5px;
+    }
+    
+    .deck-badge {
+        font-size: 6px;
+        padding: 2px 4px;
+    }
+    
+    .member-tag {
+        font-size: 9.5px;
+        padding: 4px 6px;
+    }
+    
+    .deck-socials .social-text-link {
+        padding: 6px 8px;
+        font-size: 10.5px;
+    }
+    
+    .deck-centerpiece .terminal {
+        font-size: clamp(5.5px, 1.8vw, 7.2px);
+        line-height: 1.18;
+        padding: 6px 6px !important;
+    }
+
+    .profile-container {
+        padding: 10px 6px;
+        gap: 10px;
+        grid-template-columns: 1fr;
     }
 }
 
@@ -2563,6 +2864,23 @@ body.dark-mode #dataTable tbody tr:last-child td:last-child {
 
 /* ===== MOBILE RESPONSIVENESS ===== */
 .hamburger { display: none; }
+
+/* Compact navbar for tablet landscape (769px - 960px) */
+@media screen and (min-width: 769px) and (max-width: 960px) {
+    nav {
+        width: 95%;
+        padding: 5px 12px;
+    }
+    nav ul li {
+        padding: 2px;
+    }
+    nav ul li a,
+    nav ul li button {
+        padding: 6px 8px;
+        font-size: 8px;
+        gap: 4px;
+    }
+}
 
 @media screen and (max-width: 768px) {
     nav { 
