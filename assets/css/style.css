@@ -1805,7 +1805,7 @@ a.member-tag {
         top: 50% !important;
         transform: translateY(calc(-50% - 3px)) !important;
         width: 32px !important;
-        height: 32px !important;
+        height: 25px !important;
         background: #F4F4F6 !important;
         border: 2px solid var(--border-color) !important;
         border-radius: 8px !important;
@@ -1980,7 +1980,7 @@ a.member-tag {
     .channel-tab {
         font-size: 7.5px;
         padding: 4px 6px;
-        min-height: 32px;
+        min-height: 20px;
     }
 
     .trace-key {
