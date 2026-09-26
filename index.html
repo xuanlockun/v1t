@@ -37,7 +37,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Link file CSS -->
-    <link rel="stylesheet" href="assets/css/style.css?v=20260926_cockpit">
+    <link rel="stylesheet" href="assets/css/style.css?v=20260926_cockpit_v2">
     <link rel="stylesheet" href="assets/css/ansi.css">
     <script type="application/ld+json">
     {
@@ -115,9 +115,25 @@
     <!-- Interactive Hero Cockpit Section -->
     <section class="hero-unified-stage" id="hero-stage">
         <div class="hero-stage-layout">
-            <!-- Cánh Trái: Members & Socials -->
-            <div class="stage-wing-left" id="stage-left">
-                <!-- Card 1: Members -->
+            <!-- Left Command Unit: Logo + V1T TEAM + Nút CVE & Articles -->
+            <div class="stage-brand-crown" id="stage-center">
+                <div class="brand-mascot-wrap" id="duck-toggle" role="button" tabindex="0" aria-label="Toggle Cockpit Cards" title="Click the duck to toggle cockpit cards!">
+                    <img class="logo stage-logo" src="assets/images/V1t_fin.png" alt="V1T Logo" loading="eager" fetchpriority="high">
+                    <div class="duck-click-pill" id="duck-hint">
+                        <span class="pill-dot"></span>
+                        <span class="pill-text">CLICK DUCK!</span>
+                    </div>
+                </div>
+                <h1 class="stage-title">V1T TEAM</h1>
+                <div class="stage-actions">
+                    <button class="hub-btn hub-btn-cve" id="show-cves" type="button">Show all CVEs</button>
+                    <button class="hub-btn hub-btn-article" id="show-articles" type="button" data-href="articles/">Show Articles</button>
+                </div>
+            </div>
+
+            <!-- Right Deck Cluster: 2 cards at top (Members & Socials), Curl The Duck at bottom -->
+            <div class="stage-cards-grid" id="stage-cards">
+                <!-- Card 1: Members (Top-Left) -->
                 <div class="deck-card deck-members">
                     <div class="deck-card-header">
                         <h2 class="deck-title"><i class="fa-solid fa-users"></i> MEMBERS</h2>
@@ -128,7 +144,7 @@
                     </div>
                 </div>
 
-                <!-- Card 2: Socials -->
+                <!-- Card 2: Socials (Top-Right) -->
                 <div class="deck-card deck-socials">
                     <div class="deck-card-header">
                         <h2 class="deck-title"><i class="fa-solid fa-share-nodes"></i> SOCIALS</h2>
@@ -159,26 +175,8 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Trục Giữa: Logo + V1T TEAM + Nút CVE & Articles -->
-            <div class="stage-brand-crown" id="stage-center">
-                <div class="brand-mascot-wrap" id="duck-toggle" role="button" tabindex="0" aria-label="Toggle Cockpit Cards" title="Click the duck to toggle cockpit cards!">
-                    <img class="logo stage-logo" src="assets/images/V1t_fin.png" alt="V1T Logo" loading="eager" fetchpriority="high">
-                    <div class="duck-click-pill" id="duck-hint">
-                        <span class="pill-dot"></span>
-                        <span class="pill-text">CLICK DUCK!</span>
-                    </div>
-                </div>
-                <h1 class="stage-title">V1T TEAM</h1>
-                <div class="stage-actions">
-                    <button class="hub-btn hub-btn-cve" id="show-cves" type="button">Show all CVEs</button>
-                    <button class="hub-btn hub-btn-article" id="show-articles" type="button" data-href="articles/">Show Articles</button>
-                </div>
-            </div>
-
-            <!-- Cánh Phải: Curl The Duck Terminal -->
-            <div class="stage-wing-right" id="stage-right">
+                <!-- Card 3: Curl The Duck Terminal (Bottom full-width) -->
                 <div class="deck-card deck-centerpiece">
                     <div class="deck-card-header">
                         <h2 class="deck-title"><i class="fa-solid fa-terminal"></i> CURL THE DUCK</h2>

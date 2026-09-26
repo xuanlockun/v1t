@@ -104,7 +104,7 @@ img.logo {
 .hero-unified-stage {
     max-width: 1420px;
     margin: 15px auto 30px;
-    padding: 0 20px;
+    padding: 80px 20px 10px 20px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -125,19 +125,7 @@ img.logo {
     transition: all 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Wing Left: Members & Socials stacked */
-.stage-wing-left {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    width: 320px;
-    max-width: 320px;
-    flex-shrink: 0;
-    transition: all 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
-    transform-origin: right center;
-}
-
-/* Center Crown: Logo + V1T TEAM + Action Buttons */
+/* Center/Left Crown: Logo + V1T TEAM + Action Buttons */
 .stage-brand-crown {
     display: flex;
     flex-direction: column;
@@ -145,7 +133,7 @@ img.logo {
     text-align: center;
     flex-shrink: 0;
     padding: 8px 16px;
-    margin: 0 16px;
+    margin: 0;
     position: relative;
     transition: all 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -166,33 +154,36 @@ img.logo {
     transition: opacity 0.5s ease;
 }
 
-/* Wing Right: Curl The Duck Terminal */
-.stage-wing-right {
-    display: flex;
-    flex-direction: column;
-    width: 580px;
-    max-width: 620px;
+/* Right Deck Cluster (Cards Grid): 2 columns (Top: Members & Socials | Bottom: Curl Duck Terminal) */
+.stage-cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+    max-width: 860px;
     flex-shrink: 0;
     transition: all 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
     transform-origin: left center;
 }
 
-/* Standby Floating State (Initial load: only logo & buttons float) */
-.hero-unified-stage:not(.cockpit-active) .stage-wing-left {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    max-width: 0;
-    width: 0;
-    max-height: 0;
-    height: 0;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    transform: translateX(-60px) scale(0.85);
+/* Row 1: Members (Left) & Socials (Right) */
+.stage-cards-grid .deck-members {
+    grid-column: 1 / 2;
+    min-height: 200px;
 }
 
-.hero-unified-stage:not(.cockpit-active) .stage-wing-right {
+.stage-cards-grid .deck-socials {
+    grid-column: 2 / 3;
+    min-height: 200px;
+}
+
+/* Row 2: Curl The Duck Terminal (Full width across bottom) */
+.stage-cards-grid .deck-centerpiece {
+    grid-column: 1 / -1;
+}
+
+/* Standby State (Initial load: only logo & buttons float in center) */
+.hero-unified-stage:not(.cockpit-active) .stage-cards-grid {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -203,12 +194,12 @@ img.logo {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    transform: translateX(60px) scale(0.85);
+    transform: translateX(60px) scale(0.9);
 }
 
 .hero-unified-stage:not(.cockpit-active) .stage-brand-crown {
     animation: heroFloatingCrown 3.5s ease-in-out infinite;
-    margin: 15px auto 10px;
+    margin: 10px auto;
 }
 
 .hero-unified-stage:not(.cockpit-active) .stage-logo {
@@ -224,32 +215,34 @@ img.logo {
     }
 }
 
-/* Active State (Revealed after clicking duck mascot) */
-.hero-unified-stage.cockpit-active .stage-wing-left {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    max-height: 600px;
-    height: auto;
-    transform: translateX(0) scale(1);
-}
-
-.hero-unified-stage.cockpit-active .stage-wing-right {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    max-height: 600px;
-    height: auto;
-    transform: translateX(0) scale(1);
+/* Active State (Logo shifts left, Cards Grid opens on right) */
+.hero-unified-stage.cockpit-active .hero-stage-layout {
+    gap: 28px;
+    justify-content: center;
+    align-items: center;
 }
 
 .hero-unified-stage.cockpit-active .stage-brand-crown {
     animation: none;
-    margin: 0 16px;
+    width: 320px;
+    max-width: 330px;
+    margin: 0;
+    flex-shrink: 0;
 }
 
 .hero-unified-stage.cockpit-active .stage-logo {
     max-width: 105px;
+}
+
+.hero-unified-stage.cockpit-active .stage-cards-grid {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    max-width: 860px;
+    width: 100%;
+    max-height: 850px;
+    height: auto;
+    transform: translateX(0) scale(1);
 }
 
 /* Duck Mascot Interactive Hub */
@@ -637,37 +630,44 @@ a.member-tag {
     
     .stage-brand-crown {
         order: 1;
-        margin: 15px auto !important;
+        margin: 10px auto !important;
+        width: 100% !important;
+        max-width: 400px !important;
     }
     
-    .stage-wing-right {
+    .stage-cards-grid {
         order: 2;
         width: 100%;
-        max-width: 680px;
+        max-width: 780px;
         transform-origin: top center;
     }
     
-    .stage-wing-left {
-        order: 3;
-        width: 100%;
-        max-width: 680px;
-        transform-origin: top center;
-    }
-    
-    .hero-unified-stage:not(.cockpit-active) .stage-wing-left,
-    .hero-unified-stage:not(.cockpit-active) .stage-wing-right {
+    .hero-unified-stage:not(.cockpit-active) .stage-cards-grid {
         max-height: 0;
         max-width: 100%;
         width: 100%;
         transform: translateY(-20px) scale(0.9);
     }
     
-    .hero-unified-stage.cockpit-active .stage-wing-left,
-    .hero-unified-stage.cockpit-active .stage-wing-right {
-        max-height: 1200px;
+    .hero-unified-stage.cockpit-active .stage-cards-grid {
+        max-height: 1400px;
         max-width: 100%;
         width: 100%;
         transform: translateY(0) scale(1);
+    }
+}
+
+/* Responsive Adjustments: Mobile (< 700px) */
+@media screen and (max-width: 700px) {
+    .stage-cards-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+    
+    .stage-cards-grid .deck-members,
+    .stage-cards-grid .deck-socials,
+    .stage-cards-grid .deck-centerpiece {
+        grid-column: 1 / -1;
     }
 }
 
