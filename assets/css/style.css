@@ -102,26 +102,29 @@ img.logo {
    UNIFIED HERO COMMAND STAGE (COMPACT & BALANCED)
    ========================================= */
 .hero-unified-stage {
-    max-width: 1420px;
-    margin: 15px auto 30px;
+    width: 100%;
+    margin: 15px 0 30px 0;
     padding: 80px 20px 10px 20px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
+    align-items: center; /* Luôn căn giữa 100% vào giữa màn hình */
     position: relative;
     z-index: 10;
+    box-sizing: border-box;
     transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Hero Cockpit Stage Layout */
+/* Hero Cockpit Stage Layout - Kích thước cố định (FIX) và luôn căn chính giữa màn hình bằng Flexbox */
 .hero-stage-layout {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    margin: 0 auto;
+    width: 1260px; /* Độ rộng FIXED cố định (thay đổi số px này theo ý muốn) */
+    max-width: calc(100% - 40px); /* Đảm bảo luôn cách 2 mép màn hình tối thiểu 20px khi co nhỏ */
+    margin: 0; /* Cố định 0, hoàn toàn không dùng auto */
+    box-sizing: border-box;
     transition: all 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -205,7 +208,7 @@ img.logo {
 
 .hero-unified-stage:not(.cockpit-active) .stage-brand-crown {
     animation: heroFloatingCrown 3.5s ease-in-out infinite;
-    margin: 10px auto;
+    margin: 10px 0;
 }
 
 .hero-unified-stage:not(.cockpit-active) .stage-logo {
@@ -237,7 +240,7 @@ img.logo {
 }
 
 .hero-unified-stage.cockpit-active .stage-logo {
-    max-width: 105px;
+    max-width: 272px;
 }
 
 .hero-unified-stage.cockpit-active .stage-cards-grid {
@@ -264,7 +267,7 @@ img.logo {
 .stage-logo {
     max-width: 135px;
     height: auto;
-    margin: 0 auto;
+    margin: 0;
     filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.12));
     animation: duckBounce 2.5s infinite ease-in-out;
     cursor: pointer;
