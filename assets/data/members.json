@@ -8,7 +8,10 @@
     "quoteClass": "quote",
     "blog": "https://rawr.v1t.site/",
     "ctftime": "https://ctftime.org/user/183484",
-    "aliases": ["rawr", "v1t"]
+    "aliases": [
+      "rawr",
+      "v1t"
+    ]
   },
   {
     "id": "jaze",
@@ -19,7 +22,9 @@
     "quoteClass": "quote01",
     "blog": "https://www.google.com/search?q=who+is+jaze+in+cyber+security",
     "ctftime": "https://ctftime.org/user/172832",
-    "aliases": ["jaze"]
+    "aliases": [
+      "jaze"
+    ]
   },
   {
     "id": "longpham",
@@ -30,7 +35,11 @@
     "quoteClass": "quote",
     "blog": null,
     "ctftime": "https://ctftime.org/user/213437",
-    "aliases": ["longpham+", "longpham", "bachkhi"]
+    "aliases": [
+      "longpham+",
+      "longpham",
+      "bachkhi"
+    ]
   },
   {
     "id": "arasu",
@@ -41,7 +50,10 @@
     "quoteClass": "quote",
     "blog": null,
     "ctftime": null,
-    "aliases": ["arasu", "student"]
+    "aliases": [
+      "arasu",
+      "student"
+    ]
   },
   {
     "id": "n4n4s1",
@@ -52,7 +64,11 @@
     "quoteClass": "quote",
     "blog": "https://nanasi.v1t.site/",
     "ctftime": "https://ctftime.org/user/223280",
-    "aliases": ["n4n4s1", "nanasi", "binz"]
+    "aliases": [
+      "n4n4s1",
+      "nanasi",
+      "binz"
+    ]
   },
   {
     "id": "kero",
@@ -63,7 +79,9 @@
     "quoteClass": "quote",
     "blog": null,
     "ctftime": null,
-    "aliases": ["kero"]
+    "aliases": [
+      "kero"
+    ]
   },
   {
     "id": "shah_ji",
@@ -74,7 +92,10 @@
     "quoteClass": "quote",
     "blog": "https://syedjazib.vercel.app/",
     "ctftime": "https://ctftime.org/user/219123",
-    "aliases": ["shah_ji", "shahji"]
+    "aliases": [
+      "shah_ji",
+      "shahji"
+    ]
   },
   {
     "id": "maro",
@@ -85,7 +106,9 @@
     "quoteClass": "quote",
     "blog": null,
     "ctftime": "https://ctftime.org/user/206379",
-    "aliases": ["maro"]
+    "aliases": [
+      "maro"
+    ]
   },
   {
     "id": "basim",
@@ -96,7 +119,11 @@
     "quoteClass": "quote",
     "blog": "https://basimmehdi.vercel.app/",
     "ctftime": "https://ctftime.org/user/218749",
-    "aliases": ["basim mehdi", "basim", "hacker"]
+    "aliases": [
+      "basim mehdi",
+      "basim",
+      "hacker"
+    ]
   },
   {
     "id": "vjz3r",
@@ -107,7 +134,10 @@
     "quoteClass": "quote",
     "blog": "https://vjz3r.github.io/",
     "ctftime": "https://ctftime.org/user/141944",
-    "aliases": ["vjz3r", "ninja"]
+    "aliases": [
+      "vjz3r",
+      "ninja"
+    ]
   },
   {
     "id": "emkhoi",
@@ -118,7 +148,11 @@
     "quoteClass": "quote",
     "blog": "https://emkhoi2k10.v1t.site/",
     "ctftime": "https://ctftime.org/user/165731",
-    "aliases": ["emkhoi2k10", "emkhoi", "spy"]
+    "aliases": [
+      "emkhoi2k10",
+      "emkhoi",
+      "spy"
+    ]
   },
   {
     "id": "deroise",
@@ -129,7 +163,10 @@
     "quoteClass": "quote",
     "blog": "https://deroise2306.v1t.site/",
     "ctftime": "https://ctftime.org/user/219785",
-    "aliases": ["deroise2306", "deroise"]
+    "aliases": [
+      "deroise2306",
+      "deroise"
+    ]
   },
   {
     "id": "dreamybull",
@@ -140,7 +177,11 @@
     "quoteClass": "quote",
     "blog": null,
     "ctftime": null,
-    "aliases": ["dreamybullxxl", "dreamybull", "anime"]
+    "aliases": [
+      "dreamybullxxl",
+      "dreamybull",
+      "anime"
+    ]
   },
   {
     "id": "shirajuki",
@@ -151,7 +192,10 @@
     "quoteClass": "quote",
     "blog": "https://shirajuki.js.org/",
     "ctftime": null,
-    "aliases": ["shirajuki", "cow"]
+    "aliases": [
+      "shirajuki",
+      "cow"
+    ]
   },
   {
     "id": "jayce",
@@ -162,7 +206,9 @@
     "quoteClass": "quote",
     "blog": null,
     "ctftime": "https://ctftime.org/user/168272",
-    "aliases": ["jayce"]
+    "aliases": [
+      "jayce"
+    ]
   },
   {
     "id": "winky",
@@ -173,7 +219,9 @@
     "quoteClass": "quote",
     "blog": "https://threalwinky.github.io/",
     "ctftime": null,
-    "aliases": ["winky"]
+    "aliases": [
+      "winky"
+    ]
   },
   {
     "id": "qth24",
@@ -184,7 +232,9 @@
     "quoteClass": "quote",
     "blog": "https://thinhdq.site/",
     "ctftime": null,
-    "aliases": ["qth24"]
+    "aliases": [
+      "qth24"
+    ]
   },
   {
     "id": "r1muru",
@@ -195,6 +245,21 @@
     "quoteClass": "quote",
     "blog": "https://r1muru2006.github.io/",
     "ctftime": null,
-    "aliases": ["r1muru"]
+    "aliases": [
+      "r1muru"
+    ]
+  },
+  {
+    "id": "coldB",
+    "name": "ColdB",
+    "role": "Forensics",
+    "avatar": "assets/images/coldB.png",
+    "quote": "\"Damn\"",
+    "quoteClass": "quote",
+    "blog": null,
+    "ctftime": null,
+    "aliases": [
+      "coldb"
+    ]
   }
 ]
