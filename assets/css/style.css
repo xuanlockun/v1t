@@ -207,61 +207,124 @@ img.logo {
 /* 2. Tri-Deck Panoramic Stage: Left=Members, Center=Terminal, Right=Socials */
 .stage-tri-deck {
     display: grid;
-    grid-template-columns: minmax(220px, 290px) minmax(460px, 660px) minmax(180px, 220px);
-    gap: 24px;
-    align-items: start;
+    grid-template-columns: minmax(250px, 290px) minmax(500px, 680px) minmax(230px, 270px);
+    gap: 20px;
+    align-items: stretch;
     justify-content: center;
     width: 100%;
 }
 
-.deck-wing {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    padding: 18px;
+/* Unified Deck Card Foundation */
+.deck-card {
     background: var(--card-bg);
-    border: 2px solid var(--border-color);
-    border-radius: 14px;
+    border: 2.5px solid var(--border-color);
+    border-radius: 16px;
     box-shadow: 5px 5px 0 var(--accent-yellow);
-}
-
-.deck-title {
-    font-family: 'Press Start 2P', monospace;
-    font-size: 12px;
-    color: var(--accent-orange);
-    border-bottom: 2px dashed var(--accent-yellow);
-    padding-bottom: 7px;
-    margin-bottom: 15px;
-    text-align: center;
-    letter-spacing: 0.8px;
-    white-space: nowrap;
-}
-
-.deck-centerpiece {
+    padding: 16px 18px;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease;
+}
+
+.deck-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 6px 8px 0 var(--accent-orange);
+}
+
+/* Card Header Suite */
+.deck-card-header {
+    display: flex;
     align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px dashed var(--accent-yellow);
+    padding-bottom: 9px;
+    margin-bottom: 13px;
     width: 100%;
 }
 
-/* Members Cloud */
+.deck-card-header .deck-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+    color: var(--accent-dark-orange);
+    margin: 0;
+    padding: 0;
+    border-bottom: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    line-height: 1.3;
+}
+
+.deck-card-header .deck-title i {
+    color: var(--accent-orange);
+    font-size: 11px;
+}
+
+.deck-badge {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7.5px;
+    padding: 3px 7px;
+    border-radius: 6px;
+    background: rgba(255, 202, 40, 0.18);
+    border: 1px solid var(--accent-yellow);
+    color: var(--accent-dark-orange);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.status-online {
+    color: #2E7D32;
+    border-color: #81C784;
+    background: rgba(76, 175, 80, 0.15);
+}
+
+.dot-pulse {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4CAF50;
+    box-shadow: 0 0 6px #4CAF50;
+    display: inline-block;
+    animation: statusBlink 1.8s infinite ease-in-out;
+}
+
+@keyframes statusBlink {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.75); }
+}
+
+/* Card Body Suite */
+.deck-card-body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+/* Card 1: Members Cloud */
+.deck-members .deck-card-body {
+    justify-content: center;
+}
+
 .members-cloud {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 8px 6px;
-    max-width: 290px;
+    gap: 7px 6px;
+    width: 100%;
 }
 
 .member-tag {
     display: inline-block;
-    padding: 6px 12px;
+    padding: 6px 11px;
     font-family: 'Quicksand', sans-serif;
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 700;
     color: var(--text-color);
-    background: rgba(255, 255, 255, 0.88);
+    background: rgba(255, 255, 255, 0.9);
     border: 1.5px solid var(--border-color);
     border-radius: 999px;
     text-decoration: none;
@@ -281,56 +344,86 @@ a.member-tag {
     box-shadow: 3px 3px 0 var(--border-color);
 }
 
-/* Terminal Deck Centerpiece */
+/* Card 2: Terminal Centerpiece */
+.deck-centerpiece .terminal-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: center;
+}
+
 .terminal-shell#small_container {
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
+    display: flex;
+    flex: 1;
 }
 
 .deck-centerpiece .terminal {
-    background: #1b1b1b !important;
+    background: #141416 !important;
     color: #4CAF50;
     font-family: 'Courier New', monospace;
-    padding: 14px 18px !important;
-    border-radius: 12px;
-    border: 3.5px solid var(--border-color) !important;
-    box-shadow: 6px 6px 0 var(--accent-yellow);
+    padding: 13px 16px !important;
+    border-radius: 10px;
+    border: 2px solid var(--border-color) !important;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
     overflow-x: auto;
     width: 100%;
     box-sizing: border-box;
     font-size: 11px;
     line-height: 1.32;
+    flex: 1;
 }
 
-/* Socials Cloud */
+/* Card 3: Socials List */
+.deck-socials .deck-card-body {
+    justify-content: center;
+}
+
 .socials-cloud {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 9px;
+    gap: 8px;
     width: 100%;
-    max-width: 200px;
 }
 
 .social-text-link {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     width: 100%;
-    padding: 8px 16px;
+    padding: 8px 12px;
     font-family: 'Quicksand', sans-serif;
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--text-color);
-    background: rgba(255, 255, 255, 0.88);
+    background: rgba(255, 255, 255, 0.9);
     border: 1.5px solid var(--border-color);
-    border-radius: 999px;
+    border-radius: 10px;
     text-decoration: none;
     box-shadow: 2px 2px 0 var(--border-color);
     transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
     box-sizing: border-box;
+}
+
+.social-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.social-left i {
+    font-size: 14px;
+    width: 16px;
+    text-align: center;
+}
+
+.social-arrow {
+    font-size: 10px;
+    opacity: 0.5;
+    transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
 .social-text-link:hover {
@@ -338,25 +431,26 @@ a.member-tag {
     box-shadow: 3px 3px 0 var(--border-color);
 }
 
+.social-text-link:hover .social-arrow {
+    opacity: 1;
+    transform: translate(2px, -2px);
+}
+
 .social-text-link.ctf:hover { background: var(--accent-yellow); color: #111; }
 .social-text-link.discord:hover { background: #5865F2; color: #fff; border-color: #5865F2; }
 .social-text-link.linkedin:hover { background: #0A66C2; color: #fff; border-color: #0A66C2; }
 .social-text-link.facebook:hover { background: #1877F2; color: #fff; border-color: #1877F2; }
-.social-text-link.instagram:hover { background: #E4405F; color: #fff; border-color: #E4405F; }
-
-/* Responsive Adjustments */
-@media screen and (max-width: 1120px) {
-    .stage-tri-deck {
-        grid-template-columns: minmax(180px, 240px) 1fr minmax(160px, 200px);
-        gap: 16px;
-    }
-    .deck-title { font-size: 11px; }
+.social-text-link.instagram:hover {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    color: #fff;
+    border-color: #dc2743;
 }
 
-@media screen and (max-width: 880px) {
+/* Responsive Adjustments: Tablet (768px - 1160px) */
+@media screen and (max-width: 1160px) {
     .stage-tri-deck {
         grid-template-columns: 1fr 1fr;
-        gap: 24px;
+        gap: 18px;
     }
     .deck-centerpiece {
         grid-column: 1 / -1;
@@ -368,22 +462,25 @@ a.member-tag {
     .deck-socials {
         order: 3;
     }
-    .members-cloud {
-        max-width: 100%;
-    }
-    .socials-cloud {
-        max-width: 100%;
-    }
 }
 
-@media screen and (max-width: 580px) {
+/* Responsive Adjustments: Mobile (< 768px) */
+@media screen and (max-width: 768px) {
+    .hero-unified-stage {
+        margin: 20px auto 35px;
+        padding: 0 14px;
+    }
     .stage-tri-deck {
         grid-template-columns: 1fr;
-        gap: 28px;
+        gap: 16px;
     }
     .deck-centerpiece { order: 1; }
     .deck-members { order: 2; }
     .deck-socials { order: 3; }
+    .deck-card {
+        padding: 14px 14px;
+        border-radius: 14px;
+    }
     .stage-actions {
         flex-direction: column;
         width: 100%;
@@ -393,18 +490,14 @@ a.member-tag {
         width: 100%;
     }
     .deck-centerpiece .terminal {
-        font-size: 8.5px;
+        font-size: clamp(7.5px, 2.3vw, 9.5px);
         line-height: 1.25;
-        padding: 12px 10px !important;
+        padding: 10px 8px !important;
     }
     .socials-cloud {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    .social-text-link {
-        width: auto;
-        padding: 7px 16px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
     }
 }
 
@@ -2533,21 +2626,41 @@ body.dark-mode .stage-title {
     text-shadow: 3px 3px 0 #000, 5px 5px 0 rgba(255, 202, 40, 0.4);
 }
 
-body.dark-mode .deck-title {
-    color: #FFB300;
-    border-bottom-color: rgba(255, 202, 40, 0.4);
-}
-
-body.dark-mode .deck-wing {
-    background: #21232B;
+body.dark-mode .deck-card {
+    background: #18191E;
     border-color: #383E4C;
     box-shadow: 5px 5px 0 #000;
 }
 
+body.dark-mode .deck-card:hover {
+    box-shadow: 7px 7px 0 rgba(255, 202, 40, 0.35);
+    border-color: rgba(255, 202, 40, 0.5);
+}
+
+body.dark-mode .deck-card-header {
+    border-bottom-color: rgba(255, 202, 40, 0.25);
+}
+
+body.dark-mode .deck-title {
+    color: #FFD54F;
+}
+
+body.dark-mode .deck-badge {
+    background: #252830;
+    border-color: #383E4C;
+    color: #FFCA28;
+}
+
+body.dark-mode .status-online {
+    background: rgba(76, 175, 80, 0.2);
+    border-color: #4CAF50;
+    color: #81C784;
+}
+
 body.dark-mode .member-tag {
-    background: #1e1e1e;
-    color: #f1f1f1;
-    border-color: #444;
+    background: #21232B;
+    color: #E0E0E0;
+    border-color: #383E4C;
     box-shadow: 2px 2px 0 #000;
 }
 
@@ -2556,6 +2669,11 @@ body.dark-mode .member-tag:hover {
     color: #111;
     border-color: var(--accent-yellow);
     box-shadow: 3px 3px 0 #000;
+}
+
+body.dark-mode .deck-centerpiece .terminal {
+    background: #0E0F12 !important;
+    border-color: #383E4C !important;
 }
 
 body.dark-mode .hub-btn-cve {
@@ -2579,9 +2697,9 @@ body.dark-mode .hub-btn-article:hover {
 }
 
 body.dark-mode .social-text-link {
-    background: #1e1e1e;
-    color: #f1f1f1;
-    border-color: #444;
+    background: #21232B;
+    color: #E0E0E0;
+    border-color: #383E4C;
     box-shadow: 2px 2px 0 #000;
 }
 

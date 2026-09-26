@@ -180,6 +180,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const listEl = document.getElementById('members-list') || document.querySelector('.members-list') || document.querySelector('.members-cloud');
         if (!listEl || !Array.isArray(members)) return;
 
+        const countBadge = document.getElementById('members-count-badge');
+        if (countBadge) {
+            countBadge.textContent = `${members.length} DUCKS`;
+        }
+
         listEl.innerHTML = members.map(m => {
             if (m.ctftime) {
                 return `<a href="${m.ctftime}" target="_blank" rel="noopener noreferrer" class="member-tag">${m.name}</a>`;

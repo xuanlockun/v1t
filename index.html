@@ -37,7 +37,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Link file CSS -->
-    <link rel="stylesheet" href="assets/css/style.css?v=20260926_8">
+    <link rel="stylesheet" href="assets/css/style.css?v=20260926_9">
     <link rel="stylesheet" href="assets/css/ansi.css">
     <script type="application/ld+json">
     {
@@ -128,40 +128,60 @@
 
         <!-- 3-Deck Panoramic Stage: Members (Left) | Curl The Duck Terminal (Center) | Socials (Right) -->
         <div class="stage-tri-deck">
-            <!-- Cánh Trái: Members -->
-            <div class="deck-wing deck-members">
-                <h2 class="deck-title">MEMBERS</h2>
-                <div class="members-cloud" id="members-list"></div>
-            </div>
-
-            <!-- Trục Giữa: Curl The Duck Terminal -->
-            <div class="deck-centerpiece">
-                <h2 class="deck-title terminal-title">CURL THE DUCK</h2>
-                <div class="terminal-shell" id="small_container">
-                    <pre class="terminal shadow" id="main-terminal"><code>$ curl v1t.site
-> Fetching duck energy...</code></pre>
+            <!-- Card 1: Members -->
+            <div class="deck-card deck-members">
+                <div class="deck-card-header">
+                    <h2 class="deck-title"><i class="fa-solid fa-users"></i> MEMBERS</h2>
+                    <span class="deck-badge" id="members-count-badge">SQUAD</span>
+                </div>
+                <div class="deck-card-body">
+                    <div class="members-cloud" id="members-list"></div>
                 </div>
             </div>
 
-            <!-- Cánh Phải: Socials -->
-            <div class="deck-wing deck-socials">
-                <h2 class="deck-title">SOCIALS</h2>
-                <div class="socials-cloud">
-                    <a href="https://ctftime.org/team/371186" target="_blank" rel="noopener noreferrer" class="social-text-link ctf">
-                        CTFtime
-                    </a>
-                    <a href="https://discord.com/invite/WyYTC2EZqK" target="_blank" rel="noopener noreferrer" class="social-text-link discord">
-                        Discord
-                    </a>
-                    <a href="https://www.linkedin.com/company/v1t-quack/" target="_blank" rel="noopener noreferrer" class="social-text-link linkedin">
-                        LinkedIn
-                    </a>
-                    <a href="https://www.facebook.com/profile.php?id=61586992003855" target="_blank" rel="noopener noreferrer" class="social-text-link facebook">
-                        Facebook
-                    </a>
-                    <a href="https://www.instagram.com/v1tnamese/" target="_blank" rel="noopener noreferrer" class="social-text-link instagram">
-                        Instagram
-                    </a>
+            <!-- Card 2: Curl The Duck Terminal -->
+            <div class="deck-card deck-centerpiece">
+                <div class="deck-card-header">
+                    <h2 class="deck-title"><i class="fa-solid fa-terminal"></i> CURL THE DUCK</h2>
+                    <span class="deck-badge status-online"><span class="dot-pulse"></span> ONLINE</span>
+                </div>
+                <div class="deck-card-body terminal-body">
+                    <div class="terminal-shell" id="small_container">
+                        <pre class="terminal" id="main-terminal"><code>$ curl v1t.site
+> Fetching duck energy...</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Socials -->
+            <div class="deck-card deck-socials">
+                <div class="deck-card-header">
+                    <h2 class="deck-title"><i class="fa-solid fa-share-nodes"></i> SOCIALS</h2>
+                    <span class="deck-badge">CONNECT</span>
+                </div>
+                <div class="deck-card-body">
+                    <div class="socials-cloud">
+                        <a href="https://ctftime.org/team/371186" target="_blank" rel="noopener noreferrer" class="social-text-link ctf">
+                            <span class="social-left"><i class="fa-solid fa-flag-checkered"></i> CTFtime</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square social-arrow"></i>
+                        </a>
+                        <a href="https://discord.com/invite/WyYTC2EZqK" target="_blank" rel="noopener noreferrer" class="social-text-link discord">
+                            <span class="social-left"><i class="fa-brands fa-discord"></i> Discord</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square social-arrow"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/company/v1t-quack/" target="_blank" rel="noopener noreferrer" class="social-text-link linkedin">
+                            <span class="social-left"><i class="fa-brands fa-linkedin"></i> LinkedIn</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square social-arrow"></i>
+                        </a>
+                        <a href="https://www.facebook.com/profile.php?id=61586992003855" target="_blank" rel="noopener noreferrer" class="social-text-link facebook">
+                            <span class="social-left"><i class="fa-brands fa-facebook"></i> Facebook</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square social-arrow"></i>
+                        </a>
+                        <a href="https://www.instagram.com/v1tnamese/" target="_blank" rel="noopener noreferrer" class="social-text-link instagram">
+                            <span class="social-left"><i class="fa-brands fa-instagram"></i> Instagram</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square social-arrow"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -193,7 +213,7 @@
     <!-- Scripts -->
     <script src="assets/js/commands.js"></script>
     <script src="assets/js/terminal.js"></script>
-    <script src="assets/js/script.js"></script>
+    <script src="assets/js/script.js?v=20260926_2"></script>
 </body>
 
 </html>
