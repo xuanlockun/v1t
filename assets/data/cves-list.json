@@ -105,6 +105,13 @@
     ]
   },
   {
+    "id": "CVE-2026-POI",
+    "finders": [
+      "Rawr",
+      "Jaze"
+    ]
+  },
+  {
     "id": "CVE-2026-IDOR",
     "finders": [
       "Jaze",
