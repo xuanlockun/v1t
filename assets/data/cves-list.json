@@ -1,5 +1,12 @@
 [
   {
+    "id": "CVE-2026-100517",
+    "finders": [
+      "Jaze",
+      "Rawr"
+    ]
+  },
+  {
     "id": "CVE-2026-92412",
     "finders": [
       "Jaze",
