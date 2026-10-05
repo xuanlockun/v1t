@@ -21,6 +21,13 @@
     ]
   },
   {
+    "id": "CVE-2026-96332",
+    "finders": [
+      "Jaze",
+      "Rawr"
+    ]
+  },
+  {
     "id": "CVE-2026-92412",
     "finders": [
       "Jaze",
