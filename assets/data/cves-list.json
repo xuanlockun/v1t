@@ -119,6 +119,13 @@
     ]
   },
   {
+    "id": "CVE-2026-62025",
+    "finders": [
+      "Jaze",
+      "Rawr"
+    ]
+  },
+  {
     "id": "CVE-2026-61978",
     "finders": [
       "Rawr",
