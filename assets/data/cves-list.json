@@ -154,14 +154,14 @@
     ]
   },
   {
-    "id": "CVE-2026-POI",
+    "id": "CVE-2026-RCE",
     "finders": [
       "Rawr",
       "Jaze"
     ]
   },
   {
-    "id": "CVE-2026-IDOR",
+    "id": "CVE-2026-SSRF",
     "finders": [
       "Jaze",
       "Rawr"
