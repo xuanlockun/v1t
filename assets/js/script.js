@@ -340,15 +340,32 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!Array.isArray(rawList)) return [];
             return rawList.map(item => {
                 if (typeof item === 'string') {
-                    return { id: item, finders: [] };
+                    return {
+                        id: item.trim(),
+                        finders: [],
+                        threat: null,
+                        target: null,
+                        title: null,
+                        cwe: null,
+                        description: null
+                    };
                 }
-                const id = item.id || item.cveId || item.cve || '';
+                if (!item || typeof item !== 'object') return null;
+                const id = String(item.id || item.cveId || item.cve || '').trim();
                 let finders = item.finders || item.finder || [];
                 if (!Array.isArray(finders)) {
                     finders = finders ? [finders] : [];
                 }
-                return { id, finders };
-            }).filter(item => Boolean(item.id));
+                return {
+                    id,
+                    finders,
+                    threat: typeof item.threat === 'string' && item.threat.trim() ? item.threat.trim().toUpperCase() : null,
+                    target: typeof item.target === 'string' && item.target.trim() ? item.target.trim() : null,
+                    title: typeof item.title === 'string' && item.title.trim() ? item.title.trim() : null,
+                    cwe: typeof item.cwe === 'string' && item.cwe.trim() ? item.cwe.trim().toUpperCase() : null,
+                    description: typeof item.description === 'string' && item.description.trim() ? item.description.trim() : null
+                };
+            }).filter(item => Boolean(item && item.id));
         } catch (e) {
             console.warn('Failed to load cves-list.json', e);
             return [];
@@ -429,22 +446,26 @@ document.addEventListener('DOMContentLoaded', () => {
         return /^CVE-\d{4}-\d{4,}$/.test(cveId);
     }
 
-    function renderDetailView(container, record, cveId, finders = []) {
+    function renderDetailView(container, record, cveId, finders = [], inlineItem = null) {
         // Setup data
         const cna = record.containers && record.containers.cna ? record.containers.cna : {};
         const meta = record.cveMetadata || {};
+        const hasCna = Object.keys(cna).length > 0;
+        const isReserved = meta.state === 'RESERVED' || !hasCna;
 
-        let title = cna.title || meta.cveId || cveId;
-        let datePub = meta.datePublished ? new Date(meta.datePublished).toLocaleDateString() : 'N/A';
-        let assigner = meta.assignerShortName || 'N/A';
+        let title = cna.title || inlineItem?.title || (isReserved ? `${cveId} — Advisory Record Reserved` : (meta.cveId || cveId));
+        let datePub = meta.datePublished ? new Date(meta.datePublished).toLocaleDateString() : (isReserved ? 'Pending Publication' : 'N/A');
+        let assigner = meta.assignerShortName || (isReserved ? 'MITRE / CNA' : 'N/A');
 
         let html = `
             <div class="cve-detail-header">
+                <button type="button" class="cve-back-btn" id="cve-back-btn" aria-label="Back to CVE list"><i class="fa-solid fa-arrow-left"></i> ALL CVES</button>
                 <h2>${title}</h2>
                 <div class="cve-meta-tags">
                     <span class="cve-tag tag-id">${meta.cveId || cveId}</span>
                     <span class="cve-tag tag-date">Published: ${datePub}</span>
                     <span class="cve-tag tag-assigner">Assigner: ${assigner}</span>
+                    ${isReserved ? '<span class="cve-tag tag-status badge-pending">STATUS: RESERVED</span>' : ''}
                 </div>
             </div>
             <div class="cve-detail-body">
@@ -473,11 +494,30 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         }
 
+        // Inline Target Scope (if specified in cves-list.json)
+        if (inlineItem && inlineItem.target) {
+            html += `
+                <div class="detail-box cve-target-box">
+                    <div class="box-title"><i class="fa-solid fa-crosshairs"></i> Target Scope</div>
+                    <div class="box-content"><strong>${inlineItem.target}</strong></div>
+                </div>
+            `;
+        }
+
         // Description
-        if (cna.descriptions && cna.descriptions[0]) {
+        let descText = '';
+        if (cna.descriptions && cna.descriptions[0] && cna.descriptions[0].value) {
+            descText = cna.descriptions[0].value;
+        } else if (inlineItem && inlineItem.description) {
+            descText = inlineItem.description;
+        } else if (isReserved) {
+            descText = 'This CVE record is currently in the RESERVED state by MITRE / CNA. Technical specifics, impact vectors, and remediation advisories will automatically populate once public disclosure is completed by the coordinating CNA.';
+        }
+
+        if (descText) {
             html += `<div class="detail-box">
                 <div class="box-title">Description</div>
-                <div class="box-content">${cna.descriptions[0].value}</div>
+                <div class="box-content">${descText}</div>
             </div>`;
         }
 
@@ -496,18 +536,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cvss = m.cvssV3_1 || m.cvssV3 || m.cvssV4_0;
                 if (cvss) {
                     const sevClass = (cvss.baseSeverity || 'unknown').toLowerCase();
+                    const score = cvss.baseScore ? `${cvss.baseScore} ` : '';
                     metricsHtml += `<div class="metric-item">
-                        <span class="metric-score badge-${sevClass}">${cvss.baseScore} ${cvss.baseSeverity}</span>
-                        <span class="metric-vector">${cvss.vectorString}</span>
+                        <span class="metric-score badge-${sevClass}">${score}${cvss.baseSeverity || 'CVSS'}</span>
+                        ${cvss.vectorString ? `<span class="metric-vector">${cvss.vectorString}</span>` : ''}
                     </div>`;
                 }
             });
+        } else if (inlineItem && inlineItem.threat) {
+            const sevClass = inlineItem.threat.toLowerCase();
+            metricsHtml = `<div class="metric-item">
+                <span class="metric-score badge-${sevClass}">${inlineItem.threat} (Inline Assessment)</span>
+            </div>`;
         }
 
         let weaknessHtml = '';
         if (cna.problemTypes && cna.problemTypes[0] && cna.problemTypes[0].descriptions) {
             const desc = cna.problemTypes[0].descriptions[0];
             weaknessHtml = `<div class="weakness-item">${desc.cweId ? `<strong class="cwe-id-badge">${desc.cweId}</strong> ` : ''}${desc.description || ''}</div>`;
+        } else if (inlineItem && inlineItem.cwe) {
+            weaknessHtml = `<div class="weakness-item"><strong class="cwe-id-badge">${inlineItem.cwe}</strong> (Inline)</div>`;
         }
 
         if (metricsHtml || weaknessHtml) {
@@ -554,15 +602,27 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
         }
 
-        // References
+        // References & Verification
+        let refHtml = `<ul class="ref-list">`;
+        let hasRefs = false;
         if (cna.references && cna.references.length > 0) {
-            let refHtml = `<ul class="ref-list">`;
             cna.references.forEach(r => {
-                refHtml += `<li><a href="${r.url}" target="_blank" rel="noopener noreferrer">${r.url}</a></li>`;
+                if (r.url) {
+                    refHtml += `<li><a href="${r.url}" target="_blank" rel="noopener noreferrer">${r.url}</a></li>`;
+                    hasRefs = true;
+                }
             });
-            refHtml += `</ul>`;
+        }
+        if (isValidCveId(cveId)) {
+            refHtml += `<li><a href="https://www.cve.org/CVERecord?id=${cveId}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> Official MITRE CVE Record (${cveId})</a></li>`;
+            refHtml += `<li><a href="https://nvd.nist.gov/vuln/detail/${cveId}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> NIST National Vulnerability Database (${cveId})</a></li>`;
+            hasRefs = true;
+        }
+        refHtml += `</ul>`;
+
+        if (hasRefs) {
             html += `<div class="detail-box">
-                <div class="box-title">References</div>
+                <div class="box-title">References & Verification</div>
                 <div class="box-content">${refHtml}</div>
             </div>`;
         }
@@ -595,9 +655,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
         }
+
+        // Back to list button listener (Mobile split mode)
+        const backBtn = container.querySelector('#cve-back-btn');
+        if (backBtn) {
+            backBtn.addEventListener('click', () => {
+                const modal = document.getElementById('cve-modal');
+                if (modal) modal.classList.remove('split-mode');
+                document.querySelectorAll('.cve-card.active').forEach(c => c.classList.remove('active'));
+            });
+        }
     }
 
-    function getSeverityClass(record) {
+    function getSeverityClass(record, inlineItem = null) {
         let cardMetrics = [];
         if (record && record.containers && record.containers.cna && record.containers.cna.metrics) {
             cardMetrics = cardMetrics.concat(record.containers.cna.metrics);
@@ -612,7 +682,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for (const m of cardMetrics) {
                 const cvss = m.cvssV3_1 || m.cvssV3 || m.cvssV4_0;
                 if (cvss && cvss.baseSeverity) {
-                    const s = cvss.baseSeverity.toUpperCase();
+                    const s = String(cvss.baseSeverity).toUpperCase();
                     if (s === 'CRITICAL') return 'severity-critical';
                     if (s === 'HIGH') return 'severity-high';
                     if (s === 'MEDIUM') return 'severity-medium';
@@ -620,16 +690,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
+
+        // Inline threat fallback from cves-list.json (Trường hợp 1)
+        if (inlineItem && inlineItem.threat) {
+            const s = String(inlineItem.threat).toUpperCase();
+            if (s === 'CRITICAL') return 'severity-critical';
+            if (s === 'HIGH') return 'severity-high';
+            if (s === 'MEDIUM') return 'severity-medium';
+            if (s === 'LOW') return 'severity-low';
+        }
+
+        // If CVE is reserved or awaiting publication
+        const isReserved = record && ((record.cveMetadata && record.cveMetadata.state === 'RESERVED') || (!record.containers || !record.containers.cna || Object.keys(record.containers.cna).length === 0));
+        if (isReserved) {
+            return 'severity-pending';
+        }
+
         return '';
     }
 
-    function makeCveCardElement(cveId, record, finders = []) {
+    function makeCveCardElement(cveId, record, finders = [], inlineItem = null) {
         const container = document.createElement('div');
         container.className = 'cve-card';
         container.tabIndex = 0;
 
         // Determine severity class based on local data if available
-        const severityClass = getSeverityClass(record);
+        const severityClass = getSeverityClass(record, inlineItem);
         if (severityClass) container.classList.add(severityClass);
 
         const idEl = document.createElement('div');
@@ -668,16 +754,19 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 // Direct access from RAM store - instant, 0 network fetch
                 const fresh = cveStore[cveId] || record || makePlaceholderCveRecord(cveId);
+                const hasCna = fresh.containers && fresh.containers.cna && Object.keys(fresh.containers.cna).length > 0;
+                const isReserved = (fresh.cveMetadata && fresh.cveMetadata.state === 'RESERVED') || !hasCna;
 
                 let baseScore = '';
                 let baseSeverity = '';
-                let vectorString = 'No vector string';
-                let cwe = 'N/A';
-                let title = fresh.containers && fresh.containers.cna && fresh.containers.cna.title ? fresh.containers.cna.title : 'No Title';
-                let desc = 'No description available.';
+                let vectorString = '';
+                let cwe = '';
+                let title = '';
+                let desc = '';
 
-                if (fresh.containers && fresh.containers.cna) {
+                if (hasCna) {
                     const cna = fresh.containers.cna;
+                    title = cna.title || '';
 
                     let popupMetrics = [];
                     if (cna.metrics) popupMetrics = popupMetrics.concat(cna.metrics);
@@ -691,9 +780,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         for (const m of popupMetrics) {
                             const cvss = m.cvssV3_1 || m.cvssV3 || m.cvssV4_0;
                             if (cvss) {
-                                baseScore = cvss.baseScore;
-                                baseSeverity = cvss.baseSeverity;
-                                vectorString = cvss.vectorString;
+                                baseScore = cvss.baseScore || '';
+                                baseSeverity = cvss.baseSeverity || '';
+                                vectorString = cvss.vectorString || '';
                                 break;
                             }
                         }
@@ -715,7 +804,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 cwe = d.cweId;
                                 break;
                             } else if (d.description && d.description.toUpperCase().startsWith('CWE-')) {
-                                // Fallback: try to extract CWE-XXX from description if cweId is missing
                                 const match = d.description.match(/(CWE-\d+)/i);
                                 if (match) {
                                     cwe = match[1].toUpperCase();
@@ -725,14 +813,38 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
 
-                    if (cna.descriptions && cna.descriptions[0]) {
+                    if (cna.descriptions && cna.descriptions[0] && cna.descriptions[0].value) {
                         desc = cna.descriptions[0].value;
                     }
                 }
 
+                // Fallbacks from inline item (Trường hợp 1)
+                if (!title) {
+                    title = inlineItem?.title || (isReserved ? `${cveId} (Reserved / Pending)` : cveId);
+                }
+                if (!cwe) {
+                    cwe = inlineItem?.cwe || (isReserved ? 'RESERVED' : 'N/A');
+                }
+                if (!desc) {
+                    if (inlineItem?.description) {
+                        desc = inlineItem.description;
+                    } else if (inlineItem?.target) {
+                        desc = `Target: ${inlineItem.target}. Advisory details pending disclosure.`;
+                    } else if (isReserved) {
+                        desc = 'CVE ID officially reserved. Technical impact details are awaiting public release by MITRE/CNA.';
+                    } else {
+                        desc = 'No description available.';
+                    }
+                }
+
                 let badgesHtml = `<span class="cwe">${cwe}</span>`;
-                if (baseScore !== '') {
-                    badgesHtml += `<span class="severity-badge">${baseScore} | ${baseSeverity}</span>`;
+                if (baseScore !== '' || baseSeverity !== '') {
+                    const scoreText = [baseScore, baseSeverity].filter(Boolean).join(' | ');
+                    badgesHtml += `<span class="severity-badge">${scoreText}</span>`;
+                } else if (inlineItem?.threat) {
+                    badgesHtml += `<span class="severity-badge badge-${inlineItem.threat.toLowerCase()}">${inlineItem.threat}</span>`;
+                } else if (isReserved) {
+                    badgesHtml += `<span class="severity-badge badge-pending">PENDING</span>`;
                 }
 
                 let findersPopupHtml = '';
@@ -752,12 +864,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     `;
                 }
 
+                const vectorHtml = vectorString ? `<div class="cvss">${vectorString}</div>` : '';
+
                 popup.innerHTML = `
                     <div class="title">${title}</div>
                     ${findersPopupHtml}
                     <div class="cwe-metrics">${badgesHtml}</div>
                     <div class="desc">${desc}</div>
-                    <div class="cvss">${vectorString}</div>
+                    ${vectorHtml}
                 `;
             } catch (err) {
                 console.warn('Failed to refresh popup content', cveId, err);
@@ -834,27 +948,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (hasData) {
                         // 1. Data exists in RAM - Instant render with 0 fetch
-                        renderDetailView(detailView, current, cveId, finders);
+                        renderDetailView(detailView, current, cveId, finders, inlineItem);
                     } else if (isValidCveId(cveId)) {
-                        // 2. Not in local data - fetch on-demand from API once and save to RAM
-                        detailView.innerHTML = '<p style="text-align:center; margin-top:50px; color:#888;">Loading details from API...</p>';
+                        // 2. Not in local data - render instant fallback then attempt live hydration
+                        renderDetailView(detailView, current || makePlaceholderCveRecord(cveId), cveId, finders, inlineItem);
                         try {
                             const apiUrl = `https://cveawg.mitre.org/api/cve/${cveId}`;
                             const r = await fetch(apiUrl, { cache: 'no-store' });
                             if (r.ok) {
                                 const json = await r.json();
                                 cveStore[cveId] = json;
-                                renderDetailView(detailView, json, cveId, finders);
-                                const sevClass = getSeverityClass(json);
-                                if (sevClass) container.classList.add(sevClass);
-                            } else {
-                                renderDetailView(detailView, current || makePlaceholderCveRecord(cveId), cveId, finders);
+                                if (container.classList.contains('active')) {
+                                    renderDetailView(detailView, json, cveId, finders, inlineItem);
+                                }
+                                const sevClass = getSeverityClass(json, inlineItem);
+                                if (sevClass) {
+                                    container.classList.remove('severity-pending');
+                                    container.classList.add(sevClass);
+                                }
                             }
                         } catch (e) {
-                            renderDetailView(detailView, current || makePlaceholderCveRecord(cveId), cveId, finders);
+                            // ignore API network error
                         }
                     } else {
-                        renderDetailView(detailView, current || makePlaceholderCveRecord(cveId), cveId, finders);
+                        renderDetailView(detailView, current || makePlaceholderCveRecord(cveId), cveId, finders, inlineItem);
                     }
                 }
             }
@@ -879,8 +996,10 @@ document.addEventListener('DOMContentLoaded', () => {
         ]);
 
         const findersMap = {};
+        const listMetaMap = {};
         listItems.forEach(item => {
             if (item && item.id) {
+                listMetaMap[item.id] = item;
                 if (!findersMap[item.id]) findersMap[item.id] = [];
                 if (item.finders && item.finders.length > 0) {
                     findersMap[item.id] = findersMap[item.id].concat(item.finders);
@@ -900,31 +1019,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const cardsMap = {};
         const renderedIds = new Set();
 
+        // Render ONLY items defined in cves-list.json (Single Source of Truth)
         for (const item of listItems) {
             const id = item.id;
             renderedIds.add(id);
-            const record = store[id] || makePlaceholderCveRecord(id);
+            const record = store[id] || store[id.toLowerCase()] || makePlaceholderCveRecord(id);
             store[id] = record;
             const finders = item.finders && item.finders.length > 0 ? item.finders : (findersMap[id] || []);
-            const cardEl = makeCveCardElement(id, record, finders);
+            const cardEl = makeCveCardElement(id, record, finders, item);
             cardsMap[id] = cardEl;
             grid.appendChild(cardEl);
         }
 
-        // Append any extra CVEs present in store but not in cves-list.json
-        Object.keys(store).forEach(k => {
-            if (!renderedIds.has(k)) {
-                renderedIds.add(k);
-                const record = store[k];
-                const cardEl = makeCveCardElement(k, record, findersMap[k] || []);
-                cardsMap[k] = cardEl;
-                grid.appendChild(cardEl);
-            }
-        });
-
         // Asynchronously try to fetch details for missing items from API (once per item)
         renderedIds.forEach(async (id) => {
-            if ((!store[id] || !store[id].containers || !store[id].containers.cna || Object.keys(store[id].containers.cna).length === 0) && isValidCveId(id)) {
+            const curRec = store[id];
+            const needsFetch = (!curRec || !curRec.containers || !curRec.containers.cna || Object.keys(curRec.containers.cna).length === 0)
+                && isValidCveId(id)
+                && curRec?.cveMetadata?.state !== 'RESERVED';
+
+            if (needsFetch) {
                 try {
                     const apiUrl = `https://cveawg.mitre.org/api/cve/${id}`;
                     const r = await fetch(apiUrl, { cache: 'no-store' });
@@ -933,8 +1047,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         store[id] = json;
                         const card = cardsMap[id];
                         if (card) {
-                            const sevClass = getSeverityClass(json);
-                            if (sevClass) card.classList.add(sevClass);
+                            const sevClass = getSeverityClass(json, listMetaMap[id]);
+                            if (sevClass) {
+                                card.classList.remove('severity-pending');
+                                card.classList.add(sevClass);
+                            }
+                            if (card.classList.contains('active')) {
+                                const detailView = document.getElementById('cve-detail-view');
+                                if (detailView) {
+                                    renderDetailView(detailView, json, id, findersMap[id] || [], listMetaMap[id]);
+                                }
+                            }
                         }
                     }
                 } catch (e) {
@@ -953,10 +1076,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (closeBtn && modal) closeBtn.addEventListener('click', () => { modal.hidden = true; document.querySelectorAll('.cve-popup').forEach(p => { p.style.display = 'none'; }); });
+    function closeModal() {
+        if (!modal) return;
+        modal.hidden = true;
+        modal.classList.remove('split-mode');
+        document.querySelectorAll('.cve-card.active').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.cve-popup').forEach(p => { p.style.display = 'none'; });
+    }
+
+    if (closeBtn && modal) closeBtn.addEventListener('click', closeModal);
     if (modal) {
-        modal.addEventListener('click', (e) => { if (e.target === modal) modal.hidden = true; });
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) modal.hidden = true; });
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal || (e.target && e.target.classList && e.target.classList.contains('cve-modal-backdrop'))) {
+                closeModal();
+            }
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.hidden) closeModal();
+        });
     }
 
     // Expose debug helpers to window for easier console testing

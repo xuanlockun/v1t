@@ -3403,6 +3403,36 @@ td:not(.event) { text-align: center; }
 .cve-card.severity-high .cve-id { color: #fff; text-shadow: 1px 1px 0 #000; }
 .cve-card.severity-medium { background: #ffeb3b; }
 .cve-card.severity-low { background: #81c784; }
+.cve-card.severity-pending {
+    background: repeating-linear-gradient(
+        -45deg,
+        rgba(100, 116, 139, 0.12),
+        rgba(100, 116, 139, 0.12) 6px,
+        rgba(148, 163, 184, 0.22) 6px,
+        rgba(148, 163, 184, 0.22) 12px
+    );
+    border-style: dashed;
+    border-color: #64748b;
+    position: relative;
+}
+.cve-card.severity-pending .cve-id {
+    color: #475569;
+    font-style: italic;
+    opacity: 0.9;
+}
+body.dark-mode .cve-card.severity-pending {
+    background: repeating-linear-gradient(
+        -45deg,
+        rgba(30, 41, 59, 0.5),
+        rgba(30, 41, 59, 0.5) 6px,
+        rgba(51, 65, 85, 0.6) 6px,
+        rgba(51, 65, 85, 0.6) 12px
+    );
+    border-color: #64748b;
+}
+body.dark-mode .cve-card.severity-pending .cve-id {
+    color: #94a3b8;
+}
 .cve-id {
     font-family: 'Press Start 2P', monospace;
     font-size: 12px;
@@ -3591,6 +3621,7 @@ td:not(.event) { text-align: center; }
 }
 
 /* CVE Detail View - Clean & Readable */
+.cve-back-btn { display: none; }
 .cve-detail-header { border-bottom: 2px solid #eaeaea; padding-bottom: 20px; margin-bottom: 25px; }
 .cve-detail-header h2 { font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 26px; color: #111; margin-top: 0; margin-bottom: 15px; }
 .cve-meta-tags { display: flex; flex-wrap: wrap; gap: 12px; }
@@ -3612,6 +3643,15 @@ td:not(.event) { text-align: center; }
 .badge-high { background: #f57c00; }
 .badge-medium { background: #fbc02d; color: #111; }
 .badge-low { background: #388e3c; }
+.badge-pending { background: #64748b; color: #fff; }
+.cve-tag.badge-pending { background: #475569; color: #fff; border: 1px dashed #94a3b8; }
+.cve-target-box .box-title { background: #f1f5f9; color: #0f172a; }
+
+.cve-popup .severity-badge.badge-pending { background: #64748b; color: #fff; }
+.cve-popup .severity-badge.badge-critical { background: #d32f2f; color: #fff; }
+.cve-popup .severity-badge.badge-high { background: #f57c00; color: #fff; }
+.cve-popup .severity-badge.badge-medium { background: #fbc02d; color: #111; }
+.cve-popup .severity-badge.badge-low { background: #388e3c; color: #fff; }
 .metric-vector { font-family: 'Courier New', monospace; font-size: 13px; color: #555; background: #f5f5f5; padding: 6px 10px; border-radius: 6px; border: 1px solid #ddd; word-break: break-all; }
 
 .cwe-id-badge { font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 14px; color: #fff; background: var(--accent-red); padding: 4px 8px; border-radius: 6px; display: inline-block; margin-right: 8px; }
@@ -3819,13 +3859,43 @@ td:not(.event) { text-align: center; }
     }
 
     /* Adjust Detail View Typography for Mobile */
-    .cve-detail-header h2 { font-size: 20px; line-height: 1.4; }
+    .cve-detail-header h2 { font-size: 20px; line-height: 1.4; margin-top: 6px; }
     .detail-row { flex-direction: column; gap: 15px; }
     .flex-1 { min-width: 100%; }
     .cve-meta-tags { gap: 8px; }
     .cve-tag { font-size: 11px; padding: 5px 10px; }
     .box-title { font-size: 15px; padding: 10px 15px; }
     .box-content { font-size: 14px; padding: 15px; }
+
+    /* Back to list button on mobile split mode */
+    .cve-back-btn {
+        display: inline-flex !important;
+        align-items: center;
+        gap: 8px;
+        background: #fff;
+        color: var(--accent-dark-orange);
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        font-family: 'Press Start 2P', monospace;
+        font-size: 9px;
+        padding: 7px 12px;
+        cursor: pointer;
+        margin-bottom: 12px;
+        box-shadow: 2px 2px 0 var(--accent-yellow);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        line-height: 1;
+        width: fit-content;
+    }
+    .cve-back-btn:active {
+        transform: scale(0.96);
+        box-shadow: 1px 1px 0 var(--accent-orange);
+    }
+    body.dark-mode .cve-back-btn {
+        background: #1e1e1e;
+        color: var(--accent-yellow);
+        border-color: #555;
+        box-shadow: 2px 2px 0 var(--accent-orange);
+    }
 
     /* Disable hover popups on mobile */
     .cve-popup { display: none !important; }

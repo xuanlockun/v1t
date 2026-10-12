@@ -1,0 +1,12 @@
+{
+  "name": "v1t-security-landing",
+  "version": "1.0.0",
+  "description": "V1T Security Research Landing Page & Threat Pod",
+  "scripts": {
+    "sync-cves": "node assets/js/update-cves.js",
+    "update-cves": "node assets/js/update-cves.js",
+    "validate": "node -c assets/js/script.js && node -c assets/js/update-cves.js"
+  },
+  "author": "V1T Security Team",
+  "license": "MIT"
+}
