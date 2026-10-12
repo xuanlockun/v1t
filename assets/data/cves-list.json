@@ -64,6 +64,7 @@
   },
   {
     "id": "CVE-2026-83556",
+    "threat": "HIGH",
     "finders": [
       "Jaze",
       "Rawr"
