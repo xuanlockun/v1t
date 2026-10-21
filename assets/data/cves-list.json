@@ -1,5 +1,19 @@
 [
   {
+    "id": "CVE-2026-111829",
+    "finders": [
+      "Rawr",
+      "Jaze"
+    ]
+  },
+  {
+    "id": "CVE-2026-111410",
+    "finders": [
+      "Jaze",
+      "Rawr"
+    ]
+  },
+  {
     "id": "CVE-2026-108168",
     "finders": [
       "Rawr",
