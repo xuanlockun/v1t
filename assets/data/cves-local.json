@@ -4187,5 +4187,14 @@
         }
       ]
     }
+  },
+  {
+    "dataType": "CVE_RECORD",
+    "dataVersion": "5.1",
+    "cveMetadata": {
+      "cveId": "CVE-2026-111830",
+      "state": "RESERVED"
+    },
+    "containers": {}
   }
 ]
