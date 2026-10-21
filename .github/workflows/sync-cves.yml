@@ -1,0 +1,38 @@
+name: Sync CVE data
+
+on:
+  schedule:
+    # Check unpublished CVEs every six hours. GitHub schedules use UTC.
+    - cron: '23 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-cve-data
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Refresh MITRE CVE cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out the default branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate sync script
+        run: node --check assets/js/update-cves.js
+
+      - name: Refresh CVE records
+        run: node assets/js/update-cves.js
