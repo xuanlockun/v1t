@@ -196,6 +196,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // render grid (lazy load data first time)
             if (!cveGridRendered) {
                 cveGridRendered = await renderCveGrid();
+            } else {
+                // Retry any CVEs that were still missing when the list was opened before.
+                hydrateMissingCveCards();
             }
             const firstFocusable = modal.querySelector('.cve-close');
             if (firstFocusable) firstFocusable.focus();
@@ -430,10 +433,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // In-memory RAM store for all CVE data (single fetch, cached forever in RAM)
+    // In-memory RAM store shared by local cache records and live MITRE hydration.
     const cveStore = {}; // cveId -> record object
     let cveStoreInitialized = false;
     let cveStorePromise = null;
+    const cveHydrationPromises = new Map();
+    const cveCardContexts = new Map();
 
     async function getOrInitCveStore() {
         if (cveStoreInitialized) return cveStore;
@@ -505,6 +510,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function isValidCveId(cveId) {
         return /^CVE-\d{4}-\d{4,}$/.test(cveId);
+    }
+
+    function hasCveDetails(record) {
+        return Boolean(
+            record
+            && record.containers
+            && record.containers.cna
+            && Object.keys(record.containers.cna).length > 0
+        );
+    }
+
+    async function hydrateCveRecord(cveId) {
+        const current = cveStore[cveId];
+        if (hasCveDetails(current) || !isValidCveId(cveId)) {
+            return current || null;
+        }
+
+        if (cveHydrationPromises.has(cveId)) {
+            return cveHydrationPromises.get(cveId);
+        }
+
+        const request = (async () => {
+            const apiUrl = `https://cveawg.mitre.org/api/cve/${cveId}`;
+            const response = await fetchWithTimeout(apiUrl, { cache: 'no-store' });
+            if (!response.ok) {
+                throw new Error(`MITRE request failed: HTTP ${response.status}`);
+            }
+
+            const json = await response.json();
+            if (json?.cveMetadata?.cveId !== cveId) {
+                throw new Error(`MITRE response ID mismatch for ${cveId}`);
+            }
+
+            cveStore[cveId] = json;
+            return json;
+        })();
+
+        cveHydrationPromises.set(cveId, request);
+
+        try {
+            return await request;
+        } finally {
+            if (cveHydrationPromises.get(cveId) === request) {
+                cveHydrationPromises.delete(cveId);
+            }
+        }
     }
 
     function createTextElement(tagName, className = '', text = '') {
@@ -1073,20 +1124,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const detailView = document.getElementById('cve-detail-view');
                 if (detailView) {
                     const current = cveStore[cveId] || record;
-                    const hasData = current && current.containers && current.containers.cna && Object.keys(current.containers.cna).length > 0;
+                    const hasData = hasCveDetails(current);
 
                     if (hasData) {
                         // 1. Data exists in RAM - Instant render with 0 fetch
                         renderDetailView(detailView, current, cveId, finders, inlineItem);
                     } else if (isValidCveId(cveId)) {
-                        // 2. Not in local data - render instant fallback then attempt live hydration
+                        // 2. Keep the fallback visible while reusing the list-level hydration request.
                         renderDetailView(detailView, current || makePlaceholderCveRecord(cveId), cveId, finders, inlineItem);
                         try {
-                            const apiUrl = `https://cveawg.mitre.org/api/cve/${cveId}`;
-                            const r = await fetchWithTimeout(apiUrl, { cache: 'no-store' });
-                            if (!r.ok) throw new Error(`MITRE request failed: HTTP ${r.status}`);
-                            const json = await r.json();
-                            cveStore[cveId] = json;
+                            const json = await hydrateCveRecord(cveId);
+                            if (!json) return;
                             if (container.classList.contains('active')) {
                                 renderDetailView(detailView, json, cveId, finders, inlineItem);
                             }
@@ -1096,7 +1144,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 container.classList.add(sevClass);
                             }
                         } catch (e) {
-                            // ignore API network error
+                            console.warn(`Failed to hydrate ${cveId}`, e);
                         }
                     } else {
                         renderDetailView(detailView, current || makePlaceholderCveRecord(cveId), cveId, finders, inlineItem);
@@ -1106,6 +1154,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         return container;
+    }
+
+    function applyHydratedCveRecord(cveId, record) {
+        const context = cveCardContexts.get(cveId);
+        if (!context || !record) return;
+
+        const { card, finders, inlineItem } = context;
+        const severityClass = getSeverityClass(record, inlineItem);
+        if (severityClass) {
+            card.classList.remove('severity-pending');
+            card.classList.add(severityClass);
+        }
+
+        if (card.classList.contains('active')) {
+            const detailView = document.getElementById('cve-detail-view');
+            if (detailView) {
+                renderDetailView(detailView, record, cveId, finders, inlineItem);
+            }
+        }
+    }
+
+    function hydrateMissingCveCards() {
+        cveCardContexts.forEach((context, cveId) => {
+            if (hasCveDetails(cveStore[cveId]) || !isValidCveId(cveId)) return;
+
+            hydrateCveRecord(cveId)
+                .then(record => applyHydratedCveRecord(cveId, record))
+                .catch(error => console.warn(`Failed to hydrate ${cveId}`, error));
+        });
     }
 
     async function renderCveGrid() {
@@ -1125,10 +1202,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!listItems.length) return false;
 
         const findersMap = {};
-        const listMetaMap = {};
         listItems.forEach(item => {
             if (item && item.id) {
-                listMetaMap[item.id] = item;
                 if (!findersMap[item.id]) findersMap[item.id] = [];
                 if (item.finders && item.finders.length > 0) {
                     findersMap[item.id] = findersMap[item.id].concat(item.finders);
@@ -1145,54 +1220,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        const cardsMap = {};
-        const renderedIds = new Set();
+        cveCardContexts.clear();
 
         // Render ONLY items defined in cves-list.json (Single Source of Truth)
         for (const item of listItems) {
             const id = item.id;
-            renderedIds.add(id);
             const record = store[id] || store[id.toLowerCase()] || makePlaceholderCveRecord(id);
             store[id] = record;
             const finders = item.finders && item.finders.length > 0 ? item.finders : (findersMap[id] || []);
             const cardEl = makeCveCardElement(id, record, finders, item);
-            cardsMap[id] = cardEl;
+            cveCardContexts.set(id, { card: cardEl, finders, inlineItem: item });
             grid.appendChild(cardEl);
         }
 
-        // Asynchronously try to fetch details for missing items from API (once per item)
-        renderedIds.forEach(async (id) => {
-            const curRec = store[id];
-            const needsFetch = (!curRec || !curRec.containers || !curRec.containers.cna || Object.keys(curRec.containers.cna).length === 0)
-                && isValidCveId(id)
-                && curRec?.cveMetadata?.state !== 'RESERVED';
-
-            if (needsFetch) {
-                try {
-                    const apiUrl = `https://cveawg.mitre.org/api/cve/${id}`;
-                    const r = await fetchWithTimeout(apiUrl, { cache: 'no-store' });
-                    if (!r.ok) throw new Error(`MITRE request failed: HTTP ${r.status}`);
-                    const json = await r.json();
-                    store[id] = json;
-                    const card = cardsMap[id];
-                    if (card) {
-                        const sevClass = getSeverityClass(json, listMetaMap[id]);
-                        if (sevClass) {
-                            card.classList.remove('severity-pending');
-                            card.classList.add(sevClass);
-                        }
-                        if (card.classList.contains('active')) {
-                            const detailView = document.getElementById('cve-detail-view');
-                            if (detailView) {
-                                renderDetailView(detailView, json, id, findersMap[id] || [], listMetaMap[id]);
-                            }
-                        }
-                    }
-                } catch (e) {
-                    // ignore network/CORS error
-                }
-            }
-        });
+        // Start live hydration as soon as the list opens, including RESERVED records.
+        // The list remains interactive while requests run in the background.
+        hydrateMissingCveCards();
         return true;
     }
 
