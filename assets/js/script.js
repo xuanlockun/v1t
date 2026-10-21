@@ -6,6 +6,44 @@
 
 //   const randomIndex = Math.floor(Math.random() * imageSources.length);
 //   document.querySelector('img.logo').src = imageSources[randomIndex];
+const FETCH_TIMEOUT_MS = 10000;
+
+async function fetchWithTimeout(resource, options = {}, timeoutMs = FETCH_TIMEOUT_MS) {
+    const controller = new AbortController();
+    const externalSignal = options.signal;
+    let timedOut = false;
+
+    const abortFromExternalSignal = () => controller.abort();
+    if (externalSignal) {
+        if (externalSignal.aborted) {
+            controller.abort();
+        } else {
+            externalSignal.addEventListener('abort', abortFromExternalSignal, { once: true });
+        }
+    }
+
+    const timeoutId = setTimeout(() => {
+        timedOut = true;
+        controller.abort();
+    }, timeoutMs);
+
+    try {
+        return await fetch(resource, { ...options, signal: controller.signal });
+    } catch (error) {
+        if (timedOut) {
+            const timeoutError = new Error(`Request timed out after ${timeoutMs}ms`);
+            timeoutError.name = 'TimeoutError';
+            throw timeoutError;
+        }
+        throw error;
+    } finally {
+        clearTimeout(timeoutId);
+        if (externalSignal) {
+            externalSignal.removeEventListener('abort', abortFromExternalSignal);
+        }
+    }
+}
+
 // Hamburger toggle
 const hamburger = document.getElementById('hamburger');
 const nav = document.querySelector('nav');
@@ -43,9 +81,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function fetchGoogleSheetData() {
     const rankUrl = "https://opensheet.elk.sh/1OJ1gs4Md9wFiaMFOED06MUG1KgxuZkmzzhRvYENMCkQ/Rank";
+    const rankTargets = ['#highest-rank', '#current-rank', '#country-rank', '#world-rank'];
+    if (!rankTargets.some(selector => document.querySelector(selector))) return;
 
     try {
-        const rankResponse = await fetch(rankUrl).then(res => res.json());
+        const response = await fetchWithTimeout(rankUrl);
+        if (!response.ok) {
+            throw new Error(`Ranking request failed: HTTP ${response.status}`);
+        }
+        const rankResponse = await response.json();
 
         updateRankInfo(rankResponse);
 
@@ -61,17 +105,27 @@ function updateRankInfo(rankData) {
     const overallRank = row["Overall Rating Place"] || row["Overall Rating"] || row["World Rank"] || fallbackText;
     const highestRank = row["Highest Rating Place"] || row["Highest Rank"] || row["Best Rating Place"] || fallbackText;
     const countryRank = row["Country Place"] || fallbackText;
-    const countryFlagImg = rankData ? '<img src="assets/images/vn.svg" style="padding-left: 5px;" width="17.6">' : '';
-
-    const setText = (selector, icon, label, value, extra = '') => {
+    const setText = (selector, icon, label, value, showCountryFlag = false) => {
         const el = document.querySelector(selector);
         if (!el) return;
-        el.innerHTML = ` <i class="${icon}" style="padding-right: 5px;"></i> ${label}: ${value} ${extra}`;
+        el.replaceChildren();
+        const iconEl = document.createElement('i');
+        iconEl.className = icon;
+        iconEl.style.paddingRight = '5px';
+        el.append(iconEl, document.createTextNode(` ${label}: ${value}`));
+        if (showCountryFlag && rankData) {
+            const flag = document.createElement('img');
+            flag.src = 'assets/images/vn.svg';
+            flag.alt = 'Vietnam';
+            flag.width = 18;
+            flag.style.paddingLeft = '5px';
+            el.appendChild(flag);
+        }
     };
 
     setText('#highest-rank', 'fa-solid fa-trophy', 'Highest', highestRank);
     setText('#current-rank', 'fa-solid fa-chart-line', 'Current', overallRank);
-    setText('#country-rank', 'fa-solid fa-flag', 'Country place', countryRank, countryFlagImg);
+    setText('#country-rank', 'fa-solid fa-flag', 'Country place', countryRank, true);
     setText('#world-rank', 'fa-solid fa-earth-americas', 'World', overallRank);
 }
 
@@ -141,8 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.hidden = false;
             // render grid (lazy load data first time)
             if (!cveGridRendered) {
-                await renderCveGrid();
-                cveGridRendered = true;
+                cveGridRendered = await renderCveGrid();
             }
             const firstFocusable = modal.querySelector('.cve-close');
             if (firstFocusable) firstFocusable.focus();
@@ -262,41 +315,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
         membersDataPromise = (async () => {
             try {
-                const res = await fetch('assets/data/members.json');
-                if (res.ok) {
-                    const list = await res.json();
-                    if (Array.isArray(list)) {
-                        list.forEach(m => {
-                            if (!m || !m.name) return;
-                            const memberInfo = {
-                                id: m.id || m.name.toLowerCase(),
-                                name: m.name,
-                                avatar: m.avatar || `assets/images/${(m.id || m.name).toLowerCase()}.png`,
-                                role: m.role || 'Member',
-                                quote: m.quote || '',
-                                quoteClass: m.quoteClass || 'quote',
-                                blog: m.blog || null,
-                                ctftime: m.ctftime || null
-                            };
-
-                            if (m.id) TEAM_MEMBERS[m.id.toLowerCase().trim()] = memberInfo;
-                            TEAM_MEMBERS[m.name.toLowerCase().trim()] = memberInfo;
-
-                            if (Array.isArray(m.aliases)) {
-                                m.aliases.forEach(alias => {
-                                    if (alias) TEAM_MEMBERS[String(alias).toLowerCase().trim()] = memberInfo;
-                                });
-                            }
-                        });
-
-                        // Render both sections if present on current page
-                        renderTeamProfiles(list);
-                        renderMembersList(list);
-
-                        return list;
-                    }
+                const res = await fetchWithTimeout('assets/data/members.json');
+                if (!res.ok) {
+                    throw new Error(`members.json request failed: HTTP ${res.status}`);
                 }
+                const list = await res.json();
+                if (!Array.isArray(list)) throw new Error('members.json root must be an array.');
+
+                list.forEach(m => {
+                    if (!m || !m.name) return;
+                    const memberInfo = {
+                        id: m.id || m.name.toLowerCase(),
+                        name: m.name,
+                        avatar: m.avatar || `assets/images/${(m.id || m.name).toLowerCase()}.png`,
+                        role: m.role || 'Member',
+                        quote: m.quote || '',
+                        quoteClass: m.quoteClass || 'quote',
+                        blog: m.blog || null,
+                        ctftime: m.ctftime || null
+                    };
+
+                    if (m.id) TEAM_MEMBERS[m.id.toLowerCase().trim()] = memberInfo;
+                    TEAM_MEMBERS[m.name.toLowerCase().trim()] = memberInfo;
+
+                    if (Array.isArray(m.aliases)) {
+                        m.aliases.forEach(alias => {
+                            if (alias) TEAM_MEMBERS[String(alias).toLowerCase().trim()] = memberInfo;
+                        });
+                    }
+                });
+
+                renderTeamProfiles(list);
+                renderMembersList(list);
+                return list;
             } catch (e) {
+                membersDataPromise = null;
                 console.warn('Failed to load members.json', e);
             }
             return [];
@@ -305,8 +358,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return membersDataPromise;
     }
 
-    // Load members immediately on script initialization
-    loadMembersData();
+    const pageNeedsMembers = Boolean(
+        document.getElementById('profile-container') ||
+        document.getElementById('members-list') ||
+        document.getElementById('cve-modal')
+    );
+    if (pageNeedsMembers) loadMembersData();
 
     function getFinderInfo(finderInput) {
         if (!finderInput) return null;
@@ -335,7 +392,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadCveList() {
         const listUrl = 'assets/data/cves-list.json';
         try {
-            const res = await fetch(listUrl);
+            const res = await fetchWithTimeout(listUrl);
+            if (!res.ok) throw new Error(`cves-list.json request failed: HTTP ${res.status}`);
             const rawList = await res.json();
             if (!Array.isArray(rawList)) return [];
             return rawList.map(item => {
@@ -383,52 +441,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
         cveStorePromise = (async () => {
             try {
-                const res = await fetch('assets/data/cves-local.json');
-                if (res.ok) {
-                    const text = await res.text();
-                    try {
-                        const data = JSON.parse(text);
-                        if (Array.isArray(data)) {
-                            data.forEach(item => {
-                                if (item && item.cveMetadata && item.cveMetadata.cveId) {
-                                    cveStore[item.cveMetadata.cveId] = item;
-                                }
-                            });
-                        } else if (data && data.dataType === "CVE_RECORD" && data.cveMetadata && data.cveMetadata.cveId) {
-                            cveStore[data.cveMetadata.cveId] = data;
-                        } else if (typeof data === 'object' && data !== null) {
-                            Object.assign(cveStore, data);
-                        }
-                    } catch (parseErr) {
-                        // Fallback: Support concatenated multi-JSON objects (NDJSON / raw paste)
-                        let depth = 0, start = -1, inString = false, escape = false;
-                        for (let i = 0; i < text.length; i++) {
-                            const char = text[i];
-                            if (escape) { escape = false; continue; }
-                            if (char === '\\') { escape = true; continue; }
-                            if (char === '"') { inString = !inString; continue; }
-                            if (!inString) {
-                                if (char === '{') {
-                                    if (depth === 0) start = i;
-                                    depth++;
-                                } else if (char === '}') {
-                                    depth--;
-                                    if (depth === 0 && start !== -1) {
-                                        try {
-                                            const item = JSON.parse(text.slice(start, i + 1));
-                                            if (item && item.cveMetadata && item.cveMetadata.cveId) {
-                                                cveStore[item.cveMetadata.cveId] = item;
-                                            }
-                                        } catch (e) { }
-                                        start = -1;
-                                    }
+                const res = await fetchWithTimeout('assets/data/cves-local.json');
+                if (!res.ok) {
+                    throw new Error(`cves-local.json request failed: HTTP ${res.status}`);
+                }
+                const text = await res.text();
+                try {
+                    const data = JSON.parse(text);
+                    if (Array.isArray(data)) {
+                        data.forEach(item => {
+                            if (item && item.cveMetadata && item.cveMetadata.cveId) {
+                                cveStore[item.cveMetadata.cveId] = item;
+                            }
+                        });
+                    } else if (data && data.dataType === "CVE_RECORD" && data.cveMetadata && data.cveMetadata.cveId) {
+                        cveStore[data.cveMetadata.cveId] = data;
+                    } else if (typeof data === 'object' && data !== null) {
+                        Object.assign(cveStore, data);
+                    }
+                } catch (parseErr) {
+                    // Fallback: Support concatenated multi-JSON objects (NDJSON / raw paste)
+                    let depth = 0, start = -1, inString = false, escape = false;
+                    for (let i = 0; i < text.length; i++) {
+                        const char = text[i];
+                        if (escape) { escape = false; continue; }
+                        if (char === '\\') { escape = true; continue; }
+                        if (char === '"') { inString = !inString; continue; }
+                        if (!inString) {
+                            if (char === '{') {
+                                if (depth === 0) start = i;
+                                depth++;
+                            } else if (char === '}') {
+                                depth--;
+                                if (depth === 0 && start !== -1) {
+                                    try {
+                                        const item = JSON.parse(text.slice(start, i + 1));
+                                        if (item && item.cveMetadata && item.cveMetadata.cveId) {
+                                            cveStore[item.cveMetadata.cveId] = item;
+                                        }
+                                    } catch (e) { }
+                                    start = -1;
                                 }
                             }
                         }
                     }
                 }
             } catch (e) {
+                cveStorePromise = null;
                 console.warn('Failed to load cves-local.json', e);
+                return cveStore;
             }
 
             cveStoreInitialized = true;
@@ -446,65 +507,108 @@ document.addEventListener('DOMContentLoaded', () => {
         return /^CVE-\d{4}-\d{4,}$/.test(cveId);
     }
 
+    function createTextElement(tagName, className = '', text = '') {
+        const element = document.createElement(tagName);
+        if (className) element.className = className;
+        if (text !== null && text !== undefined) element.textContent = String(text);
+        return element;
+    }
+
+    function appendIcon(element, iconClass) {
+        const icon = document.createElement('i');
+        icon.className = iconClass;
+        element.appendChild(icon);
+        return icon;
+    }
+
+    function getSafeHttpUrl(value) {
+        if (!value) return null;
+        try {
+            const url = new URL(String(value), window.location.href);
+            return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : null;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    function createDetailBox(title, extraClass = '') {
+        const box = createTextElement('div', `detail-box${extraClass ? ` ${extraClass}` : ''}`);
+        box.appendChild(createTextElement('div', 'box-title', title));
+        const content = createTextElement('div', 'box-content');
+        box.appendChild(content);
+        return { box, content };
+    }
+
     function renderDetailView(container, record, cveId, finders = [], inlineItem = null) {
-        // Setup data
         const cna = record.containers && record.containers.cna ? record.containers.cna : {};
         const meta = record.cveMetadata || {};
         const hasCna = Object.keys(cna).length > 0;
         const isReserved = meta.state === 'RESERVED' || !hasCna;
+        const title = cna.title || inlineItem?.title || (isReserved ? `${cveId} — Advisory Record Reserved` : (meta.cveId || cveId));
+        const datePub = meta.datePublished ? new Date(meta.datePublished).toLocaleDateString() : (isReserved ? 'Pending Publication' : 'N/A');
+        const assigner = meta.assignerShortName || (isReserved ? 'MITRE / CNA' : 'N/A');
 
-        let title = cna.title || inlineItem?.title || (isReserved ? `${cveId} — Advisory Record Reserved` : (meta.cveId || cveId));
-        let datePub = meta.datePublished ? new Date(meta.datePublished).toLocaleDateString() : (isReserved ? 'Pending Publication' : 'N/A');
-        let assigner = meta.assignerShortName || (isReserved ? 'MITRE / CNA' : 'N/A');
+        container.replaceChildren();
 
-        let html = `
-            <div class="cve-detail-header">
-                <button type="button" class="cve-back-btn" id="cve-back-btn" aria-label="Back to CVE list"><i class="fa-solid fa-arrow-left"></i> ALL CVES</button>
-                <h2>${title}</h2>
-                <div class="cve-meta-tags">
-                    <span class="cve-tag tag-id">${meta.cveId || cveId}</span>
-                    <span class="cve-tag tag-date">Published: ${datePub}</span>
-                    <span class="cve-tag tag-assigner">Assigner: ${assigner}</span>
-                    ${isReserved ? '<span class="cve-tag tag-status badge-pending">STATUS: RESERVED</span>' : ''}
-                </div>
-            </div>
-            <div class="cve-detail-body">
-        `;
+        const header = createTextElement('div', 'cve-detail-header');
+        const backBtn = createTextElement('button', 'cve-back-btn');
+        backBtn.type = 'button';
+        backBtn.id = 'cve-back-btn';
+        backBtn.setAttribute('aria-label', 'Back to CVE list');
+        appendIcon(backBtn, 'fa-solid fa-arrow-left');
+        backBtn.appendChild(document.createTextNode(' ALL CVES'));
+        header.appendChild(backBtn);
+        header.appendChild(createTextElement('h2', '', title));
 
-        // Discovered By / Finders section
+        const metaTags = createTextElement('div', 'cve-meta-tags');
+        metaTags.appendChild(createTextElement('span', 'cve-tag tag-id', meta.cveId || cveId));
+        metaTags.appendChild(createTextElement('span', 'cve-tag tag-date', `Published: ${datePub}`));
+        metaTags.appendChild(createTextElement('span', 'cve-tag tag-assigner', `Assigner: ${assigner}`));
+        if (isReserved) {
+            metaTags.appendChild(createTextElement('span', 'cve-tag tag-status badge-pending', 'STATUS: RESERVED'));
+        }
+        header.appendChild(metaTags);
+        container.appendChild(header);
+
+        const detailBody = createTextElement('div', 'cve-detail-body');
         const resolvedFinders = (finders || []).map(getFinderInfo).filter(Boolean);
         if (resolvedFinders.length > 0) {
-            html += `
-                <div class="detail-box cve-finders-box">
-                    <div class="box-title"><i class="fa-solid fa-award"></i> Discovered By</div>
-                    <div class="box-content">
-                        <div class="finders-grid">
-                            ${resolvedFinders.map(f => `
-                                <div class="finder-card">
-                                    <img src="${f.avatar}" class="finder-card-avatar" alt="${f.name}" onerror="this.onerror=null;this.src='assets/images/v1t.png';">
-                                    <div class="finder-card-details">
-                                        <div class="finder-card-name">${f.name}</div>
-                                        <div class="finder-card-role">${f.role}</div>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                </div>
-            `;
+            const { box, content } = createDetailBox('', 'cve-finders-box');
+            const boxTitle = box.querySelector('.box-title');
+            boxTitle.replaceChildren();
+            appendIcon(boxTitle, 'fa-solid fa-award');
+            boxTitle.appendChild(document.createTextNode(' Discovered By'));
+            const grid = createTextElement('div', 'finders-grid');
+            resolvedFinders.forEach(finder => {
+                const finderCard = createTextElement('div', 'finder-card');
+                const avatar = document.createElement('img');
+                avatar.src = finder.avatar;
+                avatar.className = 'finder-card-avatar';
+                avatar.alt = finder.name;
+                avatar.onerror = () => {
+                    avatar.onerror = null;
+                    avatar.src = 'assets/images/v1t.png';
+                };
+                const details = createTextElement('div', 'finder-card-details');
+                details.appendChild(createTextElement('div', 'finder-card-name', finder.name));
+                details.appendChild(createTextElement('div', 'finder-card-role', finder.role));
+                finderCard.append(avatar, details);
+                grid.appendChild(finderCard);
+            });
+            content.appendChild(grid);
+            detailBody.appendChild(box);
         }
 
-        // Inline Target Scope (if specified in cves-list.json)
         if (inlineItem && inlineItem.target) {
-            html += `
-                <div class="detail-box cve-target-box">
-                    <div class="box-title"><i class="fa-solid fa-crosshairs"></i> Target Scope</div>
-                    <div class="box-content"><strong>${inlineItem.target}</strong></div>
-                </div>
-            `;
+            const { box, content } = createDetailBox('', 'cve-target-box');
+            const boxTitle = box.querySelector('.box-title');
+            boxTitle.replaceChildren();
+            appendIcon(boxTitle, 'fa-solid fa-crosshairs');
+            boxTitle.appendChild(document.createTextNode(' Target Scope'));
+            content.appendChild(createTextElement('strong', '', inlineItem.target));
+            detailBody.appendChild(box);
         }
 
-        // Description
         let descText = '';
         if (cna.descriptions && cna.descriptions[0] && cna.descriptions[0].value) {
             descText = cna.descriptions[0].value;
@@ -515,14 +619,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (descText) {
-            html += `<div class="detail-box">
-                <div class="box-title">Description</div>
-                <div class="box-content">${descText}</div>
-            </div>`;
+            const { box, content } = createDetailBox('Description');
+            content.textContent = descText;
+            detailBody.appendChild(box);
         }
 
-        // Metrics & Weakness
-        let metricsHtml = '';
         let allMetrics = [];
         if (cna.metrics) allMetrics = allMetrics.concat(cna.metrics);
         if (record.containers && record.containers.adp) {
@@ -531,140 +632,158 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        const metricsContent = createTextElement('div');
         if (allMetrics.length > 0) {
             allMetrics.forEach(m => {
                 const cvss = m.cvssV3_1 || m.cvssV3 || m.cvssV4_0;
                 if (cvss) {
-                    const sevClass = (cvss.baseSeverity || 'unknown').toLowerCase();
+                    const rawSeverity = String(cvss.baseSeverity || '').toLowerCase();
+                    const sevClass = ['critical', 'high', 'medium', 'low'].includes(rawSeverity) ? rawSeverity : 'unknown';
                     const score = cvss.baseScore ? `${cvss.baseScore} ` : '';
-                    metricsHtml += `<div class="metric-item">
-                        <span class="metric-score badge-${sevClass}">${score}${cvss.baseSeverity || 'CVSS'}</span>
-                        ${cvss.vectorString ? `<span class="metric-vector">${cvss.vectorString}</span>` : ''}
-                    </div>`;
+                    const metricItem = createTextElement('div', 'metric-item');
+                    metricItem.appendChild(createTextElement('span', `metric-score badge-${sevClass}`, `${score}${cvss.baseSeverity || 'CVSS'}`));
+                    if (cvss.vectorString) {
+                        metricItem.appendChild(createTextElement('span', 'metric-vector', cvss.vectorString));
+                    }
+                    metricsContent.appendChild(metricItem);
                 }
             });
         } else if (inlineItem && inlineItem.threat) {
-            const sevClass = inlineItem.threat.toLowerCase();
-            metricsHtml = `<div class="metric-item">
-                <span class="metric-score badge-${sevClass}">${inlineItem.threat} (Inline Assessment)</span>
-            </div>`;
+            const sevClass = String(inlineItem.threat).toLowerCase();
+            const metricItem = createTextElement('div', 'metric-item');
+            metricItem.appendChild(createTextElement('span', `metric-score badge-${sevClass}`, `${inlineItem.threat} (Inline Assessment)`));
+            metricsContent.appendChild(metricItem);
         }
 
-        let weaknessHtml = '';
-        if (cna.problemTypes && cna.problemTypes[0] && cna.problemTypes[0].descriptions) {
+        const weaknessContent = createTextElement('div');
+        if (cna.problemTypes && cna.problemTypes[0] && cna.problemTypes[0].descriptions && cna.problemTypes[0].descriptions[0]) {
             const desc = cna.problemTypes[0].descriptions[0];
-            weaknessHtml = `<div class="weakness-item">${desc.cweId ? `<strong class="cwe-id-badge">${desc.cweId}</strong> ` : ''}${desc.description || ''}</div>`;
+            const weakness = createTextElement('div', 'weakness-item');
+            if (desc.cweId) {
+                weakness.appendChild(createTextElement('strong', 'cwe-id-badge', desc.cweId));
+                weakness.appendChild(document.createTextNode(' '));
+            }
+            weakness.appendChild(document.createTextNode(desc.description || ''));
+            weaknessContent.appendChild(weakness);
         } else if (inlineItem && inlineItem.cwe) {
-            weaknessHtml = `<div class="weakness-item"><strong class="cwe-id-badge">${inlineItem.cwe}</strong> (Inline)</div>`;
+            const weakness = createTextElement('div', 'weakness-item');
+            weakness.appendChild(createTextElement('strong', 'cwe-id-badge', inlineItem.cwe));
+            weakness.appendChild(document.createTextNode(' (Inline)'));
+            weaknessContent.appendChild(weakness);
         }
 
-        if (metricsHtml || weaknessHtml) {
-            html += `<div class="detail-row">`;
-            if (metricsHtml) {
-                html += `<div class="detail-box flex-1">
-                    <div class="box-title">Metrics (CVSS)</div>
-                    <div class="box-content">${metricsHtml}</div>
-                </div>`;
+        if (metricsContent.childNodes.length || weaknessContent.childNodes.length) {
+            const detailRow = createTextElement('div', 'detail-row');
+            if (metricsContent.childNodes.length) {
+                const { box, content } = createDetailBox('Metrics (CVSS)', 'flex-1');
+                content.append(...metricsContent.childNodes);
+                detailRow.appendChild(box);
             }
-            if (weaknessHtml) {
-                html += `<div class="detail-box flex-1">
-                    <div class="box-title">Weakness (CWE)</div>
-                    <div class="box-content">${weaknessHtml}</div>
-                </div>`;
+            if (weaknessContent.childNodes.length) {
+                const { box, content } = createDetailBox('Weakness (CWE)', 'flex-1');
+                content.append(...weaknessContent.childNodes);
+                detailRow.appendChild(box);
             }
-            html += `</div>`;
+            detailBody.appendChild(detailRow);
         }
 
-        // Affected Products
         if (cna.affected && cna.affected.length > 0) {
-            let affectedHtml = `<ul class="affected-list">`;
-            cna.affected.forEach(a => {
-                let text = `<strong>${a.vendor || 'Unknown'}</strong> / <span>${a.product || 'Unknown'}</span>`;
-                if (a.versions && a.versions.length > 0) {
-                    let v = a.versions[0];
-                    if (v.lessThanOrEqual) text += ` <span class="version-badge"><= ${v.lessThanOrEqual}</span>`;
-                    else if (v.version && v.version !== 'unspecified') text += ` <span class="version-badge">v${v.version}</span>`;
+            const { box, content } = createDetailBox('Affected Products');
+            const affectedList = createTextElement('ul', 'affected-list');
+            cna.affected.forEach(affected => {
+                const item = document.createElement('li');
+                item.appendChild(createTextElement('strong', '', affected.vendor || 'Unknown'));
+                item.appendChild(document.createTextNode(' / '));
+                item.appendChild(createTextElement('span', '', affected.product || 'Unknown'));
+                if (affected.versions && affected.versions.length > 0) {
+                    const version = affected.versions[0];
+                    if (version.lessThanOrEqual) {
+                        item.appendChild(document.createTextNode(' '));
+                        item.appendChild(createTextElement('span', 'version-badge', `<= ${version.lessThanOrEqual}`));
+                    } else if (version.version && version.version !== 'unspecified') {
+                        item.appendChild(document.createTextNode(' '));
+                        item.appendChild(createTextElement('span', 'version-badge', `v${version.version}`));
+                    }
                 }
-                affectedHtml += `<li>${text}</li>`;
+                affectedList.appendChild(item);
             });
-            affectedHtml += `</ul>`;
-            html += `<div class="detail-box">
-                <div class="box-title">Affected Products</div>
-                <div class="box-content">${affectedHtml}</div>
-            </div>`;
+            content.appendChild(affectedList);
+            detailBody.appendChild(box);
         }
 
-        // Solution
-        if (cna.solutions && cna.solutions[0]) {
-            html += `<div class="detail-box">
-                <div class="box-title">Solution</div>
-                <div class="box-content">${cna.solutions[0].value}</div>
-            </div>`;
+        if (cna.solutions && cna.solutions[0] && cna.solutions[0].value) {
+            const { box, content } = createDetailBox('Solution');
+            content.textContent = cna.solutions[0].value;
+            detailBody.appendChild(box);
         }
 
-        // References & Verification
-        let refHtml = `<ul class="ref-list">`;
-        let hasRefs = false;
+        const referenceList = createTextElement('ul', 'ref-list');
         if (cna.references && cna.references.length > 0) {
-            cna.references.forEach(r => {
-                if (r.url) {
-                    refHtml += `<li><a href="${r.url}" target="_blank" rel="noopener noreferrer">${r.url}</a></li>`;
-                    hasRefs = true;
-                }
+            cna.references.forEach(reference => {
+                const safeUrl = getSafeHttpUrl(reference.url);
+                if (!safeUrl) return;
+                const item = document.createElement('li');
+                const link = createTextElement('a', '', reference.url);
+                link.href = safeUrl;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                item.appendChild(link);
+                referenceList.appendChild(item);
             });
         }
         if (isValidCveId(cveId)) {
-            refHtml += `<li><a href="https://www.cve.org/CVERecord?id=${cveId}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> Official MITRE CVE Record (${cveId})</a></li>`;
-            refHtml += `<li><a href="https://nvd.nist.gov/vuln/detail/${cveId}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> NIST National Vulnerability Database (${cveId})</a></li>`;
-            hasRefs = true;
+            [
+                [`https://www.cve.org/CVERecord?id=${encodeURIComponent(cveId)}`, `Official MITRE CVE Record (${cveId})`],
+                [`https://nvd.nist.gov/vuln/detail/${encodeURIComponent(cveId)}`, `NIST National Vulnerability Database (${cveId})`]
+            ].forEach(([href, label]) => {
+                const item = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = href;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                appendIcon(link, 'fa-solid fa-arrow-up-right-from-square');
+                link.appendChild(document.createTextNode(` ${label}`));
+                item.appendChild(link);
+                referenceList.appendChild(item);
+            });
         }
-        refHtml += `</ul>`;
 
-        if (hasRefs) {
-            html += `<div class="detail-box">
-                <div class="box-title">References & Verification</div>
-                <div class="box-content">${refHtml}</div>
-            </div>`;
+        if (referenceList.childNodes.length) {
+            const { box, content } = createDetailBox('References & Verification');
+            content.appendChild(referenceList);
+            detailBody.appendChild(box);
         }
 
-        html += `</div>`; // end detail-body
+        container.appendChild(detailBody);
 
-        // Raw JSON
         const rawJson = JSON.stringify(record, null, 2);
-        html += `
-            <div class="cve-raw-json">
-                <div class="raw-header">
-                    <span>Raw JSON Data</span>
-                    <button class="copy-json-btn">Copy</button>
-                </div>
-                <pre><code id="raw-json-content">${rawJson}</code></pre>
-            </div>
-        `;
+        const rawContainer = createTextElement('div', 'cve-raw-json');
+        const rawHeader = createTextElement('div', 'raw-header');
+        rawHeader.appendChild(createTextElement('span', '', 'Raw JSON Data'));
+        const copyBtn = createTextElement('button', 'copy-json-btn', 'Copy');
+        copyBtn.type = 'button';
+        rawHeader.appendChild(copyBtn);
+        const pre = document.createElement('pre');
+        const code = createTextElement('code', '', rawJson);
+        code.id = 'raw-json-content';
+        pre.appendChild(code);
+        rawContainer.append(rawHeader, pre);
+        container.appendChild(rawContainer);
 
-        container.innerHTML = html;
-
-        // Copy button listener
-        const copyBtn = container.querySelector('.copy-json-btn');
-        if (copyBtn) {
-            copyBtn.addEventListener('click', () => {
-                navigator.clipboard.writeText(rawJson).then(() => {
-                    copyBtn.textContent = 'Copied!';
-                    setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
-                }).catch(err => {
-                    console.error('Failed to copy: ', err);
-                });
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(rawJson).then(() => {
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
             });
-        }
+        });
 
-        // Back to list button listener (Mobile split mode)
-        const backBtn = container.querySelector('#cve-back-btn');
-        if (backBtn) {
-            backBtn.addEventListener('click', () => {
-                const modal = document.getElementById('cve-modal');
-                if (modal) modal.classList.remove('split-mode');
-                document.querySelectorAll('.cve-card.active').forEach(c => c.classList.remove('active'));
-            });
-        }
+        backBtn.addEventListener('click', () => {
+            const modal = document.getElementById('cve-modal');
+            if (modal) modal.classList.remove('split-mode');
+            document.querySelectorAll('.cve-card.active').forEach(c => c.classList.remove('active'));
+        });
     }
 
     function getSeverityClass(record, inlineItem = null) {
@@ -837,42 +956,52 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
-                let badgesHtml = `<span class="cwe">${cwe}</span>`;
+                popup.replaceChildren();
+                popup.appendChild(createTextElement('div', 'title', title));
+
+                if (resolvedFinders.length > 0) {
+                    const popupFinders = createTextElement('div', 'cve-popup-finders');
+                    const findersLabel = createTextElement('span', 'finders-label');
+                    appendIcon(findersLabel, 'fa-solid fa-user-shield');
+                    findersLabel.appendChild(document.createTextNode(' Finder:'));
+                    popupFinders.appendChild(findersLabel);
+
+                    const findersChips = createTextElement('div', 'finders-chips');
+                    resolvedFinders.forEach(finder => {
+                        const chip = createTextElement('span', 'finder-chip');
+                        chip.title = finder.role;
+                        const avatar = document.createElement('img');
+                        avatar.src = finder.avatar;
+                        avatar.className = 'finder-chip-avatar';
+                        avatar.alt = finder.name;
+                        avatar.onerror = () => {
+                            avatar.onerror = null;
+                            avatar.src = 'assets/images/v1t.png';
+                        };
+                        chip.append(avatar, createTextElement('span', 'finder-chip-name', finder.name));
+                        findersChips.appendChild(chip);
+                    });
+                    popupFinders.appendChild(findersChips);
+                    popup.appendChild(popupFinders);
+                }
+
+                const metrics = createTextElement('div', 'cwe-metrics');
+                metrics.appendChild(createTextElement('span', 'cwe', cwe));
                 if (baseScore !== '' || baseSeverity !== '') {
                     const scoreText = [baseScore, baseSeverity].filter(Boolean).join(' | ');
-                    badgesHtml += `<span class="severity-badge">${scoreText}</span>`;
+                    metrics.appendChild(createTextElement('span', 'severity-badge', scoreText));
                 } else if (inlineItem?.threat) {
-                    badgesHtml += `<span class="severity-badge badge-${inlineItem.threat.toLowerCase()}">${inlineItem.threat}</span>`;
+                    const rawThreat = String(inlineItem.threat).toLowerCase();
+                    const threatClass = ['critical', 'high', 'medium', 'low'].includes(rawThreat) ? rawThreat : 'pending';
+                    metrics.appendChild(createTextElement('span', `severity-badge badge-${threatClass}`, inlineItem.threat));
                 } else if (isReserved) {
-                    badgesHtml += `<span class="severity-badge badge-pending">PENDING</span>`;
+                    metrics.appendChild(createTextElement('span', 'severity-badge badge-pending', 'PENDING'));
                 }
-
-                let findersPopupHtml = '';
-                if (resolvedFinders.length > 0) {
-                    findersPopupHtml = `
-                        <div class="cve-popup-finders">
-                            <span class="finders-label"><i class="fa-solid fa-user-shield"></i> Finder:</span>
-                            <div class="finders-chips">
-                                ${resolvedFinders.map(f => `
-                                    <span class="finder-chip" title="${f.role}">
-                                        <img src="${f.avatar}" class="finder-chip-avatar" alt="${f.name}" onerror="this.onerror=null;this.src='assets/images/v1t.png';">
-                                        <span class="finder-chip-name">${f.name}</span>
-                                    </span>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
+                popup.appendChild(metrics);
+                popup.appendChild(createTextElement('div', 'desc', desc));
+                if (vectorString) {
+                    popup.appendChild(createTextElement('div', 'cvss', vectorString));
                 }
-
-                const vectorHtml = vectorString ? `<div class="cvss">${vectorString}</div>` : '';
-
-                popup.innerHTML = `
-                    <div class="title">${title}</div>
-                    ${findersPopupHtml}
-                    <div class="cwe-metrics">${badgesHtml}</div>
-                    <div class="desc">${desc}</div>
-                    ${vectorHtml}
-                `;
             } catch (err) {
                 console.warn('Failed to refresh popup content', cveId, err);
             }
@@ -954,18 +1083,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         renderDetailView(detailView, current || makePlaceholderCveRecord(cveId), cveId, finders, inlineItem);
                         try {
                             const apiUrl = `https://cveawg.mitre.org/api/cve/${cveId}`;
-                            const r = await fetch(apiUrl, { cache: 'no-store' });
-                            if (r.ok) {
-                                const json = await r.json();
-                                cveStore[cveId] = json;
-                                if (container.classList.contains('active')) {
-                                    renderDetailView(detailView, json, cveId, finders, inlineItem);
-                                }
-                                const sevClass = getSeverityClass(json, inlineItem);
-                                if (sevClass) {
-                                    container.classList.remove('severity-pending');
-                                    container.classList.add(sevClass);
-                                }
+                            const r = await fetchWithTimeout(apiUrl, { cache: 'no-store' });
+                            if (!r.ok) throw new Error(`MITRE request failed: HTTP ${r.status}`);
+                            const json = await r.json();
+                            cveStore[cveId] = json;
+                            if (container.classList.contains('active')) {
+                                renderDetailView(detailView, json, cveId, finders, inlineItem);
+                            }
+                            const sevClass = getSeverityClass(json, inlineItem);
+                            if (sevClass) {
+                                container.classList.remove('severity-pending');
+                                container.classList.add(sevClass);
                             }
                         } catch (e) {
                             // ignore API network error
@@ -985,7 +1113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.cve-popup').forEach(p => p.remove());
 
         const grid = document.getElementById('cve-grid');
-        if (!grid) return;
+        if (!grid) return false;
         grid.innerHTML = '';
 
         // Fetch all files ONCE and cache in RAM
@@ -994,6 +1122,7 @@ document.addEventListener('DOMContentLoaded', () => {
             getOrInitCveStore(),
             loadMembersData()
         ]);
+        if (!listItems.length) return false;
 
         const findersMap = {};
         const listMetaMap = {};
@@ -1041,22 +1170,21 @@ document.addEventListener('DOMContentLoaded', () => {
             if (needsFetch) {
                 try {
                     const apiUrl = `https://cveawg.mitre.org/api/cve/${id}`;
-                    const r = await fetch(apiUrl, { cache: 'no-store' });
-                    if (r.ok) {
-                        const json = await r.json();
-                        store[id] = json;
-                        const card = cardsMap[id];
-                        if (card) {
-                            const sevClass = getSeverityClass(json, listMetaMap[id]);
-                            if (sevClass) {
-                                card.classList.remove('severity-pending');
-                                card.classList.add(sevClass);
-                            }
-                            if (card.classList.contains('active')) {
-                                const detailView = document.getElementById('cve-detail-view');
-                                if (detailView) {
-                                    renderDetailView(detailView, json, id, findersMap[id] || [], listMetaMap[id]);
-                                }
+                    const r = await fetchWithTimeout(apiUrl, { cache: 'no-store' });
+                    if (!r.ok) throw new Error(`MITRE request failed: HTTP ${r.status}`);
+                    const json = await r.json();
+                    store[id] = json;
+                    const card = cardsMap[id];
+                    if (card) {
+                        const sevClass = getSeverityClass(json, listMetaMap[id]);
+                        if (sevClass) {
+                            card.classList.remove('severity-pending');
+                            card.classList.add(sevClass);
+                        }
+                        if (card.classList.contains('active')) {
+                            const detailView = document.getElementById('cve-detail-view');
+                            if (detailView) {
+                                renderDetailView(detailView, json, id, findersMap[id] || [], listMetaMap[id]);
                             }
                         }
                     }
@@ -1065,6 +1193,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
+        return true;
     }
 
     // Article button: navigate to articles/ when clicked (keeps semantic button element)
@@ -1101,7 +1230,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.debugCves = {
             store: cveStore,
             getStore: getOrInitCveStore,
-            renderCveGrid: async () => { await renderCveGrid(); console.log('renderCveGrid done'); }
+            renderCveGrid: async () => { const rendered = await renderCveGrid(); console.log('renderCveGrid done', rendered); }
         };
     } catch (e) {
         /* ignore if window not writable */
@@ -1394,25 +1523,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? item.cwes.join(', ')
                 : (typeof item.cwes === 'string' && item.cwes.trim() ? item.cwes.trim() : (item.cwe || 'CWE-N/A'));
 
-            card.innerHTML = `
-                <div class="kev-card-head">
-                    <a href="https://nvd.nist.gov/vuln/detail/${encodeURIComponent(id)}" target="_blank" rel="noopener noreferrer" class="kev-cve-link">${id}</a>
-                    <span class="kev-threat-pill">${threat}</span>
-                </div>
-                <div class="kev-target-line">${vendor} • ${product}</div>
-                <div class="kev-desc-line">${desc}</div>
-                <div class="kev-card-footer">
-                    <span>${cwes}</span>
-                    <span>${date}</span>
-                </div>
-            `;
+            const head = createTextElement('div', 'kev-card-head');
+            const link = createTextElement('a', 'kev-cve-link', id);
+            link.href = `https://nvd.nist.gov/vuln/detail/${encodeURIComponent(id)}`;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            head.append(link, createTextElement('span', 'kev-threat-pill', threat));
+
+            const footer = createTextElement('div', 'kev-card-footer');
+            footer.append(
+                createTextElement('span', '', cwes),
+                createTextElement('span', '', date)
+            );
+
+            card.append(
+                head,
+                createTextElement('div', 'kev-target-line', `${vendor} • ${product}`),
+                createTextElement('div', 'kev-desc-line', desc),
+                footer
+            );
             return card;
         }
 
         function renderKevMarquee() {
             if (!group1 || !group2 || !kevList.length) return;
-            group1.innerHTML = '';
-            group2.innerHTML = '';
+            group1.replaceChildren();
+            group2.replaceChildren();
 
             kevList.forEach(item => {
                 group1.appendChild(createKevCard(item));
@@ -1657,16 +1793,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // 1. Local fallback data
-                const localRes = await fetch('assets/data/cisa-kev.json');
-                if (localRes.ok) {
-                    kevList = await localRes.json();
+                try {
+                    const localRes = await fetchWithTimeout('assets/data/cisa-kev.json');
+                    if (!localRes.ok) throw new Error(`Local KEV request failed: HTTP ${localRes.status}`);
+                    const localData = await localRes.json();
+                    if (!Array.isArray(localData)) throw new Error('Local KEV data must be an array.');
+                    kevList = localData;
                     sessionStorage.setItem('v1t_cisa_kev_v2', JSON.stringify(kevList));
                     renderKevMarquee();
+                } catch (localError) {
+                    console.warn('Local CISA KEV load notice:', localError);
                 }
 
                 // 2. Fetch fresh live feed from official CISA GitHub mirror (CORS enabled)
-                fetch('https://raw.githubusercontent.com/cisagov/kev-data/main/known_exploited_vulnerabilities.json')
-                    .then(res => res.json())
+                fetchWithTimeout('https://raw.githubusercontent.com/cisagov/kev-data/main/known_exploited_vulnerabilities.json')
+                    .then(res => {
+                        if (!res.ok) throw new Error(`Live KEV request failed: HTTP ${res.status}`);
+                        return res.json();
+                    })
                     .then(data => {
                         if (data && Array.isArray(data.vulnerabilities) && data.vulnerabilities.length) {
                             const fresh = data.vulnerabilities.slice(0, 12);
@@ -1752,7 +1896,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 2. Measure Latency Ping
             const t0 = performance.now();
             try {
-                await fetch('assets/images/V1t_fin.png?t=' + Date.now(), { method: 'HEAD', cache: 'no-store' });
+                await fetchWithTimeout('assets/images/V1t_fin.png?t=' + Date.now(), { method: 'HEAD', cache: 'no-store' });
                 const rtt = Math.round(performance.now() - t0);
                 if (tracePing) tracePing.textContent = `${rtt}ms RTT • TLS 1.3`;
             } catch (e) {
@@ -1769,7 +1913,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 4. Fetch Rich Ifconfig Data from ipwho.is (CORS enabled, full ifconfig.net fields)
             try {
                 let data = null;
-                const ipwhoRes = await fetch('https://ipwho.is/').catch(() => null);
+                const ipwhoRes = await fetchWithTimeout('https://ipwho.is/').catch(() => null);
                 if (ipwhoRes && ipwhoRes.ok) {
                     data = await ipwhoRes.json();
                 }
@@ -1829,7 +1973,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     };
                 } else {
                     // Fallback to cloudflare trace
-                    const cfRes = await fetch('https://1.1.1.1/cdn-cgi/trace').catch(() => null);
+                    const cfRes = await fetchWithTimeout('https://1.1.1.1/cdn-cgi/trace').catch(() => null);
                     if (cfRes && cfRes.ok) {
                         const text = await cfRes.text();
                         const ipMatch = text.match(/ip=([^\n]+)/);
