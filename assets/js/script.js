@@ -190,13 +190,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeBtn = document.getElementById('cve-close');
     let cveGridRendered = false;
     let cveGridItems = [];
-    let cveSortDirection = 'desc';
+    let cveSortMode = 'id-desc';
     const DEFAULT_CVE_FINDER_FILTERS = ['rawr', 'jaze'];
     let cveFinderFilters = new Set(DEFAULT_CVE_FINDER_FILTERS);
 
     if (showBtn && modal) {
         showBtn.addEventListener('click', async () => {
             modal.hidden = false;
+            cveSortMode = 'id-desc';
             cveFinderFilters = new Set(DEFAULT_CVE_FINDER_FILTERS);
             // render grid (lazy load data first time)
             if (!cveGridRendered) {
@@ -410,7 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return getFinderName(finderInput).toLowerCase();
     }
 
-    function compareCveItems(a, b) {
+    function compareCveIds(a, b, direction = 'desc') {
         const officialPattern = /^CVE-(\d{4})-(\d+)$/i;
         const aMatch = String(a.id || '').match(officialPattern);
         const bMatch = String(b.id || '').match(officialPattern);
@@ -429,27 +430,49 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        return cveSortDirection === 'desc' ? -result : result;
+        return direction === 'desc' ? -result : result;
+    }
+
+    function getCveSeverityRank(item) {
+        const record = cveStore[item.id] || cveStore[String(item.id || '').toLowerCase()] || null;
+        const severityClass = getSeverityClass(record, item);
+        return {
+            'severity-critical': 4,
+            'severity-high': 3,
+            'severity-medium': 2,
+            'severity-low': 1,
+            'severity-pending': 0
+        }[severityClass] ?? -1;
+    }
+
+    function compareCveItems(a, b) {
+        if (cveSortMode === 'severity-desc') {
+            const severityDifference = getCveSeverityRank(b) - getCveSeverityRank(a);
+            return severityDifference || compareCveIds(a, b, 'desc');
+        }
+
+        return compareCveIds(a, b, cveSortMode === 'id-asc' ? 'asc' : 'desc');
     }
 
     function updateCveFilterControls() {
         const toolbar = document.getElementById('cve-filter-toolbar');
         if (!toolbar) return;
 
-        toolbar.querySelectorAll('[data-cve-sort]').forEach(button => {
-            const isActive = button.dataset.cveSort === cveSortDirection;
-            button.classList.toggle('active', isActive);
-            button.setAttribute('aria-pressed', String(isActive));
-        });
+        const sortSelect = document.getElementById('cve-sort-select');
+        if (sortSelect) sortSelect.value = cveSortMode;
 
-        toolbar.querySelectorAll('[data-cve-finder]').forEach(button => {
-            const finderKey = button.dataset.cveFinder;
-            const isActive = finderKey === 'all'
-                ? cveFinderFilters.size === 0
-                : cveFinderFilters.has(finderKey);
-            button.classList.toggle('active', isActive);
-            button.setAttribute('aria-pressed', String(isActive));
-        });
+        const finderSelect = document.getElementById('cve-finder-select');
+        if (!finderSelect) return;
+
+        const defaultFiltersActive = DEFAULT_CVE_FINDER_FILTERS.length === cveFinderFilters.size
+            && DEFAULT_CVE_FINDER_FILTERS.every(key => cveFinderFilters.has(key));
+        if (cveFinderFilters.size === 0) {
+            finderSelect.value = 'all';
+        } else if (defaultFiltersActive) {
+            finderSelect.value = 'default';
+        } else if (cveFinderFilters.size === 1) {
+            finderSelect.value = Array.from(cveFinderFilters)[0];
+        }
     }
 
     function applyCveGridFilters() {
@@ -489,25 +512,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCveFilterControls();
     }
 
-    function createCveFilterButton(label, datasetName, datasetValue, title = '', count = null) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'cve-filter-btn';
-        button.dataset[datasetName] = datasetValue;
-        button.setAttribute('aria-pressed', 'false');
-        if (title) button.title = title;
-        button.append(document.createTextNode(label));
-
-        if (count !== null) {
-            const countBadge = document.createElement('span');
-            countBadge.className = 'cve-filter-count';
-            countBadge.textContent = String(count);
-            button.appendChild(countBadge);
-        }
-
-        return button;
-    }
-
     function renderCveFilterControls(listItems) {
         const toolbar = document.getElementById('cve-filter-toolbar');
         if (!toolbar) return;
@@ -532,63 +536,75 @@ document.addEventListener('DOMContentLoaded', () => {
 
         toolbar.replaceChildren();
 
-        const sortGroup = document.createElement('div');
-        sortGroup.className = 'cve-filter-group';
-        sortGroup.setAttribute('role', 'group');
-        sortGroup.setAttribute('aria-label', 'Sort by CVE ID');
-        sortGroup.append(
-            createCveFilterButton('CVE DESC', 'cveSort', 'desc', 'Sort CVE IDs from largest to smallest'),
-            createCveFilterButton('CVE ASC', 'cveSort', 'asc', 'Sort CVE IDs from smallest to largest')
-        );
+        const sortField = document.createElement('div');
+        sortField.className = 'cve-filter-field cve-sort-field';
+        const sortSelect = document.createElement('select');
+        sortSelect.id = 'cve-sort-select';
+        sortSelect.className = 'cve-filter-select';
+        sortSelect.setAttribute('aria-label', 'Sort CVEs');
+        [
+            ['id-desc', 'CVE: LARGE TO SMALL'],
+            ['id-asc', 'CVE: SMALL TO LARGE'],
+            ['severity-desc', 'SEVERITY: CRITICAL TO LOW']
+        ].forEach(([value, label]) => {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = label;
+            sortSelect.appendChild(option);
+        });
+        sortField.appendChild(sortSelect);
 
-        const divider = document.createElement('span');
-        divider.className = 'cve-filter-divider';
-        divider.setAttribute('aria-hidden', 'true');
+        const finderField = document.createElement('div');
+        finderField.className = 'cve-filter-field cve-finder-field';
+        const finderSelect = document.createElement('select');
+        finderSelect.id = 'cve-finder-select';
+        finderSelect.className = 'cve-filter-select';
+        finderSelect.setAttribute('aria-label', 'Filter CVEs by finder');
 
-        const finderGroup = document.createElement('div');
-        finderGroup.className = 'cve-filter-group cve-finder-filter-group';
-        finderGroup.setAttribute('role', 'group');
-        finderGroup.setAttribute('aria-label', 'Filter by finder');
-        finderGroup.appendChild(createCveFilterButton('ALL FINDERS', 'cveFinder', 'all'));
+        const defaultFinderOption = document.createElement('option');
+        defaultFinderOption.value = 'default';
+        defaultFinderOption.textContent = 'FINDER: RAWR + JAZE';
+        finderSelect.appendChild(defaultFinderOption);
+
+        const allFindersOption = document.createElement('option');
+        allFindersOption.value = 'all';
+        allFindersOption.textContent = 'FINDER: ALL';
+        finderSelect.appendChild(allFindersOption);
 
         Array.from(finderMap.entries())
             .sort((a, b) => a[1].name.localeCompare(b[1].name, undefined, { sensitivity: 'base' }))
             .forEach(([key, finder]) => {
-                finderGroup.appendChild(createCveFilterButton(
-                    finder.name,
-                    'cveFinder',
-                    key,
-                    `Show CVEs found by ${finder.name}`,
-                    finder.count
-                ));
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = `${finder.name.toUpperCase()} (${finder.count})`;
+                finderSelect.appendChild(option);
             });
+        finderField.appendChild(finderSelect);
 
         const status = document.createElement('output');
         status.id = 'cve-filter-status';
         status.className = 'cve-filter-status';
         status.setAttribute('aria-live', 'polite');
 
-        toolbar.append(sortGroup, divider, finderGroup, status);
+        toolbar.append(sortField, finderField, status);
 
-        toolbar.querySelectorAll('[data-cve-sort]').forEach(button => {
-            button.addEventListener('click', () => {
-                cveSortDirection = button.dataset.cveSort;
-                applyCveGridFilters();
-            });
+        sortSelect.addEventListener('change', () => {
+            cveSortMode = sortSelect.value;
+            applyCveGridFilters();
         });
 
-        toolbar.querySelectorAll('[data-cve-finder]').forEach(button => {
-            button.addEventListener('click', () => {
-                const finderKey = button.dataset.cveFinder;
-                if (finderKey === 'all') {
-                    cveFinderFilters.clear();
-                } else if (cveFinderFilters.has(finderKey)) {
-                    cveFinderFilters.delete(finderKey);
-                } else {
-                    cveFinderFilters.add(finderKey);
-                }
-                applyCveGridFilters();
-            });
+        finderSelect.addEventListener('change', () => {
+            const finderKey = finderSelect.value;
+            if (finderKey === 'all') {
+                cveFinderFilters.clear();
+            } else if (finderKey === 'default') {
+                cveFinderFilters = new Set(
+                    DEFAULT_CVE_FINDER_FILTERS.filter(key => finderMap.has(key))
+                );
+            } else {
+                cveFinderFilters = new Set([finderKey]);
+            }
+            applyCveGridFilters();
         });
 
         updateCveFilterControls();
@@ -1374,6 +1390,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (detailView) {
                 renderDetailView(detailView, record, cveId, finders, inlineItem);
             }
+        }
+
+        if (cveSortMode === 'severity-desc') {
+            applyCveGridFilters();
         }
     }
 
