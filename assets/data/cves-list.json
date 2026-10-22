@@ -182,6 +182,66 @@
     ]
   },
   {
+    "id": "CVE-2026-33368",
+    "finders": [
+      "Winky"
+    ]
+  },
+  {
+    "id": "CVE-2026-4800",
+    "finders": [
+      "Winky"
+    ]
+  },
+  {
+    "id": "CVE-2026-39368",
+    "finders": [
+      "Winky"
+    ]
+  },
+  {
+    "id": "CVE-2026-39369",
+    "finders": [
+      "Winky"
+    ]
+  },
+  {
+    "id": "CVE-2026-39370",
+    "finders": [
+      "Winky"
+    ]
+  },
+  {
+    "id": "CVE-2026-42424",
+    "finders": [
+      "Winky"
+    ]
+  },
+  {
+    "id": "CVE-2026-43526",
+    "finders": [
+      "Winky"
+    ]
+  },
+  {
+    "id": "CVE-2026-44974",
+    "finders": [
+      "Winky"
+    ]
+  },
+  {
+    "id": "CVE-2026-66432",
+    "finders": [
+      "Winky"
+    ]
+  },
+  {
+    "id": "CVE-2026-101602",
+    "finders": [
+      "Winky"
+    ]
+  },
+  {
     "id": "CVE-2026-LFI",
     "finders": [
       "Rawr",
