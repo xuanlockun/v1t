@@ -3215,8 +3215,117 @@ td:not(.event) { text-align: center; }
 }
 .cve-close { position: absolute; right: 15px; top: 15px; background: #d32f2f; color: white; border: 3px solid #111; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; cursor: pointer; box-shadow: 4px 4px 0 #111; z-index: 9999; transition: all 0.2s; }
 .cve-close:hover { transform: translateY(-2px) scale(1.05); box-shadow: 6px 6px 0 #111; background: #f44336; }
-.cve-modal-header { margin-bottom: 20px; border-bottom: 3px dashed var(--accent-orange); padding-bottom: 10px; }
-.cve-modal-header h3 { font-family: 'Press Start 2P', monospace; font-size: 20px; color: var(--accent-dark-orange); margin: 0; text-shadow: 2px 2px 0 #fff; }
+.cve-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+    margin-bottom: 14px;
+    border-bottom: 3px dashed var(--accent-orange);
+    padding: 0 54px 12px 0;
+}
+.cve-modal-header h3 {
+    flex: 0 0 auto;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 20px;
+    color: var(--accent-dark-orange);
+    margin: 0;
+    text-shadow: 2px 2px 0 #fff;
+}
+.cve-filter-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    overflow-x: auto;
+    padding: 3px 2px 5px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-yellow) transparent;
+}
+.cve-filter-toolbar::-webkit-scrollbar { height: 5px; }
+.cve-filter-toolbar::-webkit-scrollbar-track { background: transparent; }
+.cve-filter-toolbar::-webkit-scrollbar-thumb { background: var(--accent-yellow); border-radius: 999px; }
+.cve-filter-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex: 0 0 auto;
+}
+.cve-filter-divider {
+    flex: 0 0 auto;
+    width: 2px;
+    height: 24px;
+    background: var(--border-color);
+    opacity: 0.3;
+}
+.cve-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 31px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--text-color);
+    box-shadow: 2px 2px 0 var(--border-color);
+    padding: 6px 9px;
+    white-space: nowrap;
+    cursor: pointer;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    line-height: 1.2;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+.cve-filter-btn:hover,
+.cve-filter-btn:focus-visible {
+    transform: translate(-1px, -1px);
+    background: #fff8d6;
+    box-shadow: 3px 3px 0 var(--border-color);
+}
+.cve-filter-btn:focus-visible {
+    outline: 3px solid var(--accent-orange);
+    outline-offset: 2px;
+}
+.cve-filter-btn.active,
+.cve-filter-btn[aria-pressed="true"] {
+    background: var(--accent-yellow);
+    color: #111;
+    box-shadow: 3px 3px 0 var(--accent-orange);
+}
+.cve-filter-count {
+    display: inline-grid;
+    place-items: center;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    background: #111;
+    color: var(--accent-yellow);
+    padding: 0 4px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 10px;
+    font-weight: 900;
+}
+.cve-filter-status {
+    flex: 0 0 auto;
+    color: var(--accent-dark-orange);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+}
+body.dark-mode .cve-filter-btn {
+    background: #2a2a2a;
+    color: #f1f1f1;
+    border-color: #777;
+    box-shadow: 2px 2px 0 var(--accent-orange);
+}
+body.dark-mode .cve-filter-btn:hover,
+body.dark-mode .cve-filter-btn:focus-visible {
+    background: #333;
+}
+body.dark-mode .cve-filter-btn.active,
+body.dark-mode .cve-filter-btn[aria-pressed="true"] {
+    background: var(--accent-yellow);
+    color: #111;
+}
 /* Split Layout Elements */
 .cve-modal-content {
     display: flex;
@@ -3345,6 +3454,7 @@ td:not(.event) { text-align: center; }
     min-width: 0;
     box-sizing: border-box;
 }
+.cve-card[hidden] { display: none !important; }
 
 /* Invisible hit area expansion to prevent hover loss in gaps */
 .cve-card::before {
@@ -3696,9 +3806,12 @@ body.dark-mode .cve-card.severity-pending .cve-id {
         overflow: hidden;
     }
     .cve-sidebar .cve-modal-header {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
         flex-shrink: 0;
         text-align: left;
-        padding: 4px 6px 12px;
+        padding: 4px 42px 10px 6px;
         border-bottom: 2px dashed var(--accent-yellow);
         margin-bottom: 10px;
     }
@@ -3708,6 +3821,17 @@ body.dark-mode .cve-card.severity-pending .cve-id {
         color: var(--accent-dark-orange);
         margin: 0;
     }
+    .cve-filter-toolbar {
+        flex: 1 1 auto;
+        gap: 6px;
+        padding-bottom: 4px;
+    }
+    .cve-filter-btn {
+        min-height: 30px;
+        padding: 6px 8px;
+        font-size: 6.5px;
+    }
+    .cve-filter-status { font-size: 6.5px; }
     .cve-grid {
         flex: 1;
         display: flex !important;
