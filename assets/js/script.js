@@ -461,18 +461,33 @@ document.addEventListener('DOMContentLoaded', () => {
         const sortSelect = document.getElementById('cve-sort-select');
         if (sortSelect) sortSelect.value = cveSortMode;
 
-        const finderSelect = document.getElementById('cve-finder-select');
-        if (!finderSelect) return;
-
         const defaultFiltersActive = DEFAULT_CVE_FINDER_FILTERS.length === cveFinderFilters.size
             && DEFAULT_CVE_FINDER_FILTERS.every(key => cveFinderFilters.has(key));
+        let selectedFinder = '';
         if (cveFinderFilters.size === 0) {
-            finderSelect.value = 'all';
+            selectedFinder = 'all';
         } else if (defaultFiltersActive) {
-            finderSelect.value = 'default';
+            selectedFinder = 'default';
         } else if (cveFinderFilters.size === 1) {
-            finderSelect.value = Array.from(cveFinderFilters)[0];
+            selectedFinder = Array.from(cveFinderFilters)[0];
         }
+
+        const finderTrigger = document.getElementById('cve-finder-trigger');
+        const finderMenu = document.getElementById('cve-finder-menu');
+        if (!finderTrigger || !finderMenu || !selectedFinder) return;
+
+        const options = Array.from(finderMenu.querySelectorAll('[data-cve-finder]'));
+        const selectedOption = options.find(option => option.dataset.cveFinder === selectedFinder);
+        const triggerLabel = finderTrigger.querySelector('.cve-filter-trigger-label');
+        if (triggerLabel && selectedOption) {
+            triggerLabel.textContent = selectedOption.dataset.label || selectedOption.textContent.trim();
+        }
+        finderTrigger.dataset.value = selectedFinder;
+        options.forEach(option => {
+            const isSelected = option.dataset.cveFinder === selectedFinder;
+            option.classList.toggle('active', isSelected);
+            option.setAttribute('aria-selected', String(isSelected));
+        });
     }
 
     function applyCveGridFilters() {
@@ -521,8 +536,10 @@ document.addEventListener('DOMContentLoaded', () => {
             (item.finders || []).forEach(finder => {
                 const key = normalizeFinderKey(finder);
                 if (!key) return;
+                const finderInfo = getFinderInfo(finder);
                 const current = finderMap.get(key) || {
-                    name: getFinderInfo(finder)?.name || getFinderName(finder),
+                    name: finderInfo?.name || getFinderName(finder),
+                    avatar: finderInfo?.avatar || 'assets/images/v1t.png',
                     count: 0
                 };
                 current.count++;
@@ -556,30 +573,81 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const finderField = document.createElement('div');
         finderField.className = 'cve-filter-field cve-finder-field';
-        const finderSelect = document.createElement('select');
-        finderSelect.id = 'cve-finder-select';
-        finderSelect.className = 'cve-filter-select';
-        finderSelect.setAttribute('aria-label', 'Filter CVEs by finder');
+        document.getElementById('cve-finder-menu')?.remove();
+        const finderTrigger = document.createElement('button');
+        finderTrigger.type = 'button';
+        finderTrigger.id = 'cve-finder-trigger';
+        finderTrigger.className = 'cve-filter-select cve-finder-trigger';
+        finderTrigger.setAttribute('aria-label', 'Filter CVEs by finder');
+        finderTrigger.setAttribute('aria-haspopup', 'listbox');
+        finderTrigger.setAttribute('aria-expanded', 'false');
+        finderTrigger.setAttribute('aria-controls', 'cve-finder-menu');
+        const finderTriggerLabel = document.createElement('span');
+        finderTriggerLabel.className = 'cve-filter-trigger-label';
+        finderTrigger.appendChild(finderTriggerLabel);
 
-        const defaultFinderOption = document.createElement('option');
-        defaultFinderOption.value = 'default';
-        defaultFinderOption.textContent = 'FINDER: RAWR + JAZE';
-        finderSelect.appendChild(defaultFinderOption);
+        const finderMenu = document.createElement('div');
+        finderMenu.id = 'cve-finder-menu';
+        finderMenu.className = 'cve-finder-menu';
+        finderMenu.setAttribute('role', 'listbox');
+        finderMenu.setAttribute('aria-label', 'Filter CVEs by finder');
+        finderMenu.hidden = true;
 
-        const allFindersOption = document.createElement('option');
-        allFindersOption.value = 'all';
-        allFindersOption.textContent = 'FINDER: ALL';
-        finderSelect.appendChild(allFindersOption);
+        function createFinderOption(value, label, avatars = []) {
+            const option = document.createElement('button');
+            option.type = 'button';
+            option.className = 'cve-finder-option';
+            option.dataset.cveFinder = value;
+            option.dataset.label = label;
+            option.setAttribute('role', 'option');
+            option.setAttribute('aria-selected', 'false');
+
+            const optionLabel = document.createElement('span');
+            optionLabel.className = 'cve-finder-option-label';
+            optionLabel.textContent = label;
+            option.appendChild(optionLabel);
+
+            if (avatars.length) {
+                const avatarGroup = document.createElement('span');
+                avatarGroup.className = 'cve-finder-option-avatars';
+                avatarGroup.setAttribute('aria-hidden', 'true');
+                avatars.forEach(({ name, avatar }) => {
+                    const image = document.createElement('img');
+                    image.className = 'cve-finder-option-avatar';
+                    image.src = avatar || 'assets/images/v1t.png';
+                    image.alt = '';
+                    image.loading = 'lazy';
+                    image.title = name;
+                    image.onerror = () => {
+                        image.onerror = null;
+                        image.src = 'assets/images/v1t.png';
+                    };
+                    avatarGroup.appendChild(image);
+                });
+                option.appendChild(avatarGroup);
+            }
+
+            return option;
+        }
+
+        const defaultFinderAvatars = DEFAULT_CVE_FINDER_FILTERS
+            .map(key => finderMap.get(key))
+            .filter(Boolean);
+        finderMenu.append(
+            createFinderOption('default', 'FINDER: RAWR + JAZE', defaultFinderAvatars),
+            createFinderOption('all', 'FINDER: ALL')
+        );
 
         Array.from(finderMap.entries())
             .sort((a, b) => a[1].name.localeCompare(b[1].name, undefined, { sensitivity: 'base' }))
             .forEach(([key, finder]) => {
-                const option = document.createElement('option');
-                option.value = key;
-                option.textContent = `${finder.name.toUpperCase()} (${finder.count})`;
-                finderSelect.appendChild(option);
+                finderMenu.appendChild(createFinderOption(
+                    key,
+                    `${finder.name.toUpperCase()} (${finder.count})`,
+                    [finder]
+                ));
             });
-        finderField.appendChild(finderSelect);
+        finderField.appendChild(finderTrigger);
 
         const status = document.createElement('output');
         status.id = 'cve-filter-status';
@@ -587,14 +655,14 @@ document.addEventListener('DOMContentLoaded', () => {
         status.setAttribute('aria-live', 'polite');
 
         toolbar.append(sortField, finderField, status);
+        document.body.appendChild(finderMenu);
 
         sortSelect.addEventListener('change', () => {
             cveSortMode = sortSelect.value;
             applyCveGridFilters();
         });
 
-        finderSelect.addEventListener('change', () => {
-            const finderKey = finderSelect.value;
+        function selectFinder(finderKey) {
             if (finderKey === 'all') {
                 cveFinderFilters.clear();
             } else if (finderKey === 'default') {
@@ -605,7 +673,82 @@ document.addEventListener('DOMContentLoaded', () => {
                 cveFinderFilters = new Set([finderKey]);
             }
             applyCveGridFilters();
+        }
+
+        function positionFinderMenu() {
+            const triggerRect = finderTrigger.getBoundingClientRect();
+            const viewportGap = 8;
+            finderMenu.style.minWidth = `${Math.max(triggerRect.width, 220)}px`;
+            const menuRect = finderMenu.getBoundingClientRect();
+            const left = Math.max(
+                viewportGap,
+                Math.min(triggerRect.left, window.innerWidth - menuRect.width - viewportGap)
+            );
+            let top = triggerRect.bottom + 7;
+            if (top + menuRect.height > window.innerHeight - viewportGap
+                && triggerRect.top > menuRect.height + viewportGap) {
+                top = triggerRect.top - menuRect.height - 7;
+            }
+            finderMenu.style.left = `${left}px`;
+            finderMenu.style.top = `${Math.max(viewportGap, top)}px`;
+        }
+
+        function setFinderMenuOpen(isOpen, focusSelected = false) {
+            finderMenu.hidden = !isOpen;
+            finderTrigger.setAttribute('aria-expanded', String(isOpen));
+            finderField.classList.toggle('is-open', isOpen);
+            if (!isOpen) return;
+
+            positionFinderMenu();
+            if (focusSelected) {
+                const selectedOption = Array.from(finderMenu.querySelectorAll('[data-cve-finder]'))
+                    .find(option => option.getAttribute('aria-selected') === 'true');
+                (selectedOption || finderMenu.querySelector('[data-cve-finder]'))?.focus();
+            }
+        }
+
+        finderTrigger.addEventListener('click', () => {
+            setFinderMenuOpen(finderMenu.hidden);
         });
+        finderTrigger.addEventListener('keydown', event => {
+            if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                setFinderMenuOpen(true, true);
+            }
+        });
+
+        const finderOptions = Array.from(finderMenu.querySelectorAll('[data-cve-finder]'));
+        finderOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                selectFinder(option.dataset.cveFinder);
+                setFinderMenuOpen(false);
+                finderTrigger.focus();
+            });
+            option.addEventListener('keydown', event => {
+                const currentIndex = finderOptions.indexOf(option);
+                let nextIndex = null;
+                if (event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % finderOptions.length;
+                if (event.key === 'ArrowUp') nextIndex = (currentIndex - 1 + finderOptions.length) % finderOptions.length;
+                if (event.key === 'Home') nextIndex = 0;
+                if (event.key === 'End') nextIndex = finderOptions.length - 1;
+                if (nextIndex !== null) {
+                    event.preventDefault();
+                    finderOptions[nextIndex].focus();
+                } else if (event.key === 'Escape') {
+                    event.preventDefault();
+                    setFinderMenuOpen(false);
+                    finderTrigger.focus();
+                }
+            });
+        });
+
+        document.addEventListener('click', event => {
+            if (!finderField.contains(event.target) && !finderMenu.contains(event.target)) {
+                setFinderMenuOpen(false);
+            }
+        });
+        window.addEventListener('resize', () => setFinderMenuOpen(false));
+        window.addEventListener('scroll', () => setFinderMenuOpen(false));
 
         updateCveFilterControls();
     }
@@ -1478,6 +1621,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!modal) return;
         modal.hidden = true;
         modal.classList.remove('split-mode');
+        const finderMenu = document.getElementById('cve-finder-menu');
+        const finderTrigger = document.getElementById('cve-finder-trigger');
+        if (finderMenu) finderMenu.hidden = true;
+        if (finderTrigger) finderTrigger.setAttribute('aria-expanded', 'false');
+        document.querySelector('.cve-finder-field')?.classList.remove('is-open');
         document.querySelectorAll('.cve-card.active').forEach(c => c.classList.remove('active'));
         document.querySelectorAll('.cve-popup').forEach(p => { p.style.display = 'none'; });
     }
