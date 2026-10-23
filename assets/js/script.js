@@ -7,6 +7,15 @@
 //   const randomIndex = Math.floor(Math.random() * imageSources.length);
 //   document.querySelector('img.logo').src = imageSources[randomIndex];
 const FETCH_TIMEOUT_MS = 10000;
+const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+function resolveSiteAssetPath(path) {
+    const value = String(path || '').trim();
+    if (!value || /^(?:[a-z]+:)?\/\//i.test(value) || value.startsWith('/') || value.startsWith('data:') || value.startsWith('blob:')) {
+        return value;
+    }
+    return `/${value.replace(/^\.\//, '')}`;
+}
 
 async function fetchWithTimeout(resource, options = {}, timeoutMs = FETCH_TIMEOUT_MS) {
     const controller = new AbortController();
@@ -108,7 +117,7 @@ function updateRankInfo(rankData) {
         el.append(iconEl, document.createTextNode(` ${label}: ${value}`));
         if (showCountryFlag && rankData) {
             const flag = document.createElement('img');
-            flag.src = 'assets/images/vn.svg';
+            flag.src = '/assets/images/vn.svg';
             flag.alt = 'Vietnam';
             flag.width = 18;
             flag.style.paddingLeft = '5px';
@@ -185,6 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let cveGridRendered = false;
     let cveGridItems = [];
     let cveSortMode = 'id-desc';
+    let isApplyingCveUrlState = false;
     const DEFAULT_CVE_FINDER_FILTERS = ['rawr', 'jaze'];
     let cveFinderFilters = new Set(DEFAULT_CVE_FINDER_FILTERS);
 
@@ -213,7 +223,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const first = focusable[0];
         const last = focusable[focusable.length - 1];
-        if (event.shiftKey && document.activeElement === first) {
+        if (!modal.contains(document.activeElement)) {
+            event.preventDefault();
+            first.focus();
+        } else if (event.shiftKey && document.activeElement === first) {
             event.preventDefault();
             last.focus();
         } else if (!event.shiftKey && document.activeElement === last) {
@@ -232,15 +245,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const sort = params.get('sort')?.toLowerCase().trim() || null;
             const cveParam = params.get('cve')?.toUpperCase().trim() || null;
             const hash = (window.location.hash || '').replace(/^#/, '').toUpperCase().trim();
-            const cve = hash || cveParam || null;
+            const cve = cveParam || hash || null;
             return { finder, sort, cve };
         } catch (e) {
             return null;
         }
     }
 
-    function syncCveUrlParams() {
-        if (!isStandalonePage) return;
+    function syncCveUrlParams({ mode = 'push' } = {}) {
+        if (!isStandalonePage || isApplyingCveUrlState) return;
         try {
             const url = new URL(window.location.href);
             const params = url.searchParams;
@@ -267,25 +280,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // 3. Active card
-            params.delete('cve');
             const activeCard = document.querySelector('#cve-grid .cve-card.active');
-            let activeId = '';
-            if (activeCard && !activeCard.hidden) {
-                const idEl = activeCard.querySelector('.cve-id');
-                if (idEl) activeId = idEl.textContent.trim().toUpperCase();
-            }
+            const activeId = activeCard && !activeCard.hidden
+                ? String(activeCard.dataset.cveId || '').toUpperCase()
+                : '';
 
             if (activeId) {
-                url.hash = activeId;
+                params.set('cve', activeId);
             } else {
-                url.hash = '';
+                params.delete('cve');
             }
+            // Convert legacy #CVE-... links to the query-string contract.
+            if (/^#CVE-/i.test(url.hash)) url.hash = '';
 
             const searchStr = params.toString() ? `?${params.toString()}` : '';
             const newUrl = `${url.pathname}${searchStr}${url.hash}`;
             const curUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
             if (newUrl !== curUrl) {
-                history.replaceState(null, '', newUrl);
+                const method = mode === 'replace' ? 'replaceState' : 'pushState';
+                history[method]({ cveArchive: true }, '', newUrl);
             }
         } catch (e) {
             console.warn('syncCveUrlParams failed', e);
@@ -294,62 +307,63 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleCveUrlNavigation() {
         if (!isStandalonePage) return;
+        if (!cveGridRendered && !cveGridItems.length) return;
         const urlState = readCveUrlState();
         if (!urlState) return;
 
-        let needRefilter = false;
+        isApplyingCveUrlState = true;
+        try {
+            const allowedSortModes = ['id-desc', 'id-asc', 'severity-desc'];
+            cveSortMode = allowedSortModes.includes(urlState.sort) ? urlState.sort : 'id-desc';
 
-        const nextSort = (urlState.sort && ['id-desc', 'id-asc', 'severity-desc'].includes(urlState.sort))
-            ? urlState.sort
-            : 'id-desc';
-        if (cveSortMode !== nextSort) {
-            cveSortMode = nextSort;
-            needRefilter = true;
-        }
+            const availableFinders = new Set(
+                cveGridItems.flatMap(item => (item.finders || []).map(normalizeFinderKey)).filter(Boolean)
+            );
+            const defaultFinders = DEFAULT_CVE_FINDER_FILTERS.filter(key => availableFinders.has(key));
+            let nextFinderKeys;
 
-        let nextFinderKeys = [];
-        if (urlState.finder === 'all') {
-            nextFinderKeys = [];
-        } else if (urlState.finder === 'default' || !urlState.finder) {
-            nextFinderKeys = DEFAULT_CVE_FINDER_FILTERS;
-        } else {
-            nextFinderKeys = urlState.finder.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
-        }
-
-        const isFinderSame = nextFinderKeys.length === cveFinderFilters.size
-            && nextFinderKeys.every(k => cveFinderFilters.has(k));
-        if (!isFinderSame) {
-            cveFinderFilters = new Set(nextFinderKeys);
-            needRefilter = true;
-        }
-
-        if (needRefilter) {
-            applyCveGridFilters();
-        }
-
-        const currentActive = document.querySelector('#cve-grid .cve-card.active');
-        const currentActiveId = currentActive?.querySelector('.cve-id')?.textContent.trim().toUpperCase();
-        const targetId = urlState.cve;
-
-        if (targetId && targetId !== currentActiveId) {
-            const targetCard = Array.from(document.querySelectorAll('#cve-grid .cve-card')).find(c => {
-                const idEl = c.querySelector('.cve-id');
-                return idEl && idEl.textContent.trim().toUpperCase() === targetId;
-            });
-            if (targetCard) {
-                if (targetCard.hidden) {
-                    targetCard.hidden = false;
-                    targetCard.setAttribute('aria-hidden', 'false');
+            if (urlState.finder === 'all') {
+                nextFinderKeys = [];
+            } else if (urlState.finder === 'default' || !urlState.finder) {
+                nextFinderKeys = defaultFinders;
+                if (urlState.cve) {
+                    const targetItem = cveGridItems.find(item => String(item.id || '').toUpperCase() === urlState.cve);
+                    const targetFinders = (targetItem?.finders || []).map(normalizeFinderKey).filter(Boolean);
+                    if (targetFinders.length && !targetFinders.some(key => defaultFinders.includes(key))) {
+                        nextFinderKeys = targetFinders;
+                    }
                 }
-                if (!targetCard.classList.contains('active')) {
-                    targetCard.click();
-                }
-                targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                const requestedFinders = urlState.finder
+                    .split(',')
+                    .map(value => value.trim().toLowerCase())
+                    .filter(Boolean);
+                nextFinderKeys = requestedFinders.filter(key => availableFinders.has(key));
+                if (requestedFinders.length && !nextFinderKeys.length) nextFinderKeys = defaultFinders;
             }
-        } else if (!targetId && currentActive) {
-            currentActive.classList.remove('active');
-            currentActive.setAttribute('aria-expanded', 'false');
-            if (modal) modal.classList.remove('split-mode');
+
+            cveFinderFilters = new Set(nextFinderKeys);
+            applyCveGridFilters();
+
+            const currentActive = document.querySelector('#cve-grid .cve-card.active');
+            const currentActiveId = currentActive?.dataset.cveId?.toUpperCase();
+            const targetId = urlState.cve;
+            const targetCard = targetId
+                ? document.querySelector(`#cve-grid .cve-card[data-cve-id="${CSS.escape(targetId)}"]`)
+                : null;
+
+            if (targetCard && !targetCard.hidden && targetId !== currentActiveId) {
+                targetCard.click();
+                const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                targetCard.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
+            } else if ((!targetId || !targetCard || targetCard.hidden) && currentActive) {
+                currentActive.classList.remove('active');
+                currentActive.setAttribute('aria-expanded', 'false');
+                if (modal) modal.classList.remove('split-mode');
+            }
+        } finally {
+            isApplyingCveUrlState = false;
+            syncCveUrlParams({ mode: 'replace' });
         }
     }
 
@@ -358,7 +372,14 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.hidden = false;
         if (!isStandalonePage) {
             document.body.classList.add('cve-modal-open');
-            if (focusClose) closeBtn?.focus();
+            if (focusClose && closeBtn) {
+                closeBtn.focus({ preventScroll: true });
+                requestAnimationFrame(() => {
+                    if (!modal.hidden && !modal.contains(document.activeElement)) {
+                        closeBtn.focus({ preventScroll: true });
+                    }
+                });
+            }
         }
 
         if (isStandalonePage) {
@@ -395,34 +416,24 @@ document.addEventListener('DOMContentLoaded', () => {
             hydrateMissingCveCards();
         }
 
-        // Support Deep Linking via URL Hash (#CVE-XXXX-YYYY) or ?cve=
-        const targetCveId = (isStandalonePage ? readCveUrlState()?.cve : null)
-            || (window.location.hash || '').replace(/^#/, '').toUpperCase().trim();
-
-        if (targetCveId) {
-            setTimeout(() => {
-                const targetCard = Array.from(document.querySelectorAll('#cve-grid .cve-card')).find(c => {
-                    const idEl = c.querySelector('.cve-id');
-                    return idEl && idEl.textContent.trim().toUpperCase() === targetCveId;
-                });
-                if (targetCard) {
-                    if (targetCard.hidden) {
-                        targetCard.hidden = false;
-                        targetCard.setAttribute('aria-hidden', 'false');
-                    }
-                    if (!targetCard.classList.contains('active')) {
-                        targetCard.click();
-                    }
-                    targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }
-            }, 80);
+        if (!isStandalonePage && focusClose && closeBtn && !modal.contains(document.activeElement)) {
+            closeBtn.focus({ preventScroll: true });
         }
+
+        if (isStandalonePage) handleCveUrlNavigation();
     }
 
     if (showBtn && modal) {
         showBtn.addEventListener('click', async () => {
-            lastFocusedElement = document.activeElement;
+            lastFocusedElement = document.activeElement && document.activeElement !== document.body
+                ? document.activeElement
+                : showBtn;
             await openCveModal({ focusClose: true });
+            if (!modal.hidden && closeBtn) {
+                setTimeout(() => {
+                    if (!modal.hidden) closeBtn.focus({ preventScroll: true });
+                }, 0);
+            }
         });
     }
 
@@ -439,7 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             // Trigger duck hop animation
             const duckImg = duckToggle.querySelector('.stage-logo');
-            if (duckImg) {
+            if (duckImg && !reducedMotionQuery.matches) {
                 duckImg.classList.add('duck-hop');
                 setTimeout(() => duckImg.classList.remove('duck-hop'), 600);
             }
@@ -472,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const quoteText = m.quote ? `<p class="${quoteClass}">${m.quote}</p>` : '';
             const blogLink = m.blog ? `<a href="${m.blog}" target="_blank" rel="noopener noreferrer">BLOG</a>` : '';
             const role = m.role || 'Member';
-            const avatar = m.avatar || `/assets/images/${(m.id || m.name).toLowerCase()}.png`;
+            const avatar = resolveSiteAssetPath(m.avatar || `/assets/images/${(m.id || m.name).toLowerCase()}.png`);
 
             return `
                 <div class="profile-card">
@@ -539,7 +550,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         membersDataPromise = (async () => {
             try {
-                const res = await fetchWithTimeout('assets/data/members.json');
+                const res = await fetchWithTimeout('/assets/data/members.json');
                 if (!res.ok) {
                     throw new Error(`members.json request failed: HTTP ${res.status}`);
                 }
@@ -551,7 +562,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const memberInfo = {
                         id: m.id || m.name.toLowerCase(),
                         name: m.name,
-                        avatar: m.avatar || `assets/images/${(m.id || m.name).toLowerCase()}.png`,
+                        avatar: resolveSiteAssetPath(m.avatar || `/assets/images/${(m.id || m.name).toLowerCase()}.png`),
                         role: m.role || 'Member',
                         quote: m.quote || '',
                         quoteClass: m.quoteClass || 'quote',
@@ -597,7 +608,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const base = TEAM_MEMBERS[key] || {};
             return {
                 name: name,
-                avatar: finderInput.avatar || base.avatar || `assets/images/${key}.png`,
+                avatar: resolveSiteAssetPath(finderInput.avatar || base.avatar || `/assets/images/${key}.png`),
                 role: finderInput.role || base.role || 'Finder'
             };
         }
@@ -608,7 +619,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return {
             name: name,
-            avatar: `assets/images/${key}.png`,
+            avatar: `/assets/images/${key}.png`,
             role: 'Finder'
         };
     }
@@ -688,15 +699,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const finderTrigger = document.getElementById('cve-finder-trigger');
         const finderMenu = document.getElementById('cve-finder-menu');
-        if (!finderTrigger || !finderMenu || !selectedFinder) return;
+        if (!finderTrigger || !finderMenu) return;
 
         const options = Array.from(finderMenu.querySelectorAll('[data-cve-finder]'));
         const selectedOption = options.find(option => option.dataset.cveFinder === selectedFinder);
         const triggerLabel = finderTrigger.querySelector('.cve-filter-trigger-label');
-        if (triggerLabel && selectedOption) {
-            triggerLabel.textContent = selectedOption.dataset.label || selectedOption.textContent.trim();
+        if (triggerLabel) {
+            if (selectedOption) {
+                triggerLabel.textContent = selectedOption.dataset.label || selectedOption.textContent.trim();
+            } else {
+                const labels = Array.from(cveFinderFilters)
+                    .map(key => getFinderInfo(key)?.name || key)
+                    .map(name => String(name).toUpperCase());
+                triggerLabel.textContent = `FINDER: ${labels.join(' + ')}`;
+            }
         }
-        finderTrigger.dataset.value = selectedFinder;
+        finderTrigger.dataset.value = selectedFinder || 'custom';
         options.forEach(option => {
             const isSelected = option.dataset.cveFinder === selectedFinder;
             option.classList.toggle('active', isSelected);
@@ -727,7 +745,6 @@ document.addEventListener('DOMContentLoaded', () => {
             activeCard.classList.remove('active');
             activeCard.setAttribute('aria-expanded', 'false');
             if (modal) modal.classList.remove('split-mode');
-            if (isStandalonePage) syncCveUrlParams();
         }
 
         document.querySelectorAll('.cve-popup').forEach(popup => {
@@ -972,7 +989,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadCveList() {
-        const listUrl = 'assets/data/cves-list.json';
+        const listUrl = '/assets/data/cves-list.json';
         try {
             const res = await fetchWithTimeout(listUrl);
             if (!res.ok) throw new Error(`cves-list.json request failed: HTTP ${res.status}`);
@@ -1001,7 +1018,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         cveStorePromise = (async () => {
             try {
-                const res = await fetchWithTimeout('assets/data/cves-local.json');
+                const res = await fetchWithTimeout('/assets/data/cves-local.json');
                 if (!res.ok) {
                     throw new Error(`cves-local.json request failed: HTTP ${res.status}`);
                 }
@@ -1388,11 +1405,13 @@ document.addEventListener('DOMContentLoaded', () => {
         backBtn.addEventListener('click', () => {
             const modal = document.getElementById('cve-modal');
             if (modal) modal.classList.remove('split-mode');
-            document.querySelectorAll('.cve-card.active').forEach(c => {
-                c.classList.remove('active');
-                c.setAttribute('aria-expanded', 'false');
+            const activeCards = Array.from(document.querySelectorAll('.cve-card.active'));
+            activeCards.forEach(card => {
+                card.classList.remove('active');
+                card.setAttribute('aria-expanded', 'false');
             });
             if (isStandalonePage) syncCveUrlParams();
+            activeCards[0]?.focus();
         });
     }
 
@@ -1442,6 +1461,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.createElement('button');
         container.type = 'button';
         container.className = 'cve-card';
+        container.dataset.cveId = cveId;
         container.setAttribute('aria-controls', 'cve-detail-view');
         container.setAttribute('aria-expanded', 'false');
         container.setAttribute('aria-label', `View details for ${cveId}`);
@@ -2085,7 +2105,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let currentScroll = 0;
         let groupHeight = 0;
         let isHovered = false;
-        let isTabActive = true;
+        let isTabActive = false;
         let isMouseDown = false;
         let hasDragged = false;
         let startY = 0;
@@ -2116,6 +2136,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let isTouching = false;
         let momentumAnimationId = null;
+        let marqueeAnimationId = null;
         let autoResumeTimer = null;
         let isManualPaused = false;
 
@@ -2136,6 +2157,10 @@ document.addEventListener('DOMContentLoaded', () => {
         function updateHintDisplay() {
             const hintEl = sliderViewport ? sliderViewport.parentElement.querySelector('.kev-hover-hint') : null;
             if (!hintEl) return;
+            if (reducedMotionQuery.matches) {
+                hintEl.textContent = 'Auto-scroll disabled by motion preference';
+                return;
+            }
             if (window.innerWidth <= 768) {
                 if (isManualPaused) {
                     hintEl.innerHTML = '<span style="color:var(--accent-orange,#FF6D00);font-weight:700">⏸ PAUSED</span> • Tap to play';
@@ -2159,8 +2184,28 @@ document.addEventListener('DOMContentLoaded', () => {
             }, delayMs);
         }
 
-        // Animation frame loop
+        function shouldRunMarquee() {
+            return isTabActive && !document.hidden && !reducedMotionQuery.matches;
+        }
+
+        function stopMarqueeLoop() {
+            if (marqueeAnimationId !== null) {
+                cancelAnimationFrame(marqueeAnimationId);
+                marqueeAnimationId = null;
+            }
+        }
+
+        function startMarqueeLoop() {
+            if (marqueeAnimationId !== null || !shouldRunMarquee()) return;
+            lastFrameTime = performance.now();
+            marqueeAnimationId = requestAnimationFrame(marqueeTick);
+        }
+
+        // Animation frame loop. It only exists while the cockpit is visible.
         function marqueeTick(now) {
+            marqueeAnimationId = null;
+            if (!shouldRunMarquee()) return;
+
             const dt = Math.min((now - lastFrameTime) / 1000, 0.1);
             lastFrameTime = now;
 
@@ -2173,9 +2218,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            requestAnimationFrame(marqueeTick);
+            marqueeAnimationId = requestAnimationFrame(marqueeTick);
         }
-        requestAnimationFrame(marqueeTick);
 
         function createKevCard(item) {
             const card = document.createElement('div');
@@ -2231,6 +2275,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function pauseKevMarquee() {
             isTabActive = false;
+            stopMarqueeLoop();
             stopMomentum();
             clearAutoResumeTimer();
         }
@@ -2246,7 +2291,28 @@ document.addEventListener('DOMContentLoaded', () => {
             loopScrollBounds();
             applyTransform();
             updateHintDisplay();
+            startMarqueeLoop();
         }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopMarqueeLoop();
+                stopMomentum();
+            } else {
+                startMarqueeLoop();
+            }
+        });
+
+        reducedMotionQuery.addEventListener('change', () => {
+            if (reducedMotionQuery.matches) {
+                stopMarqueeLoop();
+                stopMomentum();
+                clearAutoResumeTimer();
+            } else {
+                startMarqueeLoop();
+            }
+            updateHintDisplay();
+        });
 
 
         // --- Interaction Handlers: Hover, Wheel, Drag & Touch ---
@@ -2395,7 +2461,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const MAX_V = 2400;
                         velocity = Math.max(-MAX_V, Math.min(MAX_V, velocity));
 
-                        if (Math.abs(velocity) > 60) {
+                        if (!reducedMotionQuery.matches && Math.abs(velocity) > 60) {
                             let lastT = performance.now();
                             function runMomentum(t) {
                                 const delta = Math.min((t - lastT) / 1000, 0.05);
@@ -2463,7 +2529,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 1. Local fallback data
                 try {
-                    const localRes = await fetchWithTimeout('assets/data/cisa-kev.json');
+                    const localRes = await fetchWithTimeout('/assets/data/cisa-kev.json');
                     if (!localRes.ok) throw new Error(`Local KEV request failed: HTTP ${localRes.status}`);
                     const localData = await localRes.json();
                     if (!Array.isArray(localData)) throw new Error('Local KEV data must be an array.');
@@ -2565,7 +2631,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 2. Measure Latency Ping
             const t0 = performance.now();
             try {
-                await fetchWithTimeout('assets/images/V1t_fin.png?t=' + Date.now(), { method: 'HEAD', cache: 'no-store' });
+                await fetchWithTimeout('/assets/images/V1t_fin.png?t=' + Date.now(), { method: 'HEAD', cache: 'no-store' });
                 const rtt = Math.round(performance.now() - t0);
                 if (tracePing) tracePing.textContent = `${rtt}ms RTT • TLS 1.3`;
             } catch (e) {
@@ -2729,6 +2795,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Window hooks for cockpit toggle
         window.onCockpitOpen = () => {
             if (typeof resumeKevMarquee === 'function') resumeKevMarquee();
+            window.v1tTerminal?.start();
             if (!traceExecuted && typeof runClientTrace === 'function') {
                 runClientTrace();
             }
@@ -2740,6 +2807,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         window.onCockpitClose = () => {
             if (typeof pauseKevMarquee === 'function') pauseKevMarquee();
+            window.v1tTerminal?.pause();
             if (pod) {
                 pod.classList.remove('mobile-expanded');
             }

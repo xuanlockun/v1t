@@ -5,7 +5,7 @@
   "scripts": {
     "sync-cves": "node assets/js/update-cves.js",
     "update-cves": "node assets/js/update-cves.js",
-    "check:syntax": "node --check assets/js/cve-list-contract.js && node --check assets/js/validate-cve-list.js && node --check assets/js/script.js && node --check assets/js/update-cves.js",
+    "check:syntax": "node --check assets/js/cve-list-contract.js && node --check assets/js/validate-cve-list.js && node --check assets/js/nav.js && node --check assets/js/terminal.js && node --check assets/js/script.js && node --check assets/js/update-cves.js",
     "validate:data": "node assets/js/validate-cve-list.js",
     "test:data": "node --test tests/cve-list-contract.test.js",
     "validate": "npm run check:syntax && npm run validate:data && npm run test:data"

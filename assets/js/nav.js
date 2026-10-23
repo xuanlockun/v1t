@@ -11,6 +11,7 @@
         const shouldOpen = mobileQuery.matches && isOpen;
         nav.classList.toggle('active', shouldOpen);
         toggle.setAttribute('aria-expanded', String(shouldOpen));
+        toggle.setAttribute('aria-label', shouldOpen ? 'Close navigation menu' : 'Open navigation menu');
 
         if (mobileQuery.matches && !shouldOpen) {
             menu.setAttribute('inert', '');
