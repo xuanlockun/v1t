@@ -197,6 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isApplyingCveUrlState = false;
     const DEFAULT_CVE_FINDER_FILTERS = ['rawr', 'jaze'];
     let cveFinderFilters = new Set(DEFAULT_CVE_FINDER_FILTERS);
+    const cveFilterAnimations = new WeakMap();
 
     const MODAL_FOCUSABLE_SELECTOR = [
         'a[href]',
@@ -722,9 +723,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function applyCveGridFilters() {
+    function applyCveGridFilters({ animate = false } = {}) {
         const grid = document.getElementById('cve-grid');
         if (!grid || !cveGridItems.length) return;
+
+        const shouldAnimate = animate
+            && isStandalonePage
+            && document.visibilityState === 'visible'
+            && typeof Element.prototype.animate === 'function'
+            && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const previousPositions = new Map();
+        if (shouldAnimate) {
+            grid.querySelectorAll('.cve-card:not([hidden])').forEach(card => {
+                previousPositions.set(card, card.getBoundingClientRect());
+            });
+        }
 
         let visibleCount = 0;
         [...cveGridItems].sort(compareCveItems).forEach(item => {
@@ -758,6 +771,40 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         updateCveFilterControls();
+
+        if (shouldAnimate) {
+            const visibleCards = Array.from(grid.querySelectorAll('.cve-card:not([hidden])'));
+            const nextPositions = new Map(
+                visibleCards.map(card => [card, card.getBoundingClientRect()])
+            );
+
+            visibleCards.forEach(card => {
+                const previousAnimation = cveFilterAnimations.get(card);
+                if (previousAnimation) previousAnimation.cancel();
+
+                const nextPosition = nextPositions.get(card);
+                const previousPosition = previousPositions.get(card);
+                const keyframes = previousPosition
+                    ? [
+                        {
+                            transform: `translate3d(${previousPosition.left - nextPosition.left}px, ${previousPosition.top - nextPosition.top}px, 0)`,
+                            opacity: 0.72
+                        },
+                        { transform: 'translate3d(0, 0, 0)', opacity: 1 }
+                    ]
+                    : [
+                        { transform: 'translate3d(0, 8px, 0)', opacity: 0 },
+                        { transform: 'translate3d(0, 0, 0)', opacity: 1 }
+                    ];
+                const animation = card.animate(keyframes, {
+                    duration: 180,
+                    easing: 'ease-out'
+                });
+                cveFilterAnimations.set(card, animation);
+                animation.addEventListener('finish', () => cveFilterAnimations.delete(card), { once: true });
+                animation.addEventListener('cancel', () => cveFilterAnimations.delete(card), { once: true });
+            });
+        }
     }
 
     function renderCveFilterControls(listItems) {
@@ -898,7 +945,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         sortSelect.addEventListener('change', () => {
             cveSortMode = sortSelect.value;
-            applyCveGridFilters();
+            applyCveGridFilters({ animate: true });
             if (isStandalonePage) syncCveUrlParams();
         });
 
@@ -912,7 +959,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 cveFinderFilters = new Set([finderKey]);
             }
-            applyCveGridFilters();
+            applyCveGridFilters({ animate: true });
             if (isStandalonePage) syncCveUrlParams();
         }
 

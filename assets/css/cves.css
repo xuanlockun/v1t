@@ -1,71 +1,47 @@
 /* ========================================================
-   V1T CVE Archive — minimal security ledger
-   This file only reshapes the standalone /cves/ experience.
-   The reusable home-page modal keeps its original presentation.
+   Standalone CVE page adapter
+
+   The archive intentionally inherits every visual and responsive rule from
+   the shared CVE modal in style.css. These rules only place that modal in the
+   normal page flow; filtering, cards, split detail and mobile behavior remain
+   the same component used by the "Show all CVEs" button.
    ======================================================== */
 
 body.cve-page {
-    --cve-page-bg: #f4f2e9;
-    --cve-surface: #fffef9;
-    --cve-surface-muted: #ebe9df;
-    --cve-ink: #1d1d19;
-    --cve-muted: #69685f;
-    --cve-line: #d8d5c9;
-    --cve-accent: #e6ad00;
-    --cve-accent-soft: #fff3bd;
-    --cve-card-bg: #fff8d6;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
     overflow-y: auto;
-    color: var(--cve-ink);
-    background: var(--cve-page-bg);
-    background-image: none;
-}
-
-body.dark-mode.cve-page {
-    --cve-page-bg: #11110f;
-    --cve-surface: #1b1b18;
-    --cve-surface-muted: #24241f;
-    --cve-ink: #f2f1e9;
-    --cve-muted: #aaa99f;
-    --cve-line: #37372f;
-    --cve-accent: #ffca28;
-    --cve-accent-soft: #39331d;
-    --cve-card-bg: #252216;
 }
 
 .cve-page-container {
-    width: min(100% - 40px, 1320px);
+    width: 100%;
     margin: 0 auto;
-    padding: 46px 0 80px;
+    padding: 32px 0 64px;
     flex: 1 0 auto;
 }
 
-/* Turn the shared modal structure into an in-flow archive workspace. */
 body.cve-page .cve-modal {
-    position: static !important;
-    inset: auto !important;
-    z-index: 1 !important;
-    display: flex !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    flex-direction: column !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    background: transparent !important;
-    backdrop-filter: none !important;
-    transition: none !important;
+    position: static;
+    inset: auto;
+    z-index: 1;
+    display: flex;
+    width: 100%;
+    padding: 0;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    transition: none;
 }
 
 body.cve-page .cve-modal[hidden] {
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
 }
 
 body.cve-page .cve-modal-backdrop,
@@ -73,649 +49,226 @@ body.cve-page .cve-close {
     display: none !important;
 }
 
+/* Motion system: short compositor-only transitions layered over the shared UI. */
+@keyframes cve-page-surface-in {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 10px, 0) scale(0.99);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+}
+
+@keyframes cve-page-item-in {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 8px, 0) scale(0.985);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+}
+
+@keyframes cve-page-detail-in {
+    from {
+        opacity: 0;
+        transform: translate3d(10px, 0, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+@keyframes cve-page-menu-in {
+    from {
+        opacity: 0;
+        transform: translate3d(0, -5px, 0) scale(0.985);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+}
+
 body.cve-page .cve-modal-card {
-    position: static !important;
-    display: flex !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    padding: 0 !important;
-    flex-direction: column !important;
-    background: transparent !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    animation: none !important;
+    animation: cve-page-surface-in 200ms ease-out backwards;
+    transform-origin: center top;
 }
 
-/* Index controls */
-body.cve-page .cve-modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    min-width: 0;
-    margin-bottom: 20px;
-    padding: 14px 0;
-    background: transparent;
-    border: 0;
-    border-top: 1px solid var(--cve-line);
-    border-bottom: 1px solid var(--cve-line);
-    border-radius: 0;
-    box-shadow: none;
+body.cve-page .cve-modal-header,
+body.cve-page .cve-filter-field,
+body.cve-page .cve-filter-status {
+    animation: cve-page-item-in 180ms ease-out backwards;
 }
 
-.cve-index-heading {
-    flex: 0 0 auto;
-}
-
-.cve-index-title-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    flex-wrap: wrap;
-}
-
-.cve-index-heading > span {
-    display: block;
-    margin-bottom: 3px;
-    color: var(--cve-muted);
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-}
-
-body.cve-page .cve-modal-header h1 {
-    margin: 0;
-    padding: 0;
-    color: var(--cve-ink);
-    border: 0;
-    font-family: 'Quicksand', sans-serif;
-    font-size: 26px;
-    font-weight: 700;
-    line-height: 1.2;
-    text-align: left;
-    text-shadow: none;
-}
-
-body.cve-page .cve-filter-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    flex: 1 1 auto;
-    gap: 8px;
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-    overflow: visible;
-}
-
-body.cve-page .cve-filter-field {
-    flex: 0 1 auto;
-}
-
-body.cve-page .cve-filter-select {
-    min-height: 44px;
-    max-width: 250px;
-    padding: 0 36px 0 13px;
-    color: var(--cve-ink);
-    background: var(--cve-surface);
-    border: 1px solid var(--cve-line);
-    border-radius: 10px;
-    box-shadow: none;
-    font-family: 'Quicksand', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.015em;
-    transition: border-color 160ms ease, background-color 160ms ease;
-}
-
-body.cve-page .cve-finder-trigger {
-    width: 200px;
-}
-
-body.cve-page .cve-filter-select:hover,
-body.cve-page .cve-filter-select:focus-visible {
-    color: var(--cve-ink);
-    background: var(--cve-accent-soft);
-    border-color: var(--cve-accent);
-    box-shadow: none;
-    transform: none;
-}
-
-body.cve-page .cve-filter-select:focus-visible {
-    outline: 2px solid var(--cve-accent);
-    outline-offset: 2px;
-}
-
-body.cve-page .cve-filter-field::after {
-    right: 13px;
-    color: var(--cve-muted);
-    font-size: 7px;
+body.cve-page .cve-filter-field:nth-child(2) {
+    animation-delay: 25ms;
 }
 
 body.cve-page .cve-filter-status {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 38px;
-    padding: 0 12px;
-    color: #1d1d19;
-    background: var(--accent-yellow);
-    border: 1px solid #d19c00;
-    border-radius: 7px;
-    font-family: 'Quicksand', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-}
-
-body.cve-page .cve-finder-menu {
-    gap: 2px;
-    padding: 5px;
-    color: var(--cve-ink);
-    background: var(--cve-surface);
-    border: 1px solid var(--cve-line);
-    border-radius: 10px;
-    box-shadow: 0 12px 30px rgba(20, 20, 16, 0.16);
-}
-
-body.cve-page .cve-finder-option {
-    min-height: 44px;
-    color: var(--cve-ink);
-    border: 1px solid transparent;
-    border-radius: 7px;
-    font-family: 'Quicksand', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease;
-}
-
-body.cve-page .cve-finder-option:hover,
-body.cve-page .cve-finder-option:focus-visible,
-body.cve-page .cve-finder-option.active {
-    color: var(--cve-ink);
-    background: var(--cve-accent-soft);
-    border-color: var(--cve-accent);
-    outline: 0;
-    transform: none;
-}
-
-body.cve-page .cve-finder-option-avatar {
-    width: 28px;
-    height: 28px;
-    border: 1px solid var(--cve-line);
-    box-shadow: none;
-}
-
-/* Record grid */
-body.cve-page .cve-modal-content {
-    display: flex !important;
-    align-items: flex-start !important;
-    width: 100% !important;
-    height: auto !important;
-    gap: 28px !important;
+    animation-delay: 45ms;
 }
 
 body.cve-page .cve-sidebar {
-    display: flex !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    flex-direction: column !important;
-    transition: none !important;
-}
-
-body.cve-page .cve-grid {
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 10px !important;
-    width: 100% !important;
-    height: auto !important;
-    padding: 0 0 32px !important;
-    overflow: visible !important;
-}
-
-body.cve-page .cve-card {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100% !important;
-    min-width: 0 !important;
-    height: 58px;
-    margin: 0 !important;
-    padding: 8px 12px 8px 18px;
-    color: var(--cve-ink);
-    background: var(--cve-card-bg);
-    border: 1px solid var(--cve-line);
-    border-radius: 9px;
-    box-shadow: none;
-    opacity: 1;
-    transform: none;
-    transition: border-color 140ms ease-out, background-color 140ms ease-out, transform 140ms ease-out;
-}
-
-body.cve-page .cve-card::before {
-    display: none;
-}
-
-body.cve-page .cve-card::after {
-    content: '';
-    position: absolute;
-    top: 7px;
-    bottom: 7px;
-    left: 0;
-    width: 6px;
-    background: var(--cve-severity, #8a8980);
-    border-radius: 0 4px 4px 0;
-    opacity: 0.92;
-    pointer-events: none;
-    transform: scaleX(0.82);
-    transform-origin: left center;
-    transition: transform 140ms ease-out, opacity 140ms ease-out;
-}
-
-body.cve-page .cve-card.severity-critical { --cve-severity: #c83f3f; }
-body.cve-page .cve-card.severity-high { --cve-severity: #e77f16; }
-body.cve-page .cve-card.severity-medium { --cve-severity: #c7a000; }
-body.cve-page .cve-card.severity-low { --cve-severity: #3f955d; }
-body.cve-page .cve-card.severity-pending { --cve-severity: #7b7b73; }
-
-body.cve-page .cve-card.severity-critical,
-body.cve-page .cve-card.severity-high,
-body.cve-page .cve-card.severity-medium,
-body.cve-page .cve-card.severity-low,
-body.cve-page .cve-card.severity-pending {
-    color: var(--cve-ink);
-    background: var(--cve-card-bg);
-    border-top-style: solid;
-    border-right-style: solid;
-    border-bottom-style: solid;
-    background-image: none;
-}
-
-body.cve-page .cve-grid:has(.cve-card:hover) .cve-card:not(:hover),
-body.cve-page .cve-modal.split-mode .cve-grid:has(.cve-card:hover) .cve-card:not(:hover),
-body.cve-page .cve-modal.split-mode .cve-grid .cve-card:hover ~ .cve-card {
-    opacity: 1;
-    transform: none !important;
-}
-
-body.cve-page .cve-card:hover,
-body.cve-page .cve-grid .cve-card:hover,
-body.cve-page .cve-modal.split-mode .cve-grid .cve-card:hover {
-    z-index: 1 !important;
-    background: var(--cve-accent-soft);
-    border-color: var(--cve-accent);
-    box-shadow: none !important;
-    transform: translateY(-1px) !important;
-}
-
-body.cve-page .cve-card.active {
-    color: var(--cve-ink);
-    background: var(--cve-accent-soft);
-    border-color: var(--cve-accent);
-    box-shadow: none;
-    transform: none;
-}
-
-body.cve-page .cve-card:hover::after,
-body.cve-page .cve-card.active::after {
-    opacity: 1;
-    transform: scaleX(1.18);
-}
-
-body.cve-page .cve-card:focus-visible {
-    outline: 2px solid var(--cve-accent);
-    outline-offset: 2px;
-}
-
-body.cve-page .cve-id,
-body.cve-page .cve-card.severity-critical .cve-id,
-body.cve-page .cve-card.severity-high .cve-id,
-body.cve-page .cve-card.severity-pending .cve-id {
-    justify-content: flex-start;
-    padding: 0;
-    color: var(--cve-ink);
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-    font-style: normal;
-    font-weight: 700;
-    letter-spacing: 0;
-    text-align: left;
-    text-shadow: none;
-    opacity: 1;
-}
-
-body.cve-page .cve-card-finders {
-    height: 28px;
-}
-
-body.cve-page .finder-avatar {
-    width: 26px;
-    height: 26px;
-    border: 2px solid var(--cve-surface);
-    box-shadow: none;
-    cursor: default;
     transition: none;
 }
 
-body.cve-page .finder-avatar:hover {
-    z-index: auto;
-    box-shadow: none;
-    transform: none;
+body.cve-page .cve-card {
+    animation: cve-page-item-in 180ms ease-out backwards;
+    transition: transform 160ms ease-out, opacity 160ms ease-out;
 }
 
-body.cve-page .cve-popup {
-    display: none !important;
+body.cve-page .cve-card:nth-child(2),
+body.cve-page .cve-card:nth-child(6),
+body.cve-page .cve-card:nth-child(10),
+body.cve-page .cve-card:nth-child(14),
+body.cve-page .cve-card:nth-child(18),
+body.cve-page .cve-card:nth-child(22) {
+    animation-delay: 20ms;
 }
 
-/* Selected record layout */
-body.cve-page .cve-modal.split-mode .cve-sidebar {
-    position: sticky !important;
-    top: 86px !important;
-    width: 35% !important;
-    min-width: 320px !important;
-    max-width: 420px !important;
-    max-height: calc(100vh - 106px) !important;
-    padding-right: 22px !important;
-    border-right: 1px solid var(--cve-line) !important;
+body.cve-page .cve-card:nth-child(3),
+body.cve-page .cve-card:nth-child(7),
+body.cve-page .cve-card:nth-child(11),
+body.cve-page .cve-card:nth-child(15),
+body.cve-page .cve-card:nth-child(19),
+body.cve-page .cve-card:nth-child(23) {
+    animation-delay: 40ms;
 }
 
-body.cve-page .cve-modal.split-mode .cve-grid {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 8px !important;
-    max-height: calc(100vh - 106px) !important;
-    padding: 0 8px 24px 0 !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
+body.cve-page .cve-card:nth-child(4),
+body.cve-page .cve-card:nth-child(8),
+body.cve-page .cve-card:nth-child(12),
+body.cve-page .cve-card:nth-child(16),
+body.cve-page .cve-card:nth-child(20),
+body.cve-page .cve-card:nth-child(24) {
+    animation-delay: 60ms;
 }
 
-body.cve-page .cve-modal.split-mode .cve-detail-view {
-    position: sticky !important;
-    top: 86px !important;
-    display: flex !important;
-    width: 65% !important;
-    max-height: calc(100vh - 106px) !important;
-    padding: 26px !important;
-    flex: 1 1 auto !important;
-    overflow-y: auto !important;
-    color: var(--cve-ink) !important;
-    background: var(--cve-surface) !important;
-    border: 1px solid var(--cve-line) !important;
-    border-radius: 12px !important;
-    box-shadow: none !important;
+body.cve-page .cve-card:nth-child(5),
+body.cve-page .cve-card:nth-child(9),
+body.cve-page .cve-card:nth-child(13),
+body.cve-page .cve-card:nth-child(17),
+body.cve-page .cve-card:nth-child(21),
+body.cve-page .cve-card:nth-child(25) {
+    animation-delay: 80ms;
 }
 
-body.cve-page .cve-back-btn {
-    display: none !important;
-}
-
-body.cve-page .cve-detail-header {
-    margin-bottom: 24px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--cve-line);
-}
-
-body.cve-page .cve-detail-header h2 {
-    margin: 0 0 14px;
-    padding: 0;
-    color: var(--cve-ink);
-    border: 0;
-    font-family: 'Quicksand', sans-serif;
-    font-size: clamp(22px, 2.2vw, 30px);
-    line-height: 1.2;
-    text-align: left;
-}
-
-body.cve-page .cve-meta-tags {
-    gap: 7px;
-}
-
-body.cve-page .cve-tag,
-body.cve-page .metric-score,
-body.cve-page .cwe-id-badge,
-body.cve-page .version-badge {
-    padding: 5px 8px;
-    border: 1px solid var(--cve-line);
-    border-radius: 5px;
-    box-shadow: none;
-    font-size: 12px;
-}
-
-body.cve-page .detail-row {
-    gap: 14px;
-    margin-bottom: 14px;
-}
-
-body.cve-page .detail-box,
-body.cve-page .cve-raw-json {
-    margin-bottom: 14px;
-    color: var(--cve-ink);
-    background: transparent;
-    border: 1px solid var(--cve-line);
-    border-radius: 8px;
-    box-shadow: none;
-}
-
-body.cve-page .box-title,
-body.cve-page .raw-header {
-    color: var(--cve-ink);
-    background: var(--cve-surface-muted);
-    border-bottom: 1px solid var(--cve-line);
-    font-size: 14px;
-}
-
-body.cve-page .box-content {
-    color: var(--cve-ink);
-    font-size: 15px;
-    line-height: 1.65;
-}
-
-body.cve-page .cve-target-box .box-title {
-    color: var(--cve-ink);
-    background: var(--cve-surface-muted);
-}
-
-body.cve-page .finder-card {
-    color: var(--cve-ink);
-    background: var(--cve-surface-muted);
-    border: 1px solid var(--cve-line);
-    box-shadow: none;
-}
-
-body.cve-page .finder-card:hover {
-    border-color: var(--cve-accent);
-    box-shadow: none;
-    transform: none;
-}
-
-body.cve-page .finder-card-name,
-body.cve-page .finder-card-role {
-    color: var(--cve-ink);
-}
-
-body.cve-page .metric-vector,
-body.cve-page .cve-detail-view pre {
-    color: var(--cve-ink);
-    background: var(--cve-surface-muted);
-    border: 1px solid var(--cve-line);
-}
-
+body.cve-page .cve-filter-select,
+body.cve-page .cve-finder-option,
+body.cve-page .cve-finder-option-avatars,
+body.cve-page .finder-avatar,
+body.cve-page .cve-back-btn,
 body.cve-page .copy-json-btn {
-    min-height: 44px;
-    color: var(--cve-ink);
-    background: var(--cve-surface);
-    border: 1px solid var(--cve-line);
-    transition: border-color 160ms ease, background-color 160ms ease;
+    transition: transform 160ms ease-out, opacity 160ms ease-out;
+}
+
+body.cve-page .finder-avatar:hover {
+    transform: translate3d(0, -1px, 0) scale(1.12);
 }
 
 body.cve-page .copy-json-btn:hover {
-    background: var(--cve-accent-soft);
-    border-color: var(--cve-accent);
+    transform: translate3d(0, -1px, 0);
 }
 
-body.cve-page .cve-grid::-webkit-scrollbar,
-body.cve-page .cve-detail-view::-webkit-scrollbar {
-    width: 7px;
+body.cve-page .copy-json-btn:active {
+    transform: scale(0.97);
 }
 
-body.cve-page .cve-grid::-webkit-scrollbar-track,
-body.cve-page .cve-detail-view::-webkit-scrollbar-track {
-    background: transparent;
-    border: 0;
+body.cve-page > .cve-finder-menu:not([hidden]),
+body.cve-page .cve-popup {
+    animation: cve-page-menu-in 160ms ease-out backwards;
+    transform-origin: center top;
 }
 
-body.cve-page .cve-grid::-webkit-scrollbar-thumb,
-body.cve-page .cve-detail-view::-webkit-scrollbar-thumb {
-    background: var(--cve-line);
-    border: 0;
-    border-radius: 8px;
+body.cve-page .cve-modal.split-mode .cve-detail-view {
+    animation: cve-page-detail-in 200ms ease-out backwards;
 }
 
-@media (max-width: 1080px) {
-    body.cve-page .cve-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+body.cve-page .cve-detail-header,
+body.cve-page .detail-row,
+body.cve-page .detail-box,
+body.cve-page .cve-raw-json {
+    animation: cve-page-item-in 180ms ease-out backwards;
+}
+
+body.cve-page .detail-row,
+body.cve-page .detail-box:nth-of-type(2) {
+    animation-delay: 30ms;
+}
+
+body.cve-page .cve-raw-json {
+    animation-delay: 55ms;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    body.cve-page .cve-grid:has(.cve-card:hover) .cve-card {
+        opacity: 0.82;
+        transform: scale(0.985);
+    }
+
+    body.cve-page .cve-grid .cve-card:hover,
+    body.cve-page .cve-modal.split-mode .cve-grid .cve-card:hover {
+        opacity: 1 !important;
+        transform: translate3d(0, -2px, 0) scale(1.015) !important;
+    }
+
+    body.cve-page .cve-modal.split-mode .cve-grid:has(.cve-card:hover) .cve-card:not(:hover),
+    body.cve-page .cve-modal.split-mode .cve-grid .cve-card:hover ~ .cve-card {
+        opacity: 0.84;
+        transform: scale(0.985) !important;
     }
 }
 
-@media (max-width: 900px) {
-    .cve-page-container {
-        width: min(100% - 28px, 760px);
-        padding-top: 42px;
+@media (hover: none), (pointer: coarse) {
+    body.cve-page .cve-grid:has(.cve-card:hover) .cve-card,
+    body.cve-page .cve-modal.split-mode .cve-grid:has(.cve-card:hover) .cve-card:not(:hover),
+    body.cve-page .cve-modal.split-mode .cve-grid .cve-card:hover ~ .cve-card,
+    body.cve-page .cve-grid .cve-card:hover,
+    body.cve-page .cve-modal.split-mode .cve-grid .cve-card:hover {
+        opacity: 1 !important;
+        transform: none !important;
     }
 
-    body.cve-page .cve-modal-header {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 14px;
-    }
-
-    body.cve-page .cve-filter-toolbar {
-        width: 100%;
-        justify-content: flex-start;
-    }
-
-    body.cve-page .cve-modal.split-mode .cve-sidebar {
-        display: none !important;
-    }
-
-    body.cve-page .cve-modal.split-mode .cve-detail-view {
-        position: static !important;
-        width: 100% !important;
-        max-height: none !important;
-        padding: 22px !important;
-    }
-
-    body.cve-page .cve-back-btn {
-        display: inline-flex !important;
-        align-items: center;
-        gap: 8px;
-        min-height: 44px;
-        margin-bottom: 18px;
-        padding: 0 12px;
-        color: var(--cve-ink);
-        background: transparent;
-        border: 1px solid var(--cve-line);
-        border-radius: 8px;
-        box-shadow: none;
-        font-family: 'Quicksand', sans-serif;
-        font-size: 12px;
-        font-weight: 700;
-        transition: border-color 160ms ease, background-color 160ms ease;
-    }
-
-    body.cve-page .cve-back-btn:hover {
-        color: var(--cve-ink);
-        background: var(--cve-accent-soft);
-        border-color: var(--cve-accent);
-        box-shadow: none;
+    body.cve-page .finder-avatar:hover {
         transform: none;
     }
 }
 
-@media (max-width: 620px) {
+@media (max-width: 768px) {
     .cve-page-container {
-        width: calc(100% - 24px);
-        padding: 28px 0 56px;
-    }
-
-    body.cve-page .cve-filter-toolbar {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        gap: 8px;
-    }
-
-    body.cve-page .cve-filter-field,
-    body.cve-page .cve-filter-select,
-    body.cve-page .cve-finder-trigger {
-        width: 100%;
-        max-width: none;
-    }
-
-    body.cve-page .cve-filter-select {
-        font-size: 10px;
-    }
-
-    body.cve-page .cve-filter-status {
-        min-height: 34px;
-        padding: 0 10px;
-        font-size: 13px;
-    }
-
-    body.cve-page .cve-grid {
-        grid-template-columns: minmax(0, 1fr) !important;
-        gap: 8px !important;
-    }
-
-    body.cve-page .cve-card {
-        height: 56px;
+        padding: 18px 0 40px;
     }
 
     body.cve-page .cve-modal.split-mode .cve-detail-view {
-        padding: 18px 14px !important;
-        border-radius: 10px !important;
-    }
-
-    body.cve-page .cve-detail-header h2 {
-        font-size: 22px;
-    }
-
-    body.cve-page .detail-row {
-        display: block;
-    }
-
-    body.cve-page .flex-1 {
-        min-width: 0;
-    }
-
-    body.cve-page .finders-grid {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    body.cve-page .raw-header {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 10px;
-    }
-}
-
-@media (pointer: coarse) {
-    body.cve-page .cve-card:hover,
-    body.cve-page .cve-grid .cve-card:hover,
-    body.cve-page .cve-modal.split-mode .cve-grid .cve-card:hover {
-        transform: none !important;
+        animation-name: cve-page-item-in;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    body.cve-page *,
-    body.cve-page *::before,
-    body.cve-page *::after {
+    body.cve-page .cve-modal-card,
+    body.cve-page .cve-modal-header,
+    body.cve-page .cve-filter-field,
+    body.cve-page .cve-filter-status,
+    body.cve-page .cve-card,
+    body.cve-page .cve-filter-select,
+    body.cve-page .cve-finder-option,
+    body.cve-page .cve-finder-option-avatars,
+    body.cve-page .finder-avatar,
+    body.cve-page .cve-back-btn,
+    body.cve-page .copy-json-btn,
+    body.cve-page .cve-finder-menu,
+    body.cve-page .cve-popup,
+    body.cve-page .cve-detail-view,
+    body.cve-page .cve-detail-header,
+    body.cve-page .detail-row,
+    body.cve-page .detail-box,
+    body.cve-page .cve-raw-json {
+        animation: none !important;
         transition: none !important;
     }
 }

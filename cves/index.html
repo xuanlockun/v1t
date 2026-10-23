@@ -36,7 +36,7 @@
     <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/assets/css/style.css?v=20261023_minimal_nav_v2">
-    <link rel="stylesheet" href="/assets/css/cves.css?v=20261023_minimal_archive_v2">
+    <link rel="stylesheet" href="/assets/css/cves.css?v=20261023_shared_modal_motion">
     <link rel="stylesheet" href="/assets/css/ansi.css">
 
     <script type="application/ld+json">
@@ -94,23 +94,17 @@
 
     <!-- Main Full-page CVE Archive -->
     <main class="cve-page-container">
-        <div id="cve-modal" class="cve-modal" role="region" aria-label="CVE disclosures archive">
+        <div id="cve-modal" class="cve-modal" role="region" aria-labelledby="cve-modal-title">
             <div class="cve-modal-backdrop" aria-hidden="true" style="display:none;"></div>
             <div class="cve-modal-card">
                 <button class="cve-close" id="cve-close" type="button" aria-hidden="true" style="display:none;">&times;</button>
-                <div class="cve-modal-header">
-                    <div class="cve-index-heading">
-                        <span>Disclosure log</span>
-                        <div class="cve-index-title-row">
-                            <h1 id="cve-modal-title">CVE list</h1>
-                            <output id="cve-filter-status" class="cve-filter-status" aria-live="polite"></output>
-                        </div>
-                    </div>
-                    <div id="cve-filter-toolbar" class="cve-filter-toolbar"
-                        aria-label="Filter and sort CVEs"></div>
-                </div>
                 <div class="cve-modal-content">
                     <div class="cve-sidebar">
+                        <div class="cve-modal-header">
+                            <h3 id="cve-modal-title">All CVEs</h3>
+                            <div id="cve-filter-toolbar" class="cve-filter-toolbar"
+                                aria-label="Filter and sort CVEs"></div>
+                        </div>
                         <div id="cve-grid" class="cve-grid"></div>
                     </div>
                     <div id="cve-detail-view" class="cve-detail-view" aria-live="polite">
@@ -124,7 +118,7 @@
     <!-- Scripts -->
     <script src="/assets/js/cve-list-contract.js?v=20261023_cve_group_input"></script>
     <script src="/assets/js/nav.js?v=20261023_minimal_nav"></script>
-    <script src="/assets/js/script.js?v=20261023_cve_url_motion_v3"></script>
+    <script src="/assets/js/script.js?v=20261023_cve_url_motion_v4"></script>
 </body>
 
 </html>
