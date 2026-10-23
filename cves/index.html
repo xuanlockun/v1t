@@ -36,6 +36,7 @@
     <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/assets/css/style.css?v=20261023_a11y_motion">
+    <link rel="stylesheet" href="/assets/css/cves.css?v=20261023_fullpage">
     <link rel="stylesheet" href="/assets/css/ansi.css">
 
     <script type="application/ld+json">
@@ -67,7 +68,7 @@
     </script>
 </head>
 
-<body class="cve-page cve-modal-open">
+<body class="cve-page">
     <!-- Navbar -->
     <nav>
         <div class="logo">
@@ -91,31 +92,43 @@
         </ul>
     </nav>
 
-    <!-- CVE modal (exact identical layout and styling as the modal) -->
-    <div id="cve-modal" class="cve-modal" role="dialog" aria-modal="true" aria-labelledby="cve-modal-title">
-        <div class="cve-modal-backdrop" aria-hidden="true"></div>
-        <div class="cve-modal-card">
-            <button class="cve-close" id="cve-close" type="button" aria-label="Back to home" title="Back to home">✕</button>
-            <div class="cve-modal-content">
-                <div class="cve-sidebar">
-                    <div class="cve-modal-header">
-                        <h3 id="cve-modal-title">All CVEs</h3>
-                        <div id="cve-filter-toolbar" class="cve-filter-toolbar"
-                            aria-label="Filter and sort CVEs"></div>
-                    </div>
-                    <div id="cve-grid" class="cve-grid"></div>
+    <!-- Main Full-page CVE Archive -->
+    <main class="cve-page-container">
+        <header class="cve-hero-section">
+            <div class="cve-hero-badge">
+                <i class="fa-solid fa-shield-halved"></i> RESEARCH & DISCLOSURES
+            </div>
+            <h1 class="cve-hero-title">ALL DISCLOSED CVES</h1>
+            <p class="cve-hero-subtitle">
+                Security vulnerability disclosures, advisories, and technical CVE research published by V1T team.
+            </p>
+        </header>
+
+        <div id="cve-modal" class="cve-modal" role="region" aria-label="CVE disclosures archive">
+            <div class="cve-modal-backdrop" aria-hidden="true" style="display:none;"></div>
+            <div class="cve-modal-card">
+                <button class="cve-close" id="cve-close" type="button" aria-hidden="true" style="display:none;">✕</button>
+                <div class="cve-modal-header">
+                    <h2 id="cve-modal-title">ARCHIVE</h2>
+                    <div id="cve-filter-toolbar" class="cve-filter-toolbar"
+                        aria-label="Filter and sort CVEs"></div>
                 </div>
-                <div id="cve-detail-view" class="cve-detail-view" aria-live="polite">
-                    <!-- CVE details will be injected here -->
+                <div class="cve-modal-content">
+                    <div class="cve-sidebar">
+                        <div id="cve-grid" class="cve-grid"></div>
+                    </div>
+                    <div id="cve-detail-view" class="cve-detail-view" aria-live="polite">
+                        <!-- CVE details will be injected here -->
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- Scripts -->
     <script src="/assets/js/cve-list-contract.js?v=20261023_cve_group_input"></script>
     <script src="/assets/js/nav.js?v=20261023_a11y_motion"></script>
-    <script src="/assets/js/script.js?v=20261023_cve_url_sync"></script>
+    <script src="/assets/js/script.js?v=20261023_cve_fullpage"></script>
 </body>
 
 </html>
