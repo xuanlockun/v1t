@@ -28,7 +28,8 @@ async function fetchWithTimeout(resource, options = {}, timeoutMs = FETCH_TIMEOU
     }, timeoutMs);
 
     try {
-        return await fetch(resource, { ...options, signal: controller.signal });
+        const fetchUrl = (typeof resource === 'string' && resource.startsWith('assets/')) ? '/' + resource : resource;
+        return await fetch(fetchUrl, { ...options, signal: controller.signal });
     } catch (error) {
         if (timedOut) {
             const timeoutError = new Error(`Request timed out after ${timeoutMs}ms`);
@@ -221,22 +222,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    const isStandalonePage = document.body.classList.contains('cve-page') || (!showBtn && Boolean(modal));
+
+    async function openCveModal({ focusClose = true } = {}) {
+        if (!modal) return;
+        modal.hidden = false;
+        document.body.classList.add('cve-modal-open');
+        if (focusClose) closeBtn?.focus();
+        cveSortMode = 'id-desc';
+        cveFinderFilters = new Set(DEFAULT_CVE_FINDER_FILTERS);
+        if (!cveGridRendered) {
+            cveGridRendered = await renderCveGrid();
+        } else {
+            applyCveGridFilters();
+            hydrateMissingCveCards();
+        }
+
+        // Support Deep Linking via URL Hash (#CVE-XXXX-YYYY)
+        const hash = (window.location.hash || '').replace(/^#/, '').toUpperCase().trim();
+        if (hash) {
+            setTimeout(() => {
+                const targetCard = Array.from(document.querySelectorAll('.cve-card')).find(c => {
+                    const idEl = c.querySelector('.cve-id');
+                    return idEl && idEl.textContent.trim().toUpperCase() === hash;
+                });
+                if (targetCard) {
+                    targetCard.click();
+                    targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }, 60);
+        }
+    }
+
     if (showBtn && modal) {
         showBtn.addEventListener('click', async () => {
             lastFocusedElement = document.activeElement;
-            modal.hidden = false;
-            document.body.classList.add('cve-modal-open');
-            closeBtn?.focus();
-            cveSortMode = 'id-desc';
-            cveFinderFilters = new Set(DEFAULT_CVE_FINDER_FILTERS);
-            // render grid (lazy load data first time)
-            if (!cveGridRendered) {
-                cveGridRendered = await renderCveGrid();
-            } else {
-                applyCveGridFilters();
-                // Retry any CVEs that were still missing when the list was opened before.
-                hydrateMissingCveCards();
-            }
+            await openCveModal({ focusClose: true });
         });
     }
 
@@ -286,11 +307,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const quoteText = m.quote ? `<p class="${quoteClass}">${m.quote}</p>` : '';
             const blogLink = m.blog ? `<a href="${m.blog}" target="_blank" rel="noopener noreferrer">BLOG</a>` : '';
             const role = m.role || 'Member';
-            const avatar = m.avatar || `assets/images/${(m.id || m.name).toLowerCase()}.png`;
+            const avatar = m.avatar || `/assets/images/${(m.id || m.name).toLowerCase()}.png`;
 
             return `
                 <div class="profile-card">
-                    <img src="${avatar}" alt="${m.name}" loading="lazy" onerror="this.onerror=null; this.src='assets/images/v1t.png';">
+                    <img src="${avatar}" alt="${m.name}" loading="lazy" onerror="this.onerror=null; this.src='/assets/images/v1t.png';">
                     <h3>${m.name}</h3>
                     <h4>${role}</h4>
                     ${quoteText}
@@ -568,7 +589,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const finderInfo = getFinderInfo(finder);
                 const current = finderMap.get(key) || {
                     name: finderInfo?.name || getFinderName(finder),
-                    avatar: finderInfo?.avatar || 'assets/images/v1t.png',
+                    avatar: finderInfo?.avatar || '/assets/images/v1t.png',
                     count: 0
                 };
                 current.count++;
@@ -643,13 +664,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 avatars.forEach(({ name, avatar }) => {
                     const image = document.createElement('img');
                     image.className = 'cve-finder-option-avatar';
-                    image.src = avatar || 'assets/images/v1t.png';
+                    image.src = avatar || '/assets/images/v1t.png';
                     image.alt = '';
                     image.loading = 'lazy';
                     image.title = name;
                     image.onerror = () => {
                         image.onerror = null;
-                        image.src = 'assets/images/v1t.png';
+                        image.src = '/assets/images/v1t.png';
                     };
                     avatarGroup.appendChild(image);
                 });
@@ -1004,7 +1025,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 avatar.alt = finder.name;
                 avatar.onerror = () => {
                     avatar.onerror = null;
-                    avatar.src = 'assets/images/v1t.png';
+                    avatar.src = '/assets/images/v1t.png';
                 };
                 const details = createTextElement('div', 'finder-card-details');
                 details.appendChild(createTextElement('div', 'finder-card-name', finder.name));
@@ -1274,7 +1295,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 img.alt = f.name;
                 img.title = `Finder: ${f.name} (${f.role})`;
                 img.loading = 'lazy';
-                img.onerror = () => { img.src = 'assets/images/v1t.png'; };
+                img.onerror = () => { img.src = '/assets/images/v1t.png'; };
                 findersEl.appendChild(img);
             });
             container.appendChild(findersEl);
@@ -1396,7 +1417,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         avatar.alt = finder.name;
                         avatar.onerror = () => {
                             avatar.onerror = null;
-                            avatar.src = 'assets/images/v1t.png';
+                            avatar.src = '/assets/images/v1t.png';
                         };
                         chip.append(avatar, createTextElement('span', 'finder-chip-name', finder.name));
                         findersChips.appendChild(chip);
@@ -1488,11 +1509,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isActive) {
                 // If it was already active, we are closing it
                 if (modal) modal.classList.remove('split-mode');
+                if (isStandalonePage) history.replaceState(null, '', window.location.pathname);
             } else {
                 // Otherwise, mark this one active and open split mode
                 container.classList.add('active');
                 container.setAttribute('aria-expanded', 'true');
                 if (modal) modal.classList.add('split-mode');
+                if (isStandalonePage) history.replaceState(null, '', '#' + cveId);
 
                 const detailView = document.getElementById('cve-detail-view');
                 if (detailView) {
@@ -1631,6 +1654,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function closeModal() {
         if (!modal) return;
+        if (isStandalonePage) {
+            window.location.href = '/';
+            return;
+        }
         modal.hidden = true;
         document.body.classList.remove('cve-modal-open');
         modal.classList.remove('split-mode');
@@ -1666,6 +1693,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             trapModalFocus(e);
         });
+
+    if (isStandalonePage && modal) {
+        openCveModal({ focusClose: false });
+    }
     }
 
     // Expose debug helpers to window for easier console testing

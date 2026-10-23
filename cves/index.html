@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://v1t.site/cves/">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+    <!-- Open Graph SEO -->
+    <meta property="og:title" content="V1T | All CVEs" />
+    <meta property="og:description"
+        content="V1T builds security products, applied research, and engineering systems for teams operating in high-stakes environments.">
+    <meta property="og:url" content="https://v1t.site/cves/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://v1t.site/assets/images/V1t_fin.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1250">
+    <meta property="og:image:height" content="1250">
+    <meta property="og:image:alt" content="V1T logo">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="V1T">
+
+    <title>V1T | All CVEs</title>
+    <meta name="author" content="V1T">
+    <meta name="description"
+        content="V1T builds security products, applied research, and engineering systems for teams operating in high-stakes environments.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="V1T | All CVEs">
+    <meta name="twitter:description"
+        content="V1T builds security products, applied research, and engineering systems for teams operating in high-stakes environments.">
+    <meta name="twitter:image" content="https://v1t.site/assets/images/V1t_fin.png">
+    <meta name="twitter:image:alt" content="V1T logo">
+
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=20261023_a11y_motion">
+    <link rel="stylesheet" href="/assets/css/ansi.css">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://v1t.site/" },
+                    { "@type": "ListItem", "position": 2, "name": "All CVEs", "item": "https://v1t.site/cves/" }
+                ]
+            },
+            {
+                "@type": "WebPage",
+                "@id": "https://v1t.site/cves/#webpage",
+                "url": "https://v1t.site/cves/",
+                "name": "V1T | All CVEs",
+                "description": "V1T security vulnerability disclosures and research publications.",
+                "isPartOf": {
+                    "@type": "WebSite",
+                    "@id": "https://v1t.site/#website",
+                    "url": "https://v1t.site/",
+                    "name": "V1T"
+                }
+            }
+        ]
+    }
+    </script>
+</head>
+
+<body class="cve-page cve-modal-open">
+    <!-- Navbar -->
+    <nav>
+        <div class="logo">
+            <a class="text-white font-bold text-xl tracking-widest pl-2 font-[family-name:var(--font-roboto)]"
+                href="/">V1T</a>
+            <img class="nav-logo-hover" src="/assets/images/V1t_fin.png" alt="V1T Logo" loading="lazy">
+        </div>
+        <button class="hamburger" id="hamburger" type="button" aria-label="Open navigation menu"
+            aria-controls="nav-links" aria-expanded="false">
+            <i class="fa-solid fa-bars" aria-hidden="true"></i>
+        </button>
+        <ul id="nav-links">
+            <li><a href="/"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li><a href="/cves/" class="active" aria-current="page"><i class="fa-solid fa-shield-halved"></i> CVEs</a></li>
+            <li><a href="/ctf/" title="Capture The Flag" aria-label="Capture The Flag"><i class="fa-solid fa-flag"></i> CTF</a></li>
+            <li><a href="/product/"><i class="fa-solid fa-cube"></i> Product</a></li>
+            <li><a href="/#team"><i class="fa-solid fa-users"></i> Team</a></li>
+            <li><a href="/articles/"><i class="fa-solid fa-newspaper"></i> Articles</a></li>
+            <li><a href="/careers/"><i class="fa-solid fa-briefcase"></i> Careers</a></li>
+            <li><button type="button" id="darkModeToggle"><i class="fa-solid fa-moon"></i> Dark Mode</button></li>
+        </ul>
+    </nav>
+
+    <!-- CVE modal (exact identical layout and styling as the modal) -->
+    <div id="cve-modal" class="cve-modal" role="dialog" aria-modal="true" aria-labelledby="cve-modal-title">
+        <div class="cve-modal-backdrop" aria-hidden="true"></div>
+        <div class="cve-modal-card">
+            <button class="cve-close" id="cve-close" type="button" aria-label="Back to home" title="Back to home">✕</button>
+            <div class="cve-modal-content">
+                <div class="cve-sidebar">
+                    <div class="cve-modal-header">
+                        <h3 id="cve-modal-title">All CVEs</h3>
+                        <div id="cve-filter-toolbar" class="cve-filter-toolbar"
+                            aria-label="Filter and sort CVEs"></div>
+                    </div>
+                    <div id="cve-grid" class="cve-grid"></div>
+                </div>
+                <div id="cve-detail-view" class="cve-detail-view" aria-live="polite">
+                    <!-- CVE details will be injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/assets/js/cve-list-contract.js?v=20261023_cve_group_input"></script>
+    <script src="/assets/js/nav.js?v=20261023_a11y_motion"></script>
+    <script src="/assets/js/script.js?v=20261023_cve_page"></script>
+</body>
+
+</html>
