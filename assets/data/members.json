@@ -213,7 +213,7 @@
   {
     "id": "winky",
     "name": "Winky",
-    "role": "vulnerability researcher",
+    "role": "Vulnerability Researcher",
     "avatar": "assets/images/winky.png",
     "quote": "\"Just a noob\"",
     "quoteClass": "quote",
