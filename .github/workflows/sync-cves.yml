@@ -32,7 +32,10 @@ jobs:
           node-version: '20'
 
       - name: Validate sync script
-        run: node --check assets/js/update-cves.js
+        run: npm run check:syntax
+
+      - name: Validate CVE input data
+        run: npm run validate:data
 
       - name: Refresh CVE records
         run: node assets/js/update-cves.js

@@ -6,84 +6,21 @@
     ]
   },
   {
-    "id": "CVE-2026-111830",
-    "finders": [
-      "Jaze",
-      "Rawr"
-    ]
-  },
-  {
-    "id": "CVE-2026-111829",
-    "finders": [
-      "Rawr",
-      "Jaze"
-    ]
-  },
-  {
-    "id": "CVE-2026-111410",
-    "finders": [
-      "Jaze",
-      "Rawr"
-    ]
-  },
-  {
-    "id": "CVE-2026-108168",
-    "finders": [
-      "Rawr",
-      "Jaze"
-    ]
-  },
-  {
-    "id": "CVE-2026-104814",
-    "finders": [
-      "Rawr",
-      "Jaze"
-    ]
-  },
-  {
-    "id": "CVE-2026-104400",
-    "finders": [
-      "Rawr",
-      "Jaze"
-    ]
-  },
-  {
-    "id": "CVE-2026-104398",
-    "finders": [
-      "Rawr",
-      "Jaze"
-    ]
-  },
-  {
-    "id": "CVE-2026-100517",
-    "finders": [
-      "Jaze",
-      "Rawr"
-    ]
-  },
-  {
-    "id": "CVE-2026-96332",
-    "finders": [
-      "Jaze",
-      "Rawr"
-    ]
-  },
-  {
-    "id": "CVE-2026-92412",
-    "finders": [
-      "Jaze",
-      "Rawr"
-    ]
-  },
-  {
-    "id": "CVE-2026-89269",
-    "finders": [
-      "Jaze",
-      "Rawr"
-    ]
-  },
-  {
-    "id": "CVE-2026-84781",
+    "ids": [
+      "CVE-2026-111830",
+      "CVE-2026-111410",
+      "CVE-2026-100517",
+      "CVE-2026-96332",
+      "CVE-2026-92412",
+      "CVE-2026-89269",
+      "CVE-2026-84781",
+      "CVE-2026-81765",
+      "CVE-2026-66687",
+      "CVE-2026-62111",
+      "CVE-2026-62025",
+      "CVE-2026-61985",
+      "CVE-2026-14841"
+    ],
     "finders": [
       "Jaze",
       "Rawr"
@@ -98,168 +35,39 @@
     ]
   },
   {
-    "id": "CVE-2026-81765",
-    "finders": [
-      "Jaze",
-      "Rawr"
-    ]
-  },
-  {
-    "id": "CVE-2026-81292",
-    "finders": [
-      "Rawr",
-      "Jaze"
-    ]
-  },
-  {
-    "id": "CVE-2026-73354",
+    "ids": [
+      "CVE-2026-111829",
+      "CVE-2026-108168",
+      "CVE-2026-104814",
+      "CVE-2026-104400",
+      "CVE-2026-104398",
+      "CVE-2026-81292",
+      "CVE-2026-73354",
+      "CVE-2026-66603",
+      "CVE-2026-66584",
+      "CVE-2026-62127",
+      "CVE-2026-61978"
+    ],
     "finders": [
       "Rawr",
       "Jaze"
     ]
   },
   {
-    "id": "CVE-2026-66603",
-    "finders": [
-      "Rawr",
-      "Jaze"
-    ]
-  },
-  {
-    "id": "CVE-2026-66687",
-    "finders": [
-      "Jaze",
-      "Rawr"
-    ]
-  },
-  {
-    "id": "CVE-2026-66584",
-    "finders": [
-      "Rawr",
-      "Jaze"
-    ]
-  },
-  {
-    "id": "CVE-2026-62127",
-    "finders": [
-      "Rawr",
-      "Jaze"
-    ]
-  },
-  {
-    "id": "CVE-2026-62111",
-    "finders": [
-      "Jaze",
-      "Rawr"
-    ]
-  },
-  {
-    "id": "CVE-2026-62025",
-    "finders": [
-      "Jaze",
-      "Rawr"
-    ]
-  },
-  {
-    "id": "CVE-2026-61978",
-    "finders": [
-      "Rawr",
-      "Jaze"
-    ]
-  },
-  {
-    "id": "CVE-2026-61985",
-    "finders": [
-      "Jaze",
-      "Rawr"
-    ]
-  },
-  {
-    "id": "CVE-2026-14841",
-    "finders": [
-      "Jaze",
-      "Rawr"
-    ]
-  },
-  {
-    "id": "CVE-2026-33368",
+    "ids": [
+      "CVE-2026-33368",
+      "CVE-2026-4800",
+      "CVE-2026-39368",
+      "CVE-2026-39369",
+      "CVE-2026-39370",
+      "CVE-2026-42424",
+      "CVE-2026-43526",
+      "CVE-2026-44974",
+      "CVE-2026-66432",
+      "CVE-2026-101602"
+    ],
     "finders": [
       "Winky"
-    ]
-  },
-  {
-    "id": "CVE-2026-4800",
-    "finders": [
-      "Winky"
-    ]
-  },
-  {
-    "id": "CVE-2026-39368",
-    "finders": [
-      "Winky"
-    ]
-  },
-  {
-    "id": "CVE-2026-39369",
-    "finders": [
-      "Winky"
-    ]
-  },
-  {
-    "id": "CVE-2026-39370",
-    "finders": [
-      "Winky"
-    ]
-  },
-  {
-    "id": "CVE-2026-42424",
-    "finders": [
-      "Winky"
-    ]
-  },
-  {
-    "id": "CVE-2026-43526",
-    "finders": [
-      "Winky"
-    ]
-  },
-  {
-    "id": "CVE-2026-44974",
-    "finders": [
-      "Winky"
-    ]
-  },
-  {
-    "id": "CVE-2026-66432",
-    "finders": [
-      "Winky"
-    ]
-  },
-  {
-    "id": "CVE-2026-101602",
-    "finders": [
-      "Winky"
-    ]
-  },
-  {
-    "id": "CVE-2026-LFI",
-    "finders": [
-      "Rawr",
-      "Jaze"
-    ]
-  },
-  {
-    "id": "CVE-2026-XSS",
-    "finders": [
-      "Jaze",
-      "Rawr"
-    ]
-  },
-  {
-    "id": "CVE-2026-BAC",
-    "finders": [
-      "Jaze",
-      "Rawr"
     ]
   }
 ]

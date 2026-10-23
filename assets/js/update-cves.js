@@ -1,10 +1,11 @@
 const fs = require('fs/promises');
 const path = require('path');
 const { execSync } = require('child_process');
+const { normalizeCveList, isOfficialCveId } = require('./cve-list-contract');
 
 // Script to sync CVE records from MITRE CVE API to assets/data/cves-local.json
 // Can run via CLI (node update-cves.js) or in CI/CD (GitHub Actions / pre-commit).
-// Reads ONLY the 'id' field from assets/data/cves-list.json (finders are strictly UI metadata).
+// Normalizes string, legacy `id`, and grouped `ids` entries (finders remain strictly UI metadata).
 // Preserves all existing local records intact and only fetches missing/unpopulated records.
 
 const repoRoot = path.join(__dirname, '..'); // assets/js -> assets
@@ -12,33 +13,8 @@ const listPath = path.join(repoRoot, 'data', 'cves-list.json');
 const outPath = path.join(repoRoot, 'data', 'cves-local.json');
 const FETCH_TIMEOUT_MS = 20000;
 
-function isValidMitreCveId(id) {
-  return /^CVE-\d{4}-\d{4,}$/i.test(id);
-}
-
 function normalizeTargetIds(rawItems) {
-  if (!Array.isArray(rawItems) || rawItems.length === 0) {
-    return [];
-  }
-
-  const seen = new Set();
-  return rawItems.map((item, index) => {
-    const rawId = typeof item === 'string' ? item : (item && item.id);
-    const id = rawId ? String(rawId).trim().toUpperCase() : '';
-
-    if (!id) {
-      throw new Error(`Invalid cves-list.json item at index ${index}: missing id.`);
-    }
-    if (!/^CVE-\d{4}-(?:\d{4,}|[A-Z][A-Z0-9-]*)$/.test(id)) {
-      throw new Error(`Invalid CVE id at index ${index}: ${id}`);
-    }
-    if (seen.has(id)) {
-      throw new Error(`Duplicate CVE id in cves-list.json: ${id}`);
-    }
-
-    seen.add(id);
-    return id;
-  });
+  return normalizeCveList(rawItems).map(item => item.id);
 }
 
 function addLocalRecord(localMap, record, fallbackId = '') {
@@ -164,7 +140,7 @@ async function main() {
     }
 
     // If ID is not standard MITRE format (e.g. CVE-2026-LFI, CVE-2026-BAC)
-    if (!isValidMitreCveId(id)) {
+    if (!isOfficialCveId(id)) {
       if (!existing) {
         localMap.set(id, {
           dataType: "CVE_RECORD",

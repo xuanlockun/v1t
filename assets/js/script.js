@@ -759,35 +759,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetchWithTimeout(listUrl);
             if (!res.ok) throw new Error(`cves-list.json request failed: HTTP ${res.status}`);
             const rawList = await res.json();
-            if (!Array.isArray(rawList)) return [];
-            return rawList.map(item => {
-                if (typeof item === 'string') {
-                    return {
-                        id: item.trim(),
-                        finders: [],
-                        threat: null,
-                        target: null,
-                        title: null,
-                        cwe: null,
-                        description: null
-                    };
-                }
-                if (!item || typeof item !== 'object') return null;
-                const id = String(item.id || item.cveId || item.cve || '').trim();
-                let finders = item.finders || item.finder || [];
-                if (!Array.isArray(finders)) {
-                    finders = finders ? [finders] : [];
-                }
-                return {
-                    id,
-                    finders,
-                    threat: typeof item.threat === 'string' && item.threat.trim() ? item.threat.trim().toUpperCase() : null,
-                    target: typeof item.target === 'string' && item.target.trim() ? item.target.trim() : null,
-                    title: typeof item.title === 'string' && item.title.trim() ? item.title.trim() : null,
-                    cwe: typeof item.cwe === 'string' && item.cwe.trim() ? item.cwe.trim().toUpperCase() : null,
-                    description: typeof item.description === 'string' && item.description.trim() ? item.description.trim() : null
-                };
-            }).filter(item => Boolean(item && item.id));
+            const contract = window.V1TCveListContract;
+            if (!contract || typeof contract.normalizeCveList !== 'function') {
+                throw new Error('CVE list contract failed to load.');
+            }
+            return contract.normalizeCveList(rawList);
         } catch (e) {
             console.warn('Failed to load cves-list.json', e);
             return [];
