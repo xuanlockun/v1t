@@ -36,7 +36,7 @@
     <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <link rel="stylesheet" href="assets/css/style.css?v=20261022_cve_finder_avatar">
+    <link rel="stylesheet" href="assets/css/style.css?v=20261023_a11y_motion">
     <link rel="stylesheet" href="assets/css/ansi.css">
     <script type="application/ld+json">
     {
@@ -96,9 +96,10 @@
                 href="/">V1T</a>
             <img class="nav-logo-hover" src="assets/images/V1t_fin.png" alt="V1T Logo" loading="lazy">
         </div>
-        <div class="hamburger" id="hamburger">
-            <i class="fa-solid fa-bars"></i>
-        </div>
+        <button class="hamburger" id="hamburger" type="button" aria-label="Open navigation menu"
+            aria-controls="nav-links" aria-expanded="false">
+            <i class="fa-solid fa-bars" aria-hidden="true"></i>
+        </button>
         <ul id="nav-links">
             <li><a href="/"><i class="fa-solid fa-house"></i> Home</a></li>
             <li><a href="/ctf/" title="Capture The Flag" aria-label="Capture The Flag"><i class="fa-solid fa-flag"></i>
@@ -335,20 +336,21 @@
     <div class="profile-container" id="profile-container"></div>
 
     <!-- CVE modal (full-screen card) -->
-    <div id="cve-modal" class="cve-modal" hidden>
-        <div class="cve-modal-backdrop"></div>
+    <div id="cve-modal" class="cve-modal" role="dialog" aria-modal="true" aria-labelledby="cve-modal-title"
+        hidden>
+        <div class="cve-modal-backdrop" aria-hidden="true"></div>
         <div class="cve-modal-card">
-            <button class="cve-close" id="cve-close" aria-label="Close CVE list">✕</button>
+            <button class="cve-close" id="cve-close" type="button" aria-label="Close CVE list">✕</button>
             <div class="cve-modal-content">
                 <div class="cve-sidebar">
                     <div class="cve-modal-header">
-                        <h3>All CVEs</h3>
+                        <h3 id="cve-modal-title">All CVEs</h3>
                         <div id="cve-filter-toolbar" class="cve-filter-toolbar"
                             aria-label="Filter and sort CVEs"></div>
                     </div>
-                    <div id="cve-grid" class="cve-grid" role="list"></div>
+                    <div id="cve-grid" class="cve-grid"></div>
                 </div>
-                <div id="cve-detail-view" class="cve-detail-view">
+                <div id="cve-detail-view" class="cve-detail-view" aria-live="polite">
                     <!-- CVE details will be injected here -->
                 </div>
             </div>
@@ -358,8 +360,9 @@
     <!-- Scripts -->
     <script src="assets/js/cve-list-contract.js?v=20261023_cve_group_input"></script>
     <script src="assets/js/commands.js"></script>
-    <script src="assets/js/terminal.js"></script>
-    <script src="assets/js/script.js?v=20261023_cve_group_input"></script>
+    <script src="assets/js/nav.js?v=20261023_a11y_motion"></script>
+    <script src="assets/js/terminal.js?v=20261023_a11y_motion"></script>
+    <script src="assets/js/script.js?v=20261023_a11y_motion"></script>
 </body>
 
 </html>

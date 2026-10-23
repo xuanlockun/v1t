@@ -3522,6 +3522,7 @@ body.dark-mode .cve-finder-option.active {
 
 /* CVE card minimal rectangle */
 .cve-card { 
+    appearance: none;
     background: #fff;
     border: 3px solid var(--border-color);
     padding: 7px 14px;
@@ -3538,6 +3539,9 @@ body.dark-mode .cve-finder-option.active {
     width: 100%;
     min-width: 0;
     box-sizing: border-box;
+    color: inherit;
+    font: inherit;
+    text-align: left;
 }
 .cve-card[hidden] { display: none !important; }
 
@@ -4448,7 +4452,21 @@ body.dark-mode #dataTable tbody tr:last-child td:last-child {
 .small_container a.team-article-btn:hover { background: var(--accent-orange) !important; }
 
 /* ===== MOBILE RESPONSIVENESS ===== */
-.hamburger { display: none; }
+.hamburger {
+    display: none;
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--accent-yellow);
+    font: inherit;
+}
+
+.hamburger:focus-visible,
+.cve-close:focus-visible,
+.cve-card:focus-visible {
+    outline: 3px solid var(--accent-yellow);
+    outline-offset: 3px;
+}
 
 /* Compact navbar for tablet landscape (769px - 960px) */
 @media screen and (min-width: 769px) and (max-width: 960px) {
@@ -4475,7 +4493,16 @@ body.dark-mode #dataTable tbody tr:last-child td:last-child {
         border-radius: 20px;
     }
     nav .logo { padding: 5px 0; }
-    .hamburger { display: block; color: var(--accent-yellow); font-size: 20px; cursor: pointer; }
+    .hamburger {
+        display: inline-grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border-radius: 10px;
+        font-size: 20px;
+        cursor: pointer;
+    }
     
     nav ul {
         position: absolute; top: 100%; right: 0; left: 0; width: 100%;
@@ -4489,13 +4516,22 @@ body.dark-mode #dataTable tbody tr:last-child td:last-child {
         border-radius: 20px;
         box-shadow: 0 10px 40px rgba(0,0,0,0.7);
         max-height: 0; overflow: hidden; opacity: 0;
-        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease, margin-top 0.4s ease;
+        visibility: hidden;
+        pointer-events: none;
+        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease, margin-top 0.4s ease, visibility 0s linear 0.4s;
     }
 
 /* Ensure popup is fixed and always above everything (override earlier rules) */
 .cve-popup { display: none !important; position: fixed !important; left: 0 !important; top: 0 !important; z-index: 99999 !important; width: min(520px, 92vw) !important; max-height: 78vh !important; overflow: auto !important; background: var(--card-bg) !important; border: 3px solid var(--border-color) !important; padding: 14px !important; border-radius: 10px !important; box-shadow: 12px 12px 0 var(--accent-yellow) !important; box-sizing: border-box !important; }
 
-    nav.active ul { max-height: 500px; opacity: 1; padding-bottom: 10px; }
+    nav.active ul {
+        max-height: 500px;
+        opacity: 1;
+        padding-bottom: 10px;
+        visibility: visible;
+        pointer-events: auto;
+        transition-delay: 0s;
+    }
     nav ul li { padding: 10px 20px; text-align: center; }
     
     h1, .h1-like { font-size: 18px; margin: 30px 10px 10px; }
@@ -4840,6 +4876,26 @@ body.dark-mode .brand-mascot-wrap:hover .duck-click-pill {
     background: var(--accent-yellow);
     color: #111;
     border-color: var(--accent-yellow);
+}
+
+body.cve-modal-open {
+    overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html:focus-within {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-delay: 0ms !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 
 

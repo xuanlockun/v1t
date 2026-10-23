@@ -200,7 +200,7 @@
   {
     "id": "jayce",
     "name": "Jayce",
-    "role": "Web",
+    "role": "BugBounty Hunter",
     "avatar": "assets/images/jayce.png",
     "quote": "\"Mốc 7 học viện\"",
     "quoteClass": "quote",
@@ -213,7 +213,7 @@
   {
     "id": "winky",
     "name": "Winky",
-    "role": "Web",
+    "role": "vulnerability researcher",
     "avatar": "assets/images/winky.png",
     "quote": "\"Just a noob\"",
     "quoteClass": "quote",

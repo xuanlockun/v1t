@@ -26,7 +26,7 @@
     <meta name="twitter:image" content="https://v1t.site/assets/images/V1t_fin.png">
     <meta name="twitter:image:alt" content="V1T logo">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=20261023_a11y_motion">
     <link rel="stylesheet" href="/assets/css/product.css">
     <script type="application/ld+json">
     {
@@ -46,9 +46,10 @@
             <a href="/">V1T</a>
             <img class="nav-logo-hover" src="/assets/images/V1t_fin.png" alt="V1T Logo" loading="lazy">
         </div>
-        <div class="hamburger" id="hamburger">
-            <i class="fa-solid fa-bars"></i>
-        </div>
+        <button class="hamburger" id="hamburger" type="button" aria-label="Open navigation menu"
+            aria-controls="nav-links" aria-expanded="false">
+            <i class="fa-solid fa-bars" aria-hidden="true"></i>
+        </button>
         <ul id="nav-links">
             <li><a href="/"><i class="fa-solid fa-house"></i> Home</a></li>
             <li><a href="/ctf/" title="Capture The Flag" aria-label="Capture The Flag"><i class="fa-solid fa-flag"></i> CTF</a></li>
@@ -92,12 +93,9 @@
     </main>
     <footer class="product-footer product-shell"><div><b>V1T</b><p>Security review and software<br>engineering for teams that ship.</p></div><div><strong>Services</strong><a href="#services">V1T Security</a><a href="#services">V1T Forge</a><a href="#services">Audit &amp; Research</a></div><div><strong>Company</strong><a href="/#team">About Us</a><a href="/careers/">Careers</a><a href="#contact">Contact</a></div><div><strong>Resources</strong><a href="/articles/">Articles</a><a href="/ctf/">CTF</a><a href="/">Home</a></div><div><strong>Follow us</strong><p class="socials"><a href="https://discord.com/invite/WyYTC2EZqK" target="_blank" rel="noopener noreferrer" aria-label="V1T on Discord"><i class="fa-brands fa-discord"></i></a><a href="https://www.instagram.com/v1tnamese/" target="_blank" rel="noopener noreferrer" aria-label="V1T on Instagram"><i class="fa-brands fa-instagram"></i></a><a href="https://www.linkedin.com/company/v1t-quack/" target="_blank" rel="noopener noreferrer" aria-label="V1T on LinkedIn"><i class="fa-brands fa-linkedin"></i></a></p></div><small>© 2026 V1T Services. All rights reserved.</small></footer>
 
+    <script src="/assets/js/nav.js?v=20261023_a11y_motion"></script>
     <script>
-        const nav = document.querySelector('nav');
-        const hamburger = document.getElementById('hamburger');
         const darkModeToggle = document.getElementById('darkModeToggle');
-
-        hamburger.addEventListener('click', () => nav.classList.toggle('active'));
 
         if (localStorage.getItem('darkMode') === 'enabled') {
             document.body.classList.add('dark-mode');

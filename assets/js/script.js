@@ -44,14 +44,6 @@ async function fetchWithTimeout(resource, options = {}, timeoutMs = FETCH_TIMEOU
     }
 }
 
-// Hamburger toggle
-const hamburger = document.getElementById('hamburger');
-const nav = document.querySelector('nav');
-
-hamburger.addEventListener('click', () => {
-    nav.classList.toggle('active');
-});
-
 document.addEventListener("DOMContentLoaded", () => {
     const toggleLink = document.getElementById("darkModeToggle");
     const body = document.body;
@@ -188,15 +180,53 @@ document.addEventListener('DOMContentLoaded', () => {
     const showBtn = document.getElementById('show-cves');
     const modal = document.getElementById('cve-modal');
     const closeBtn = document.getElementById('cve-close');
+    let lastFocusedElement = null;
     let cveGridRendered = false;
     let cveGridItems = [];
     let cveSortMode = 'id-desc';
     const DEFAULT_CVE_FINDER_FILTERS = ['rawr', 'jaze'];
     let cveFinderFilters = new Set(DEFAULT_CVE_FINDER_FILTERS);
 
+    const MODAL_FOCUSABLE_SELECTOR = [
+        'a[href]',
+        'button:not([disabled])',
+        'input:not([disabled])',
+        'select:not([disabled])',
+        'textarea:not([disabled])',
+        '[tabindex]:not([tabindex="-1"])'
+    ].join(',');
+
+    function getModalFocusableElements() {
+        if (!modal || modal.hidden) return [];
+        return Array.from(modal.querySelectorAll(MODAL_FOCUSABLE_SELECTOR))
+            .filter(element => !element.hidden && element.getClientRects().length > 0);
+    }
+
+    function trapModalFocus(event) {
+        if (event.key !== 'Tab' || !modal || modal.hidden) return;
+        const focusable = getModalFocusableElements();
+        if (!focusable.length) {
+            event.preventDefault();
+            return;
+        }
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+        }
+    }
+
     if (showBtn && modal) {
         showBtn.addEventListener('click', async () => {
+            lastFocusedElement = document.activeElement;
             modal.hidden = false;
+            document.body.classList.add('cve-modal-open');
+            closeBtn?.focus();
             cveSortMode = 'id-desc';
             cveFinderFilters = new Set(DEFAULT_CVE_FINDER_FILTERS);
             // render grid (lazy load data first time)
@@ -207,8 +237,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Retry any CVEs that were still missing when the list was opened before.
                 hydrateMissingCveCards();
             }
-            const firstFocusable = modal.querySelector('.cve-close');
-            if (firstFocusable) firstFocusable.focus();
         });
     }
 
@@ -511,6 +539,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const activeCard = grid.querySelector('.cve-card.active');
         if (activeCard && activeCard.hidden) {
             activeCard.classList.remove('active');
+            activeCard.setAttribute('aria-expanded', 'false');
             if (modal) modal.classList.remove('split-mode');
         }
 
@@ -1217,9 +1246,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function makeCveCardElement(cveId, record, finders = [], inlineItem = null) {
-        const container = document.createElement('div');
+        const container = document.createElement('button');
+        container.type = 'button';
         container.className = 'cve-card';
-        container.tabIndex = 0;
+        container.setAttribute('aria-controls', 'cve-detail-view');
+        container.setAttribute('aria-expanded', 'false');
+        container.setAttribute('aria-label', `View details for ${cveId}`);
 
         // Determine severity class based on local data if available
         const severityClass = getSeverityClass(record, inlineItem);
@@ -1448,7 +1480,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const isActive = container.classList.contains('active');
 
             // Remove active from all cards
-            document.querySelectorAll('.cve-card').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.cve-card').forEach(card => {
+                card.classList.remove('active');
+                card.setAttribute('aria-expanded', 'false');
+            });
 
             if (isActive) {
                 // If it was already active, we are closing it
@@ -1456,6 +1491,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 // Otherwise, mark this one active and open split mode
                 container.classList.add('active');
+                container.setAttribute('aria-expanded', 'true');
                 if (modal) modal.classList.add('split-mode');
 
                 const detailView = document.getElementById('cve-detail-view');
@@ -1596,14 +1632,22 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeModal() {
         if (!modal) return;
         modal.hidden = true;
+        document.body.classList.remove('cve-modal-open');
         modal.classList.remove('split-mode');
         const finderMenu = document.getElementById('cve-finder-menu');
         const finderTrigger = document.getElementById('cve-finder-trigger');
         if (finderMenu) finderMenu.hidden = true;
         if (finderTrigger) finderTrigger.setAttribute('aria-expanded', 'false');
         document.querySelector('.cve-finder-field')?.classList.remove('is-open');
-        document.querySelectorAll('.cve-card.active').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.cve-card.active').forEach(card => {
+            card.classList.remove('active');
+            card.setAttribute('aria-expanded', 'false');
+        });
         document.querySelectorAll('.cve-popup').forEach(p => { p.style.display = 'none'; });
+        if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+            lastFocusedElement.focus();
+        }
+        lastFocusedElement = null;
     }
 
     if (closeBtn && modal) closeBtn.addEventListener('click', closeModal);
@@ -1614,7 +1658,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !modal.hidden) closeModal();
+            if (modal.hidden) return;
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                closeModal();
+                return;
+            }
+            trapModalFocus(e);
         });
     }
 

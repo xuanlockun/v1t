@@ -26,7 +26,7 @@
     <meta name="twitter:image" content="https://v1t.site/assets/images/V1t_fin.png">
     <meta name="twitter:image:alt" content="V1T logo">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=20261023_a11y_motion">
     <link rel="stylesheet" href="/assets/css/careers.css">
     <script type="application/ld+json">
     {
@@ -46,9 +46,10 @@
             <a href="/">V1T</a>
             <img class="nav-logo-hover" src="/assets/images/V1t_fin.png" alt="V1T Logo" loading="lazy">
         </div>
-        <div class="hamburger" id="hamburger">
-            <i class="fa-solid fa-bars"></i>
-        </div>
+        <button class="hamburger" id="hamburger" type="button" aria-label="Open navigation menu"
+            aria-controls="nav-links" aria-expanded="false">
+            <i class="fa-solid fa-bars" aria-hidden="true"></i>
+        </button>
         <ul id="nav-links">
             <li><a href="/"><i class="fa-solid fa-house"></i> Home</a></li>
             <li><a href="/ctf/" title="Capture The Flag" aria-label="Capture The Flag"><i class="fa-solid fa-flag"></i> CTF</a></li>
@@ -160,7 +161,8 @@
         </section>
     </main>
 
-    <script src="/assets/js/script.js"></script>
+    <script src="/assets/js/nav.js?v=20261023_a11y_motion"></script>
+    <script src="/assets/js/script.js?v=20261023_a11y_motion"></script>
 </body>
 
 </html>
