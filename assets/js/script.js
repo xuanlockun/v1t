@@ -753,7 +753,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const status = document.getElementById('cve-filter-status');
         if (status) {
-            status.textContent = `${visibleCount}/${cveGridItems.length}`;
+            status.textContent = `${visibleCount} / ${cveGridItems.length} CVEs`;
             status.setAttribute('aria-label', `${visibleCount} of ${cveGridItems.length} CVEs shown`);
         }
 
@@ -882,12 +882,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         finderField.appendChild(finderTrigger);
 
-        const status = document.createElement('output');
-        status.id = 'cve-filter-status';
-        status.className = 'cve-filter-status';
-        status.setAttribute('aria-live', 'polite');
+        toolbar.append(sortField, finderField);
 
-        toolbar.append(sortField, finderField, status);
+        // The standalone archive owns its count next to the title. Modal views
+        // create the same live output inside the toolbar as a fallback.
+        let status = document.getElementById('cve-filter-status');
+        if (!status) {
+            status = document.createElement('output');
+            status.id = 'cve-filter-status';
+            status.className = 'cve-filter-status';
+            status.setAttribute('aria-live', 'polite');
+            toolbar.appendChild(status);
+        }
         document.body.appendChild(finderMenu);
 
         sortSelect.addEventListener('change', () => {
