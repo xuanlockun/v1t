@@ -224,13 +224,168 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const isStandalonePage = document.body.classList.contains('cve-page') || (!showBtn && Boolean(modal));
 
+    function readCveUrlState() {
+        if (!isStandalonePage) return null;
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const finder = params.get('finder')?.toLowerCase().trim() || null;
+            const sort = params.get('sort')?.toLowerCase().trim() || null;
+            const cveParam = params.get('cve')?.toUpperCase().trim() || null;
+            const hash = (window.location.hash || '').replace(/^#/, '').toUpperCase().trim();
+            const cve = hash || cveParam || null;
+            return { finder, sort, cve };
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function syncCveUrlParams() {
+        if (!isStandalonePage) return;
+        try {
+            const url = new URL(window.location.href);
+            const params = url.searchParams;
+
+            // 1. Finder param
+            const isDefaultFinder = DEFAULT_CVE_FINDER_FILTERS.length === cveFinderFilters.size
+                && DEFAULT_CVE_FINDER_FILTERS.every(key => cveFinderFilters.has(key));
+
+            if (isDefaultFinder) {
+                params.delete('finder');
+            } else if (cveFinderFilters.size === 0) {
+                params.set('finder', 'all');
+            } else if (cveFinderFilters.size === 1) {
+                params.set('finder', Array.from(cveFinderFilters)[0]);
+            } else {
+                params.set('finder', Array.from(cveFinderFilters).join(','));
+            }
+
+            // 2. Sort param
+            if (!cveSortMode || cveSortMode === 'id-desc') {
+                params.delete('sort');
+            } else {
+                params.set('sort', cveSortMode);
+            }
+
+            // 3. Active card
+            params.delete('cve');
+            const activeCard = document.querySelector('#cve-grid .cve-card.active');
+            let activeId = '';
+            if (activeCard && !activeCard.hidden) {
+                const idEl = activeCard.querySelector('.cve-id');
+                if (idEl) activeId = idEl.textContent.trim().toUpperCase();
+            }
+
+            if (activeId) {
+                url.hash = activeId;
+            } else {
+                url.hash = '';
+            }
+
+            const searchStr = params.toString() ? `?${params.toString()}` : '';
+            const newUrl = `${url.pathname}${searchStr}${url.hash}`;
+            const curUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+            if (newUrl !== curUrl) {
+                history.replaceState(null, '', newUrl);
+            }
+        } catch (e) {
+            console.warn('syncCveUrlParams failed', e);
+        }
+    }
+
+    function handleCveUrlNavigation() {
+        if (!isStandalonePage) return;
+        const urlState = readCveUrlState();
+        if (!urlState) return;
+
+        let needRefilter = false;
+
+        const nextSort = (urlState.sort && ['id-desc', 'id-asc', 'severity-desc'].includes(urlState.sort))
+            ? urlState.sort
+            : 'id-desc';
+        if (cveSortMode !== nextSort) {
+            cveSortMode = nextSort;
+            needRefilter = true;
+        }
+
+        let nextFinderKeys = [];
+        if (urlState.finder === 'all') {
+            nextFinderKeys = [];
+        } else if (urlState.finder === 'default' || !urlState.finder) {
+            nextFinderKeys = DEFAULT_CVE_FINDER_FILTERS;
+        } else {
+            nextFinderKeys = urlState.finder.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+        }
+
+        const isFinderSame = nextFinderKeys.length === cveFinderFilters.size
+            && nextFinderKeys.every(k => cveFinderFilters.has(k));
+        if (!isFinderSame) {
+            cveFinderFilters = new Set(nextFinderKeys);
+            needRefilter = true;
+        }
+
+        if (needRefilter) {
+            applyCveGridFilters();
+        }
+
+        const currentActive = document.querySelector('#cve-grid .cve-card.active');
+        const currentActiveId = currentActive?.querySelector('.cve-id')?.textContent.trim().toUpperCase();
+        const targetId = urlState.cve;
+
+        if (targetId && targetId !== currentActiveId) {
+            const targetCard = Array.from(document.querySelectorAll('#cve-grid .cve-card')).find(c => {
+                const idEl = c.querySelector('.cve-id');
+                return idEl && idEl.textContent.trim().toUpperCase() === targetId;
+            });
+            if (targetCard) {
+                if (targetCard.hidden) {
+                    targetCard.hidden = false;
+                    targetCard.setAttribute('aria-hidden', 'false');
+                }
+                if (!targetCard.classList.contains('active')) {
+                    targetCard.click();
+                }
+                targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        } else if (!targetId && currentActive) {
+            currentActive.classList.remove('active');
+            currentActive.setAttribute('aria-expanded', 'false');
+            if (modal) modal.classList.remove('split-mode');
+        }
+    }
+
     async function openCveModal({ focusClose = true } = {}) {
         if (!modal) return;
         modal.hidden = false;
         document.body.classList.add('cve-modal-open');
         if (focusClose) closeBtn?.focus();
-        cveSortMode = 'id-desc';
-        cveFinderFilters = new Set(DEFAULT_CVE_FINDER_FILTERS);
+
+        if (isStandalonePage) {
+            const urlState = readCveUrlState();
+            if (urlState) {
+                if (urlState.sort && ['id-desc', 'id-asc', 'severity-desc'].includes(urlState.sort)) {
+                    cveSortMode = urlState.sort;
+                } else {
+                    cveSortMode = 'id-desc';
+                }
+
+                if (urlState.finder) {
+                    if (urlState.finder === 'all') {
+                        cveFinderFilters.clear();
+                    } else if (urlState.finder === 'default') {
+                        cveFinderFilters = new Set(DEFAULT_CVE_FINDER_FILTERS);
+                    } else {
+                        const keys = urlState.finder.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+                        cveFinderFilters = new Set(keys);
+                    }
+                } else {
+                    cveFinderFilters = new Set(DEFAULT_CVE_FINDER_FILTERS);
+                }
+            }
+        } else {
+            cveSortMode = 'id-desc';
+            cveFinderFilters = new Set(DEFAULT_CVE_FINDER_FILTERS);
+        }
+
         if (!cveGridRendered) {
             cveGridRendered = await renderCveGrid();
         } else {
@@ -238,19 +393,27 @@ document.addEventListener('DOMContentLoaded', () => {
             hydrateMissingCveCards();
         }
 
-        // Support Deep Linking via URL Hash (#CVE-XXXX-YYYY)
-        const hash = (window.location.hash || '').replace(/^#/, '').toUpperCase().trim();
-        if (hash) {
+        // Support Deep Linking via URL Hash (#CVE-XXXX-YYYY) or ?cve=
+        const targetCveId = (isStandalonePage ? readCveUrlState()?.cve : null)
+            || (window.location.hash || '').replace(/^#/, '').toUpperCase().trim();
+
+        if (targetCveId) {
             setTimeout(() => {
-                const targetCard = Array.from(document.querySelectorAll('.cve-card')).find(c => {
+                const targetCard = Array.from(document.querySelectorAll('#cve-grid .cve-card')).find(c => {
                     const idEl = c.querySelector('.cve-id');
-                    return idEl && idEl.textContent.trim().toUpperCase() === hash;
+                    return idEl && idEl.textContent.trim().toUpperCase() === targetCveId;
                 });
                 if (targetCard) {
-                    targetCard.click();
+                    if (targetCard.hidden) {
+                        targetCard.hidden = false;
+                        targetCard.setAttribute('aria-hidden', 'false');
+                    }
+                    if (!targetCard.classList.contains('active')) {
+                        targetCard.click();
+                    }
                     targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
-            }, 60);
+            }, 80);
         }
     }
 
@@ -562,6 +725,7 @@ document.addEventListener('DOMContentLoaded', () => {
             activeCard.classList.remove('active');
             activeCard.setAttribute('aria-expanded', 'false');
             if (modal) modal.classList.remove('split-mode');
+            if (isStandalonePage) syncCveUrlParams();
         }
 
         document.querySelectorAll('.cve-popup').forEach(popup => {
@@ -710,6 +874,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sortSelect.addEventListener('change', () => {
             cveSortMode = sortSelect.value;
             applyCveGridFilters();
+            if (isStandalonePage) syncCveUrlParams();
         });
 
         function selectFinder(finderKey) {
@@ -723,6 +888,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 cveFinderFilters = new Set([finderKey]);
             }
             applyCveGridFilters();
+            if (isStandalonePage) syncCveUrlParams();
         }
 
         function positionFinderMenu() {
@@ -1220,7 +1386,11 @@ document.addEventListener('DOMContentLoaded', () => {
         backBtn.addEventListener('click', () => {
             const modal = document.getElementById('cve-modal');
             if (modal) modal.classList.remove('split-mode');
-            document.querySelectorAll('.cve-card.active').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.cve-card.active').forEach(c => {
+                c.classList.remove('active');
+                c.setAttribute('aria-expanded', 'false');
+            });
+            if (isStandalonePage) syncCveUrlParams();
         });
     }
 
@@ -1509,13 +1679,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isActive) {
                 // If it was already active, we are closing it
                 if (modal) modal.classList.remove('split-mode');
-                if (isStandalonePage) history.replaceState(null, '', window.location.pathname);
+                if (isStandalonePage) syncCveUrlParams();
             } else {
                 // Otherwise, mark this one active and open split mode
                 container.classList.add('active');
                 container.setAttribute('aria-expanded', 'true');
                 if (modal) modal.classList.add('split-mode');
-                if (isStandalonePage) history.replaceState(null, '', '#' + cveId);
+                if (isStandalonePage) syncCveUrlParams();
 
                 const detailView = document.getElementById('cve-detail-view');
                 if (detailView) {
@@ -1620,6 +1790,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        if (isStandalonePage) {
+            const urlState = readCveUrlState();
+            if (urlState?.cve && !urlState?.finder) {
+                const targetItem = listItems.find(it => String(it.id || '').toUpperCase() === urlState.cve);
+                if (targetItem) {
+                    const itemFinders = (targetItem.finders || []).map(normalizeFinderKey).filter(Boolean);
+                    const inDefault = itemFinders.some(f => DEFAULT_CVE_FINDER_FILTERS.includes(f));
+                    if (!inDefault && itemFinders.length > 0) {
+                        cveFinderFilters = new Set(itemFinders);
+                    }
+                }
+            }
+        }
+
         cveCardContexts.clear();
         cveGridItems = listItems;
         renderCveFilterControls(listItems);
@@ -1696,6 +1880,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (isStandalonePage && modal) {
         openCveModal({ focusClose: false });
+        window.addEventListener('popstate', handleCveUrlNavigation);
+        window.addEventListener('hashchange', handleCveUrlNavigation);
     }
     }
 
