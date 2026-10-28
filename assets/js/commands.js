@@ -25,6 +25,6 @@ const COMMANDS = [{
     "   $ curl v1t.site/ping       Ping",
     "   $ curl v1t.site/help       Help",
     "   $ curl v1t.site/duck       Duck",
-    "   $ curl v1t.site/flag       Flag for v1t ctf 2026",
+    "   $ curl v1t.site/flag       Flag for v1t ctf 2027",
   ]
 }];
