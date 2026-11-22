@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V1T Lab</title>
+    <meta name="description" content="Security research and vulnerability disclosures from V1T.">
+    <link rel="canonical" href="https://v1t.site/lab/">
+    <link rel="icon" href="/favicon.ico">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="V1T Lab">
+    <meta property="og:description" content="Security research and vulnerability disclosures from V1T.">
+    <meta property="og:url" content="https://v1t.site/lab/">
+    <meta property="og:image" content="https://v1t.site/assets/images/V1t_fin.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v=20261023_minimal_nav_v2">
+    <style>
+        .lab-main {
+            width: min(100% - 2rem, 52rem);
+            margin-inline: auto;
+            padding-block: clamp(3rem, 10vw, 7rem);
+        }
+
+        .lab-heading {
+            margin: 0;
+            font-size: clamp(1.4rem, 6vw, 2.75rem);
+            text-align: left;
+        }
+
+        .lab-intro {
+            margin: 1rem 0 2.5rem;
+            font-size: 1.125rem;
+        }
+
+        .lab-archive {
+            padding: clamp(1.25rem, 4vw, 2rem);
+            border: 3px solid var(--border-color);
+            border-radius: 16px;
+            background: var(--card-bg);
+            box-shadow: 5px 5px 0 var(--border-color);
+        }
+
+        .lab-archive h2 {
+            margin: 0;
+            border: 0;
+            padding: 0;
+            color: inherit;
+            line-height: 1.5;
+            text-align: left;
+        }
+
+        .lab-archive p {
+            margin: 0.75rem 0 1.25rem;
+        }
+
+        .lab-archive .hub-btn {
+            gap: 0.65rem;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">
+            <a href="/">V1T</a>
+            <img class="nav-logo-hover" src="/assets/images/V1t_fin.png" alt="V1T Logo" loading="lazy">
+        </div>
+        <button class="hamburger" id="hamburger" type="button" aria-label="Open navigation menu"
+            aria-controls="nav-links" aria-expanded="false">
+            <i class="fa-solid fa-bars" aria-hidden="true"></i>
+        </button>
+        <ul id="nav-links">
+            <li><a href="/"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li><a href="/lab/" class="active" aria-current="page"><i class="fa-solid fa-flask" aria-hidden="true"></i> V1T Lab</a></li>
+            <li><a href="/ctf/" title="Capture The Flag" aria-label="Capture The Flag"><i class="fa-solid fa-flag"></i> CTF</a></li>
+            <li><a href="/product/"><i class="fa-solid fa-cube"></i> Product</a></li>
+            <li><a href="/#team"><i class="fa-solid fa-users"></i> Team</a></li>
+            <li><a href="/articles/"><i class="fa-solid fa-newspaper"></i> Articles</a></li>
+            <li><a href="/careers/"><i class="fa-solid fa-briefcase"></i> Careers</a></li>
+            <li><button type="button" id="darkModeToggle"><i class="fa-solid fa-moon"></i> Dark Mode</button></li>
+        </ul>
+    </nav>
+
+    <main class="lab-main">
+        <h1 class="lab-heading">V1T Lab</h1>
+        <p class="lab-intro">Security research and vulnerability disclosures from V1T.</p>
+
+        <section class="lab-archive" aria-labelledby="lab-archive-heading">
+            <h2 id="lab-archive-heading"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> CVE Archive</h2>
+            <p>Browse CVE records and filter by researcher.</p>
+            <a class="hub-btn hub-btn-cve" href="/lab/cves/">
+                Browse CVEs <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            </a>
+        </section>
+    </main>
+
+    <script src="/assets/js/nav.js?v=20261023_minimal_nav"></script>
+    <script src="/assets/js/script.js?v=20261023_cve_url_motion_v4"></script>
+</body>
+</html>
