@@ -1,5 +1,5 @@
 const COMMANDS = [{
-  cmd: "curl v1t.site/duck",
+  cmd: "curl v1t.site/ctf",
   lines: [
     "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠿⠿⠿⠿⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿",
     "⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⣉⡥⠶⢶⣿⣿⣿⣿⣷⣆⠉⠛⠿⣿⣿⣿⣿⣿⣿⣿",
@@ -14,17 +14,17 @@ const COMMANDS = [{
     "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⡘⣿⣿⣿⣿⣿⣿⣿⡇⣼⣿⣿⣿⣿⣿⣿⣿⣿",
     "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣇⢸⣿⣿⣿⣿⣿⣿⠁⣿⣿⣿⣿⣿⣿⣿⣿⣿",
     "",
-    "  ┌─About───────────────────────────────┐  ┌─Socials───┬─────────────────────────────────┐",
-    "  │                                     │  │           │                                 │",
-    "  │ Yo what's up everyone we are V1t    │  │ CTFTime   │ https://ctftime.org/team/371186 │",
-    "  │ We are not hacker, we are duck      │  │ Discord   │ https://discord.gg/P2k7NTXNks   │",
-    "  └─────────────────────────────────────┘  │           │                                 │",
-    "                                           └───────────┴─────────────────────────────────┘",
+    "  ┌─Upcoming───────────────────┐ ┌─Past Events────┬────────────────────────┐",
+    "  │                            │ │                │                        │",
+    "  │ V1T CTF 2027               │ │ V1T CTF 2026   │ https://2026.v1t.site  │",
+    "  │ Date: Coming soon          │ │ V1T CTF 2025   │ https://2025.v1t.site  │",
+    "  │                            │ │                │                        │",
+    "  └────────────────────────────┘ └────────────────┴────────────────────────┘",
     "    Commands",
     "",
     "   $ curl v1t.site/ping       Ping",
     "   $ curl v1t.site/help       Help",
-    "   $ curl v1t.site/duck       Duck",
+    "   $ curl v1t.site/ctf        Capture the Flag",
     "   $ curl v1t.site/flag       Flag for v1t ctf 2027",
   ]
 }];

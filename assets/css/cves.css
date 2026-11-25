@@ -1,10 +1,8 @@
 /* ========================================================
    Standalone CVE page adapter
 
-   The archive intentionally inherits every visual and responsive rule from
-   the shared CVE modal in style.css. These rules only place that modal in the
-   normal page flow; filtering, cards, split detail and mobile behavior remain
-   the same component used by the "Show all CVEs" button.
+   The archive inherits the CVE component styles from style.css.
+   These rules place the component in the normal page flow.
    ======================================================== */
 
 body.cve-page {

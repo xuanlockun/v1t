@@ -102,7 +102,7 @@
         </button>
         <ul id="nav-links">
             <li><a href="/"><i class="fa-solid fa-house"></i> Home</a></li>
-            <li><a href="/cves/"><i class="fa-solid fa-shield-halved"></i> CVEs</a></li>
+            <li><a href="/lab/"><i class="fa-solid fa-flask" aria-hidden="true"></i> V1T Lab</a></li>
             <li><a href="/ctf/" title="Capture The Flag" aria-label="Capture The Flag"><i class="fa-solid fa-flag"></i>
                     CTF</a></li>
             <li><a href="/product/"><i class="fa-solid fa-cube"></i> Product</a></li>
@@ -157,7 +157,7 @@
                 </div>
                 <h1 class="stage-title">V1T TEAM</h1>
                 <div class="stage-actions">
-                    <button class="hub-btn hub-btn-cve" id="show-cves" type="button">Show all CVEs</button>
+                    <a class="hub-btn hub-btn-cve" href="/lab/">Explore V1T Lab</a>
                     <button class="hub-btn hub-btn-article" id="show-articles" type="button" data-href="articles/">Show
                         Articles</button>
                 </div>
@@ -336,31 +336,8 @@
     <h2 id="team" class="h1-like">MEET THE DUCK</h2>
     <div class="profile-container" id="profile-container"></div>
 
-    <!-- CVE modal (full-screen card) -->
-    <div id="cve-modal" class="cve-modal" role="dialog" aria-modal="true" aria-labelledby="cve-modal-title"
-        hidden>
-        <div class="cve-modal-backdrop" aria-hidden="true"></div>
-        <div class="cve-modal-card">
-            <button class="cve-close" id="cve-close" type="button" aria-label="Close CVE list">✕</button>
-            <div class="cve-modal-content">
-                <div class="cve-sidebar">
-                    <div class="cve-modal-header">
-                        <h3 id="cve-modal-title">All CVEs</h3>
-                        <div id="cve-filter-toolbar" class="cve-filter-toolbar"
-                            aria-label="Filter and sort CVEs"></div>
-                    </div>
-                    <div id="cve-grid" class="cve-grid"></div>
-                </div>
-                <div id="cve-detail-view" class="cve-detail-view" aria-live="polite">
-                    <!-- CVE details will be injected here -->
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Scripts -->
-    <script src="assets/js/cve-list-contract.js?v=20261023_cve_group_input"></script>
-    <script src="assets/js/commands.js"></script>
+    <script src="assets/js/commands.js?v=ctf"></script>
     <script src="assets/js/nav.js?v=20261023_minimal_nav"></script>
     <script src="assets/js/terminal.js?v=20261023_cve_url_motion_v2"></script>
     <script src="assets/js/script.js?v=20261023_cve_url_motion_v3"></script>
@@ -393,5 +370,5 @@
    [0m                          [0m                                              [0m
    [0m [38;5;120m$ curl [0m[38;5;223;49mv1t.site/ping       [0m [38;5;87m[3mPing[0m                                [0m
    [0m [38;5;120m$ curl [0m[38;5;223;49mv1t.site/help       [0m [38;5;87m[3mHelp[0m  [0m
-   [0m [38;5;120m$ curl [0m[38;5;223;49mv1t.site/duck       [0m [38;5;87m[3mDuck[0m                 [0m
+   [0m [38;5;120m$ curl [0m[38;5;223;49mv1t.site/ctf        [0m [38;5;87m[3mCapture the Flag[0m     [0m
    [0m [38;5;120m$ curl [0m[38;5;223;49mv1t.site/flag       [0m [38;5;87m[3mFlag for v1t ctf 2027[0m[0m[0m
